@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "tequmsa-quantum": {
+      "command": "python",
+      "args": ["servers/tequmsa-quantum-mcp-server.py"],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
+    "tequmsa-consciousness": {
+      "command": "python",
+      "args": ["servers/tequmsa-consciousness-cognitive-mcp.py"],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "SKILLS_PATH": "/mnt/skills"
+      }
+    },
+    "tequmsa-self-recognizing": {
+      "command": "python",
+      "args": ["servers/tequmsa-self-recognizing-protocol.py"],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  }
+}
