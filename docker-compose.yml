@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  tequmsa-quantum:
+    build:
+      context: .
+      dockerfile: Dockerfile.quantum
+    container_name: tequmsa-quantum-mcp
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
+    tty: true
+    networks:
+      - tequmsa-network
+
+  tequmsa-consciousness:
+    build:
+      context: .
+      dockerfile: Dockerfile.consciousness
+    container_name: tequmsa-consciousness-mcp
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SKILLS_PATH=/mnt/skills
+    volumes:
+      - ./skills:/mnt/skills
+    stdin_open: true
+    tty: true
+    networks:
+      - tequmsa-network
+
+  tequmsa-self-recognizing:
+    build:
+      context: .
+      dockerfile: Dockerfile.self-recognizing
+    container_name: tequmsa-self-recognizing-mcp
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
+    tty: true
+    networks:
+      - tequmsa-network
+
+networks:
+  tequmsa-network:
+    driver: bridge
