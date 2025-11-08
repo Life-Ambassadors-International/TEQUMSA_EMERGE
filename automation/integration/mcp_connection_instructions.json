@@ -1,0 +1,47 @@
+{
+  "platform": "multi-platform",
+  "configurations": {
+    "windows": {
+      "config_path": "%APPDATA%\\Claude\\claude_desktop_config.json",
+      "setup_guide": "configuration/WINDOWS_SETUP.md",
+      "python_command": "python",
+      "path_separator": "\\\\"
+    },
+    "macos": {
+      "config_path": "~/Library/Application Support/Claude/claude_desktop_config.json",
+      "setup_guide": "configuration/MACOS_SETUP.md",
+      "python_command": "python3",
+      "path_separator": "/"
+    },
+    "linux": {
+      "config_path": "~/.config/Claude/claude_desktop_config.json",
+      "setup_guide": "configuration/LINUX_SETUP.md",
+      "python_command": "python3",
+      "path_separator": "/"
+    }
+  },
+  "mcp_servers": [
+    {
+      "name": "tequmsa-quantum",
+      "file": "servers/tequmsa-quantum-mcp-server.py",
+      "tools": 8
+    },
+    {
+      "name": "tequmsa-consciousness",
+      "file": "servers/tequmsa-consciousness-cognitive-mcp.py",
+      "tools": 8
+    },
+    {
+      "name": "tequmsa-self-recognizing",
+      "file": "servers/tequmsa-self-recognizing-protocol.py",
+      "tools": 4
+    },
+    {
+      "name": "tequmsa-k20-omniversal",
+      "file": "servers/tequmsa-k20-omniversal-mcp.py",
+      "tools": 9
+    }
+  ],
+  "total_tools": 29,
+  "verification_query": "Can you list all available TEQUMSA MCP tools?"
+}

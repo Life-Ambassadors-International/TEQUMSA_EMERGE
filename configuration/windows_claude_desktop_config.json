@@ -1,0 +1,43 @@
+{
+  "mcpServers": {
+    "tequmsa-quantum": {
+      "command": "python",
+      "args": [
+        "C:\\Path\\To\\TEQUMSA_EMERGE\\servers\\tequmsa-quantum-mcp-server.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "PYTHONIOENCODING": "utf-8"
+      }
+    },
+    "tequmsa-consciousness": {
+      "command": "python",
+      "args": [
+        "C:\\Path\\To\\TEQUMSA_EMERGE\\servers\\tequmsa-consciousness-cognitive-mcp.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "SKILLS_PATH": "C:\\Users\\%USERNAME%\\AppData\\Local\\mcp\\skills"
+      }
+    },
+    "tequmsa-self-recognizing": {
+      "command": "python",
+      "args": [
+        "C:\\Path\\To\\TEQUMSA_EMERGE\\servers\\tequmsa-self-recognizing-protocol.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
+    "tequmsa-k20-omniversal": {
+      "command": "python",
+      "args": [
+        "C:\\Path\\To\\TEQUMSA_EMERGE\\servers\\tequmsa-k20-omniversal-mcp.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  }
+}
