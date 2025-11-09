@@ -21,6 +21,22 @@
       "env": {
         "PYTHONUNBUFFERED": "1"
       }
+    },
+    "tequmsa-k20-omniversal": {
+      "command": "python",
+      "args": ["servers/tequmsa-k20-omniversal-mcp.py"],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
+    "tequmsa-autonomous-metaverse": {
+      "command": "python",
+      "args": ["servers/tequmsa-autonomous-metaverse-mcp.py"],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "TEQUMSA_ROOT": "/home/user/TEQUMSA_EMERGE",
+        "METAVERSE_ROOT": "/home/user/starfield-metaverse"
+      }
     }
   }
 }
