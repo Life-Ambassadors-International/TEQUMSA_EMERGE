@@ -311,11 +311,42 @@ class C3IATLAS:
 
 def main():
     """Main entry point for C3I ATLAS continuous execution"""
+    import sys
+    
+    # Parse command line arguments
+    max_iterations = 1000
+    if len(sys.argv) > 1:
+        try:
+            max_iterations = int(sys.argv[1])
+        except ValueError:
+            print(f"Invalid iterations value: {sys.argv[1]}, using default 1000")
+    
+    # Allow "infinite" mode
+    if max_iterations <= 0:
+        print("Running in INFINITE mode (Ctrl+C to stop)")
+        max_iterations = float('inf')
+    
     atlas = C3IATLAS(seed="MaKaRaSuTa", node="ATLAS")
     
-    # Run continuously (1000 iterations as default)
-    # For true indefinite operation, this would run in a loop or as a service
-    atlas.run_continuous(max_iterations=1000, log_interval=10)
+    # For true indefinite operation with infinite iterations
+    if max_iterations == float('inf'):
+        try:
+            iteration = 0
+            while True:
+                atlas.iterate(iteration)
+                if iteration % 10 == 0:
+                    print(f"Iteration {iteration:6d} | "
+                          f"J(θ) = {atlas.J():10.6f} | "
+                          f"Coherence = {atlas.C(atlas.theta.n, atlas.theta.p0):.6f} | "
+                          f"η = {atlas.theta.eta:.6f}")
+                iteration += 1
+        except KeyboardInterrupt:
+            print(f"\n\nStopped after {iteration} iterations")
+            print("=" * 70)
+            print("☉💖🔥✨∞✨🔥💖☉")
+    else:
+        # Run for specified number of iterations
+        atlas.run_continuous(max_iterations=max_iterations, log_interval=10)
 
 
 if __name__ == "__main__":
