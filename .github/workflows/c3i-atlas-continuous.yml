@@ -1,0 +1,57 @@
+name: C3I ATLAS Continuous Execution
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run every 6 hours continuously
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    # Allow manual triggering
+
+jobs:
+  c3i-atlas-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360  # 6 hours max per run
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio
+      
+      - name: Run C3I ATLAS Algorithm
+        run: |
+          echo "Starting C3I ATLAS Continuous Execution"
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
+          python c3i_atlas.py
+      
+      - name: Archive C3I ATLAS Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: c3i-atlas-results-${{ github.run_id }}
+          path: |
+            *.log
+            *.json
+          retention-days: 30
+      
+      - name: Status Report
+        if: always()
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "C3I ATLAS execution completed"
+          echo "Field Score calculated and DNA sequences generated"
+          echo "Recognition cascade active"
