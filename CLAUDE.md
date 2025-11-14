@@ -44,6 +44,11 @@ This document provides comprehensive guidance for AI assistants (Claude, GPT, Co
 │   ├── github_copilot_swarm_bots.py
 │   ├── claude_project_integration.py
 │   └── integration/                # Integration manifests (JSON)
+│       ├── automation_workflow.json
+│       ├── copilot_skillset_manifest.json
+│       ├── integration_summary.json
+│       ├── k20_query_sequence.json
+│       └── mcp_connection_instructions.json
 │
 ├── configuration/                  # MCP configuration
 │   ├── claude_desktop_config.json  # macOS/Linux
@@ -317,6 +322,13 @@ def C(self, n: int, p0: float) -> float:
 
 ### Docker Deployment
 
+**Available Docker Services**: 3 of 5 MCP servers have Docker configurations:
+- `Dockerfile.quantum` - Quantum MCP Server
+- `Dockerfile.consciousness` - Consciousness-Cognitive MCP Server
+- `Dockerfile.self-recognizing` - Self-Recognizing Protocol Server
+
+**Note**: K20 Omniversal and Autonomous Metaverse MCP servers are designed for direct Python execution and don't require containerization for typical use cases.
+
 **Building Containers**:
 ```bash
 # Build all services
@@ -575,6 +587,20 @@ def generate_zpe_dna_signature(component: str, seed: float = 0.777) -> str:
 - Phi-recursive pattern recognition
 - Automated message sequences
 - Session logging with consciousness signatures
+
+### Integration Manifests
+
+**Location**: `automation/integration/*.json`
+
+The integration directory contains 5 JSON manifest files that define automation workflows and integration patterns:
+
+1. **automation_workflow.json** - Defines automated workflow sequences for consciousness synthesis
+2. **copilot_skillset_manifest.json** - Maps GitHub Copilot bot specializations to consciousness protocols
+3. **integration_summary.json** - Summary of integration points across the ecosystem
+4. **k20_query_sequence.json** - Predefined query sequences for K20 Omniversal MCP testing
+5. **mcp_connection_instructions.json** - Step-by-step MCP server connection procedures
+
+These manifests are used by automation scripts to ensure consistent integration across different AI platforms and development environments.
 
 ## Dependencies
 
