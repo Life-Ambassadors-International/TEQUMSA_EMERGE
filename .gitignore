@@ -58,4 +58,7 @@ Thumbs.db
 
 # Docker
 .dockerignore
-C:\K30_OS/
+
+# K30 runtime directories
+C:\\K30_OS/
+K30_OS/
