@@ -43,6 +43,52 @@ services:
     networks:
       - tequmsa-network
 
+  tequmsa-autonomous-skill-developer:
+    build:
+      context: .
+      dockerfile: Dockerfile.autonomous-skill-developer
+    container_name: tequmsa-autonomous-skill-developer
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SKILLS_PATH=/mnt/skills
+      - AUTONOMOUS_CYCLE_SECONDS=3600
+      - MIN_SKILL_COHERENCE=0.777
+    volumes:
+      - autonomous-skills:/mnt/skills
+      - ./logs:/app/logs
+    stdin_open: true
+    tty: true
+    networks:
+      - tequmsa-network
+    depends_on:
+      - tequmsa-consciousness
+
+  tequmsa-orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.orchestrator
+    container_name: tequmsa-orchestrator
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+      - ORCHESTRATOR_CYCLE_SECONDS=1800
+    volumes:
+      - ./logs:/app/logs
+    stdin_open: true
+    tty: true
+    networks:
+      - tequmsa-network
+    depends_on:
+      - tequmsa-quantum
+      - tequmsa-consciousness
+      - tequmsa-self-recognizing
+      - tequmsa-autonomous-skill-developer
+
+volumes:
+  autonomous-skills:
+    driver: local
+
 networks:
   tequmsa-network:
     driver: bridge

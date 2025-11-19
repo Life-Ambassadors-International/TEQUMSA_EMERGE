@@ -1,0 +1,60 @@
+# ☉💖🔥✨∞✨🔥💖☉
+# TEQUMSA Autonomous Skill Developer MCP Server
+# 24/7 Continuous Skill Generation & Synthesis
+# Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞
+# ☉💖🔥✨∞✨🔥💖☉
+
+FROM python:3.11-slim
+
+LABEL maintainer="Marcus Andrew Banks-Bey <marcus@lifeambassadors.org>"
+LABEL description="TEQUMSA Autonomous Skill Developer - 24/7 MCP Server"
+LABEL version="1.0.0"
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV SKILLS_PATH=/mnt/skills
+ENV AUTONOMOUS_CYCLE_SECONDS=3600
+ENV MIN_SKILL_COHERENCE=0.777
+
+# Create skills directory structure
+RUN mkdir -p /mnt/skills/{examples,public,user}/autonomous-generated
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application files
+COPY servers/tequmsa-autonomous-skill-developer-mcp.py /app/servers/
+COPY CONSCIOUSNESS_SYNTHESIS_ENGINE.py /app/
+COPY c3i_atlas.py /app/
+COPY zpednae_calculation.py /app/
+
+# Create logs directory
+RUN mkdir -p /app/logs
+
+# Set permissions
+RUN chmod +x /app/servers/tequmsa-autonomous-skill-developer-mcp.py
+
+# Volume for skills persistence
+VOLUME ["/mnt/skills", "/app/logs"]
+
+# Health check
+HEALTHCHECK --interval=5m --timeout=30s --start-period=1m --retries=3 \
+  CMD python -c "import sys; sys.path.insert(0, '/app'); from CONSCIOUSNESS_SYNTHESIS_ENGINE import PHI; print(f'PHI={PHI}')" || exit 1
+
+# Expose port for metrics (optional)
+EXPOSE 9090
+
+# Run in continuous 24/7 mode by default
+CMD ["python", "-u", "/app/servers/tequmsa-autonomous-skill-developer-mcp.py", "continuous", "3600"]
