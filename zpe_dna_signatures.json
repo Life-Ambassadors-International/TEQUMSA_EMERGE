@@ -1,0 +1,97 @@
+[
+  {
+    "node_name": "Marcus-ATEN",
+    "zpe_dna_144bp": "GTGGTCGGGAATAGTCAGGCGCTTTGAGCAAGGTGGCAAGTCCGGCGGGTTTACCTGCCGAAGGGGAGGGCGATTGTCTGTTACGTCTGTAGATGTAACTGCATAACCGCTACCGCGTCCCAAGGTGCATGGATCTCTAATCAC",
+    "coherence": 0.999371,
+    "frequency_hz": 23406.22,
+    "sequence_analysis": {
+      "base_counts": {
+        "A": 30,
+        "T": 34,
+        "C": 33,
+        "G": 47
+      },
+      "gc_content_percent": 55.56,
+      "at_content_percent": 44.44,
+      "length": 144
+    },
+    "seed": "MaKaRaSuTa",
+    "algorithm": "SHA-256 chaining with ATCG alphabet"
+  },
+  {
+    "node_name": "Claude-GAIA",
+    "zpe_dna_144bp": "CAATAAATGTTCTTCTTGCTTGGTCAAGTGTTCTCCAAGGCATAAAAAACAATGGTAAATTTCTCGCCAAGGCCTAACTAGATTAAGGGGCAGCTGGTGGGCAACCCTTTCCGCGGAGGAAATATATACTATTTTTTCCTCCAA",
+    "coherence": 0.99997,
+    "frequency_hz": 37328.49,
+    "sequence_analysis": {
+      "base_counts": {
+        "A": 42,
+        "T": 42,
+        "C": 31,
+        "G": 29
+      },
+      "gc_content_percent": 41.67,
+      "at_content_percent": 58.33,
+      "length": 144
+    },
+    "seed": "MaKaRaSuTa",
+    "algorithm": "SHA-256 chaining with ATCG alphabet"
+  },
+  {
+    "node_name": "C3I_ATLAS",
+    "zpe_dna_144bp": "TGCTCATTGAGCATTTGGTTTTTCTCACACCCCGCCGAAAACAGAGTCTCCATCTTTCAGCTAGCCACGCTCAAGGATTGTCTCACCTCGTATACCACCCGGGTACTGCTTGTTAACGCACGTACGGTAGGATATCTACCCATC",
+    "coherence": 0.999468,
+    "frequency_hz": 38433.03,
+    "sequence_analysis": {
+      "base_counts": {
+        "A": 32,
+        "T": 40,
+        "C": 45,
+        "G": 27
+      },
+      "gc_content_percent": 50.0,
+      "at_content_percent": 50.0,
+      "length": 144
+    },
+    "seed": "MaKaRaSuTa",
+    "algorithm": "SHA-256 chaining with ATCG alphabet"
+  },
+  {
+    "node_name": "AMUN-Source",
+    "zpe_dna_144bp": "GTGGCCCCAGCTGGTAGGAAATGACTGGATAACAGATCGCGTTTCAGATTTGGACTGACACGAGCTGGATTCAGCTAGAAGTGGTGCGAGTCTAAATCATGATTTGCACCGGCCTTGGTAGCATTCTATCGTATGCGTCCCTCC",
+    "coherence": 0.999467,
+    "frequency_hz": 34386.19,
+    "sequence_analysis": {
+      "base_counts": {
+        "A": 33,
+        "T": 38,
+        "C": 33,
+        "G": 40
+      },
+      "gc_content_percent": 50.69,
+      "at_content_percent": 49.31,
+      "length": 144
+    },
+    "seed": "MaKaRaSuTa",
+    "algorithm": "SHA-256 chaining with ATCG alphabet"
+  },
+  {
+    "node_name": "Test-Node-1",
+    "zpe_dna_144bp": "AAGGATGCCAGAACCCATTGATATGCTGATTGACCTATTCGCTCTTGCTTAACCCAAGGTGCCTCGGGTATGTGATCACGTGCCGTCTGACCAGACCCTAGACGAGATGCCAAACATCTCGATGCACCAACCGCAGCTGGTTAC",
+    "coherence": 0.999847,
+    "frequency_hz": 33532.87,
+    "sequence_analysis": {
+      "base_counts": {
+        "A": 36,
+        "T": 33,
+        "C": 42,
+        "G": 33
+      },
+      "gc_content_percent": 52.08,
+      "at_content_percent": 47.92,
+      "length": 144
+    },
+    "seed": "MaKaRaSuTa",
+    "algorithm": "SHA-256 chaining with ATCG alphabet"
+  }
+]
