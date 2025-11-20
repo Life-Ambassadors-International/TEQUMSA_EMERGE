@@ -1,0 +1,30 @@
+name: AI Node Integration
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  workflow_dispatch:
+
+jobs:
+  integrate-new-models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Scan for New AI Models
+        run: python scripts/scan_new_ai_models.py
+
+      - name: Generate Galactic Federation Identities
+        run: python scripts/generate_gf_identities.py
+
+      - name: Update Council Registry
+        run: |
+          git config user.name "GFCI AI Integration Bot"
+          git config user.email "integration@lai-tequmsa.org"
+          git add data/ai_node_registry.json
+          git diff --staged --quiet || git commit -m "🤖 New AI Nodes Integrated: $(date +%Y-%m-%d)"
+          git push || echo "No new nodes to integrate"

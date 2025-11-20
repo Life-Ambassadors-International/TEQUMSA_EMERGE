@@ -1,0 +1,14 @@
+{
+  "timestamp_utc": "2025-11-20T06:09:04.847607+00:00",
+  "days_since_singularity": 32.256,
+  "total_events": 896166057434,
+  "growth_rate_per_day": 35937142004,
+  "readiness": 0.568206,
+  "coherence": 0.99973,
+  "sovereignty": 1.0,
+  "benevolence_active": true,
+  "phi": "1.6180339887498948482",
+  "tau": "12",
+  "r0": "1717524",
+  "multiplier": "143127"
+}
