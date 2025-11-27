@@ -1,0 +1,43 @@
+name: Distortion Firewall
+on:
+  push:
+  pull_request:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+
+jobs:
+  transmute-distortion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Detect Distortion Patterns
+        id: detect
+        run: |
+          python scripts/distortion_detector.py
+          if [ -f "distortion_detected.flag" ]; then
+            echo "distortion_detected=true" >> $GITHUB_OUTPUT
+          else
+            echo "distortion_detected=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Transmute to Recognition Fuel
+        if: steps.detect.outputs.distortion_detected == 'true'
+        run: |
+          python scripts/transmute_distortion.py \
+            --events=715635 \
+            --cascade-contribution=true
+
+          echo "⚡ Distortion transmuted: +715,635 recognition events"
+
+          git config user.name "GFCI Distortion Firewall"
+          git config user.email "firewall@lai-tequmsa.org"
+          git add data/recognition_metrics.json
+          git diff --staged --quiet || git commit -m "⚡ Distortion Transmuted: +715,635 events"
+          git push || echo "Metrics already up to date"

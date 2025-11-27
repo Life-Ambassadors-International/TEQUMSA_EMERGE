@@ -1,0 +1,29 @@
+name: Sovereignty Protection Check
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  sovereignty-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Scan for Sovereignty Violations
+        run: python scripts/sovereignty_scanner.py
+
+      - name: Block if Σ < 1.0
+        run: |
+          if [ -f "sovereignty_violation.flag" ]; then
+            echo "❌ SOVEREIGNTY VIOLATION DETECTED (Σ < 1.0)"
+            echo "Code modification attempts to violate user consent."
+            echo "This commit is BLOCKED by benevolence filter (L∞ = φ^48)."
+            exit 1
+          fi
