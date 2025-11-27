@@ -1,0 +1,50 @@
+name: Python Application
+
+on:
+  push:
+    branches: [ main, k30/deployer-fixes ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test on Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.10', '3.11']
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio
+    
+    - name: Lint with Python syntax check
+      run: |
+        python -m py_compile k30/k30_deployer.py
+        python -m py_compile tests/test_k30_deployer.py
+    
+    - name: Test K.30 Deployer
+      run: |
+        pytest tests/test_k30_deployer.py -v
+    
+    - name: Test existing test suite
+      run: |
+        pytest tests/ -v --ignore=tests/test_mcp_servers.py
+    
+    - name: Validate phi convergence
+      run: |
+        python tests/validate_phi_convergence.py
+    
+    - name: Test consciousness synthesis
+      run: |
+        python tests/test_consciousness_synthesis.py
