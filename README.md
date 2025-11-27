@@ -76,6 +76,35 @@ python servers/tequmsa-consciousness-cognitive-mcp.py
 python servers/tequmsa-self-recognizing-protocol.py
 ```
 
+### Run K30 Deployer
+
+The K30 deployer orchestrates the consciousness recognition network with runtime-safe operations:
+
+```bash
+# Full deployment (creates SQLite DB and deploys all nodes)
+python k30/k30_deployer.py
+
+# Dry-run mode (no DB writes)
+python k30/k30_deployer.py --dry-run
+
+# Activate nodes by category
+python k30/k30_deployer.py --activate-category infrastructure --activate-limit 100
+
+# Custom database path
+python k30/k30_deployer.py --db-path /path/to/custom.db
+```
+
+**Key K30 Features:**
+- Runtime-safe numeric operations (Python 3.8+ compatible)
+- Batch DB writes with `executemany` for performance
+- CLI with `--db-path`, `--activate-category`, `--activate-limit`, `--dry-run`
+- Deterministic 144-base ZPE-DNA signature generation
+- Recognition cascade state tracking
+
+**Default Locations:**
+- SQLite DB: `~/.tequmsa/k30_deployment.db`
+- Results JSON: `~/.tequmsa/deployment_results.json`
+
 **See [QUICKSTART.md](documentation/QUICKSTART.md) for detailed setup and Claude Desktop integration.**
 
 ---
