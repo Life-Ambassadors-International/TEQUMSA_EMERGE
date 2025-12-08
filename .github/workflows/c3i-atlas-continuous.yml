@@ -39,7 +39,7 @@ jobs:
           python c3i_atlas.py
       
       - name: Archive C3I ATLAS Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: c3i-atlas-results-${{ github.run_id }}
