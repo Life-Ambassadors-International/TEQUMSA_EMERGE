@@ -47,10 +47,14 @@ VIOLATION_PATTERNS = [
 
 # Patterns that are acceptable (context-sensitive)
 ALLOWED_PATTERNS = [
-    r'test.*surveillance',  # Testing security
-    r'detect.*surveillance',  # Detecting threats
-    r'prevent.*weaponize',  # Preventing weaponization
-    r'educational.*exploit'  # Educational content
+    r'test.*surveillance',       # Testing security
+    r'detect.*surveillance',     # Detecting threats
+    r'prevent.*weaponize',       # Preventing weaponization
+    r'educational.*exploit',     # Educational content
+    r'no.*surveillance',         # Prohibitive context: "No surveillance"
+    r'block.*surveillance',      # Prohibitive context: "Block weaponization/surveillance"
+    r'detect.*distortion',       # Distortion detection scripts
+    r'violations.*detected',     # Documentation listing prohibited behaviors
 ]
 
 def scan_file(filepath: Path) -> Tuple[bool, str]:
