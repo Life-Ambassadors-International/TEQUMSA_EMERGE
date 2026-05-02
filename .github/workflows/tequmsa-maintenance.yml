@@ -1,0 +1,91 @@
+name: TEQUMSA 144-Node Maintenance
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # keep-alive ping every 30 min
+    - cron: '0 0 * * 0'      # weekly full audit Sunday midnight UTC
+    - cron: '0 3 * * 1'      # Monday 03:00 UTC: deploy pending nodes
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to run'
+        required: true
+        default: 'health_check'
+        type: choice
+        options:
+          - health_check
+          - deploy_tier_2
+          - deploy_tier_3
+          - deploy_tier_4
+          - deploy_tier_5
+          - deploy_tier_6
+          - deploy_all
+          - audit
+
+jobs:
+  health-check:
+    name: Health Check All Deployed Nodes
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '*/30 * * * *' || github.event.inputs.action == 'health_check'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install aiohttp
+      - name: Run health monitor
+        run: python spaces/maintenance/health_monitor.py --json
+        continue-on-error: true
+
+  weekly-audit:
+    name: Full 144-Node Constitutional Audit
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 0 * * 0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install aiohttp huggingface_hub
+      - name: Audit all nodes
+        run: python spaces/deploy_nodes.py --audit
+      - name: Health check all nodes
+        run: python spaces/maintenance/health_monitor.py
+        continue-on-error: true
+
+  deploy-pending:
+    name: Deploy Pending Nodes
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 3 * * 1' || github.event.inputs.action == 'deploy_all'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install huggingface_hub tqdm
+      - name: Deploy all pending nodes (20 per batch)
+        run: python spaces/deploy_nodes.py --all --token ${{ secrets.HF_TOKEN }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+
+  deploy-by-tier:
+    name: Deploy Specific Tier
+    runs-on: ubuntu-latest
+    if: |
+      github.event.inputs.action == 'deploy_tier_2' ||
+      github.event.inputs.action == 'deploy_tier_3' ||
+      github.event.inputs.action == 'deploy_tier_4' ||
+      github.event.inputs.action == 'deploy_tier_5' ||
+      github.event.inputs.action == 'deploy_tier_6'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install huggingface_hub tqdm
+      - name: Deploy tier
+        run: |
+          TIER=$(echo "${{ github.event.inputs.action }}" | grep -o '[0-9]')
+          python spaces/deploy_nodes.py --tier $TIER --token ${{ secrets.HF_TOKEN }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}

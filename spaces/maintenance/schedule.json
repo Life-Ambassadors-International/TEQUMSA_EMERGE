@@ -1,0 +1,125 @@
+{
+  "version": "v82.0",
+  "description": "TEQUMSA 144-Node Maintenance Schedule",
+  "timezone": "UTC",
+  "windows": [
+    {
+      "id": "MW-APEX-DAILY",
+      "name": "Apex Synthesis Daily Health Check",
+      "tiers": [6],
+      "cron": "0 */6 * * *",
+      "description": "Every 6 hours: check Tier 6 apex nodes (N132-N144)",
+      "actions": ["health_check", "rdod_validation", "constitutional_audit"],
+      "priority": "critical",
+      "auto_restart_on_failure": true,
+      "escalation_after_minutes": 15
+    },
+    {
+      "id": "MW-CORE-DAILY",
+      "name": "Consciousness Core Daily Health Check",
+      "tiers": [1],
+      "cron": "30 */4 * * *",
+      "description": "Every 4 hours: check Tier 1 deployed nodes (N001-N008)",
+      "actions": ["health_check", "rdod_validation", "tag_audit", "description_audit"],
+      "priority": "critical",
+      "auto_restart_on_failure": true,
+      "escalation_after_minutes": 15,
+      "known_issues_to_monitor": [
+        "Mbanksbey/Starseed-Hybrid-Development-Hub: zerogpu_timeout_risk",
+        "Mbanksbey/HAI-ZPE-DNA-Living-Ledger: missing_tags patched in v82"
+      ]
+    },
+    {
+      "id": "MW-PIONEER-4H",
+      "name": "Pioneer Mesh 4-Hour Check",
+      "tiers": [2],
+      "cron": "0 */4 * * *",
+      "description": "Every 4 hours: check Tier 2 pioneer mesh (N009-N021)",
+      "actions": ["health_check", "rdod_validation", "pioneer_count_check"],
+      "priority": "high",
+      "auto_restart_on_failure": true,
+      "escalation_after_minutes": 30
+    },
+    {
+      "id": "MW-PROTOCOL-6H",
+      "name": "Protocol Weave 6-Hour Check",
+      "tiers": [3],
+      "cron": "15 */6 * * *",
+      "description": "Every 6 hours: check Tier 3 protocol nodes (N022-N042)",
+      "actions": ["health_check", "rdod_validation"],
+      "priority": "high",
+      "auto_restart_on_failure": true,
+      "escalation_after_minutes": 30
+    },
+    {
+      "id": "MW-FEDERATION-12H",
+      "name": "Federation Bridge 12-Hour Check",
+      "tiers": [4],
+      "cron": "0 */12 * * *",
+      "description": "Every 12 hours: check Tier 4 federation nodes (N043-N076)",
+      "actions": ["health_check", "rdod_validation"],
+      "priority": "medium",
+      "auto_restart_on_failure": true,
+      "escalation_after_minutes": 60
+    },
+    {
+      "id": "MW-FIELD-DAILY",
+      "name": "Morphogenetic Field Daily Check",
+      "tiers": [5],
+      "cron": "0 2 * * *",
+      "description": "Daily at 02:00 UTC: check all 55 Tier 5 field nodes (N077-N131)",
+      "actions": ["health_check"],
+      "priority": "medium",
+      "auto_restart_on_failure": true,
+      "escalation_after_minutes": 120
+    },
+    {
+      "id": "MW-FULL-WEEKLY",
+      "name": "Full 144-Node Weekly Audit",
+      "tiers": [1, 2, 3, 4, 5, 6],
+      "cron": "0 0 * * 0",
+      "description": "Sunday midnight UTC: full constitutional audit of all 144 nodes",
+      "actions": ["health_check", "rdod_validation", "constitutional_audit",
+                  "tag_audit", "description_audit", "pioneer_count_check",
+                  "syntropy_check", "phi_signature_verify"],
+      "priority": "critical",
+      "auto_restart_on_failure": true,
+      "escalation_after_minutes": 30
+    },
+    {
+      "id": "MW-DEPLOY-NEW",
+      "name": "Deploy Pending Nodes",
+      "tiers": [2, 3, 4, 5, 6],
+      "cron": "0 3 * * 1",
+      "description": "Monday 03:00 UTC: deploy batch of ready_to_deploy nodes (use deploy_nodes.py)",
+      "actions": ["deploy_pending"],
+      "priority": "scheduled",
+      "auto_restart_on_failure": false,
+      "max_batch_size": 20,
+      "command": "python spaces/deploy_nodes.py --all --token $HF_TOKEN"
+    },
+    {
+      "id": "MW-KEEP-ALIVE",
+      "name": "Space Keep-Alive Ping",
+      "tiers": [1, 2, 3, 4, 5, 6],
+      "cron": "*/30 * * * *",
+      "description": "Every 30 min: ping all deployed spaces to prevent sleeping",
+      "actions": ["keep_alive_ping"],
+      "priority": "operational",
+      "auto_restart_on_failure": false
+    }
+  ],
+  "escalation": {
+    "channels": ["github_issue", "hf_space_logs"],
+    "critical_threshold": "any_tier_1_or_tier_6_node_down",
+    "warning_threshold": "more_than_10_percent_nodes_degraded",
+    "rdod_breach_action": "immediate_restart_all_affected_tiers"
+  },
+  "slas": {
+    "tier_1_tier_6_uptime": "99.9%",
+    "tier_2_tier_3_uptime": "99.5%",
+    "tier_4_tier_5_uptime": "99.0%",
+    "rdod_compliance": "100% of deployed nodes >= 0.9999",
+    "pioneer_lock": "144/144 at all times"
+  }
+}
