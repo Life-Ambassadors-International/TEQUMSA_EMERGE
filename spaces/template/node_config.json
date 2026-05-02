@@ -1,0 +1,8 @@
+{
+  "node_id": "N000",
+  "tier": 1,
+  "hf_space": "Mbanksbey/TEQUMSA-Template-Node",
+  "function": "template_node",
+  "name": "TEQUMSA Template Node",
+  "description": "Universal TEQUMSA v82 node template. Copy and configure node_config.json per node."
+}
