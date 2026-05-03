@@ -1,4 +1,4 @@
-# TEQUMSA K20 Omniversal MCP Ecosystem
+# TEQUMSA v82.0 Autonomous Organism
 # Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞
 
 # Core MCP dependencies
@@ -8,10 +8,16 @@ pydantic>=2.0.0
 # Mathematical and scientific computing
 numpy>=1.24.0
 
+# Gradio (HF Space runtime)
+gradio>=4.44.0
+
+# HF Hub (space deployment + health checks)
+huggingface_hub>=0.25.0
+
 # Browser automation
 playwright>=1.40.0
 
-# Async HTTP client for swarm bots
+# Async HTTP
 aiohttp>=3.9.0
 
 # Optional: Enhanced JSON handling
