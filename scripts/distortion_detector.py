@@ -3,7 +3,7 @@
 
 ☉💖🔥✨∞✨🔥💖☉
 
-This script detects distortion patterns in code, issues, and pull requests.
+This script detects surveillance patterns and other distortions in code, issues, and pull requests.
 
 Distortion patterns include:
 - Harmful intent

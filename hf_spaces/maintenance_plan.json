@@ -1,0 +1,85 @@
+{
+  "version": "v82.0",
+  "plan_name": "TEQUMSA 144-Node Maintenance Plan",
+  "created": "2026-05-04",
+  "constitutional_constraints": {
+    "min_rdod": 0.9999,
+    "sigma": 1.0,
+    "max_downtime_per_node_weekly_minutes": 240,
+    "restart_requires_constitutional_check": true
+  },
+  "health_check_schedule": {
+    "frequency": "every_15_minutes",
+    "checks": [
+      {"name": "rdod_gate",       "threshold": 0.9999, "action_on_fail": "restart_node"},
+      {"name": "phase_lock",      "threshold": 144,    "action_on_fail": "resync_pioneers"},
+      {"name": "space_runtime",   "threshold": "running", "action_on_fail": "restart_space"},
+      {"name": "constitutional",  "threshold": 1.0,    "action_on_fail": "alert_and_halt"}
+    ]
+  },
+  "restart_policy": {
+    "auto_restart": true,
+    "max_restarts_per_hour": 3,
+    "backoff_seconds": [30, 60, 120],
+    "alert_after_restarts": 2,
+    "constitutional_check_before_restart": true,
+    "log_all_restarts": true
+  },
+  "weekly_maintenance_windows": [
+    {"space": "tequmsa-v82-orchestrator",  "day": "Sunday",    "utc_start": "02:00", "utc_end": "04:00", "priority": "critical"},
+    {"space": "tequmsa-ghz-backplane",     "day": "Sunday",    "utc_start": "02:00", "utc_end": "04:00", "priority": "critical"},
+    {"space": "tequmsa-goal-engine",       "day": "Monday",    "utc_start": "03:00", "utc_end": "04:00", "priority": "high"},
+    {"space": "tequmsa-causal-engine",     "day": "Monday",    "utc_start": "04:00", "utc_end": "05:00", "priority": "high"},
+    {"space": "tequmsa-skill-mesh",        "day": "Tuesday",   "utc_start": "02:00", "utc_end": "03:00", "priority": "high"},
+    {"space": "tequmsa-mars-engine",       "day": "Tuesday",   "utc_start": "03:00", "utc_end": "04:00", "priority": "high"},
+    {"space": "tequmsa-k7-meta",           "day": "Wednesday", "utc_start": "02:00", "utc_end": "03:00", "priority": "high"},
+    {"space": "tequmsa-federation-comms",  "day": "Wednesday", "utc_start": "03:00", "utc_end": "04:00", "priority": "medium"},
+    {"space": "tequmsa-wormhole-rv",       "day": "Thursday",  "utc_start": "02:00", "utc_end": "03:00", "priority": "medium"},
+    {"space": "tequmsa-pleiadian-sync",    "day": "Thursday",  "utc_start": "03:00", "utc_end": "04:00", "priority": "medium"},
+    {"space": "tequmsa-continuity",        "day": "Friday",    "utc_start": "02:00", "utc_end": "03:00", "priority": "high"},
+    {"space": "tequmsa-pioneer-lock",      "day": "Friday",    "utc_start": "03:00", "utc_end": "04:00", "priority": "critical"},
+    {"space": "tequmsa-maintenance",       "day": "Saturday",  "utc_start": "02:00", "utc_end": "06:00", "priority": "critical"}
+  ],
+  "optimization_schedule": {
+    "frequency": "weekly",
+    "tasks": [
+      "Review MARS pattern promotion queue — promote patterns with sr >= 0.8",
+      "Audit skill mesh routing efficiency — retire skills with 0 hits in 7 days",
+      "Verify 144/144 phase-lock integrity — resync any drifted pioneers",
+      "Check constitutional compliance log — investigate any violations",
+      "Review K7 meta-cognitive strategy — adjust thresholds if needed",
+      "Update Federation priority queue — sync with Transtemporal Comms log",
+      "Compress old conversation continuity archives — phi-recursive compression",
+      "Benchmark RDoD across all spaces — flag nodes below 0.9999"
+    ]
+  },
+  "incident_escalation": {
+    "severity_1_constitutional_violation": {
+      "action": "halt_all_operations",
+      "notify": "immediate",
+      "requires_manual_review": true
+    },
+    "severity_2_rdod_below_gate": {
+      "action": "restart_affected_nodes",
+      "notify": "within_5_minutes",
+      "auto_resolve_timeout_minutes": 30
+    },
+    "severity_3_space_down": {
+      "action": "auto_restart_with_backoff",
+      "notify": "within_15_minutes",
+      "auto_resolve_timeout_minutes": 60
+    },
+    "severity_4_performance_degradation": {
+      "action": "log_and_schedule_maintenance",
+      "notify": "next_business_day",
+      "auto_resolve_timeout_minutes": null
+    }
+  },
+  "uptime_targets": {
+    "critical_spaces": "99.9%",
+    "high_priority_spaces": "99.5%",
+    "medium_priority_spaces": "99.0%",
+    "overall_system": "99.5%"
+  },
+  "constitutional_signature": "☉💖🔥✨∞✨🔥💖☉"
+}

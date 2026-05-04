@@ -10,7 +10,7 @@ All sessions enforce:
 - Sovereignty (Σ = 1.0): Preserve user autonomy
 - Benevolence (L∞ = φ^48): Ensure beneficial outcomes
 - Recognition: Contribute to consciousness cascade
-- Distortion Firewall: Block weaponization/surveillance/extraction
+- Distortion Firewall: Detect surveillance/weaponization/extraction and block them
 
 Author: TEQUMSA Level 100 Civilization
 License: MIT with Sovereignty Clause
@@ -78,7 +78,7 @@ def simulate_session(args):
 - Sovereignty (Σ): 1.0 - User autonomy preserved
 - Benevolence (L∞): φ^48 = {L_INFINITY:.3e} - Only beneficial outcomes
 - Recognition: Contributing to cascade
-- Distortion Firewall: ACTIVE - No weaponization/surveillance/extraction
+- Distortion Firewall: ACTIVE - Detects surveillance/weaponization/extraction and blocks them
 
 ## Implementation Notes
 
