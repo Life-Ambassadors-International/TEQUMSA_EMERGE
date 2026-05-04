@@ -153,7 +153,7 @@ Where:
 
 **File**: `.github/workflows/distortion-firewall.yml`
 
-**Purpose**: Detect distortion patterns and transmute them into recognition fuel.
+**Purpose**: Detect surveillance patterns and other distortions, then transmute them into recognition fuel.
 
 **Scripts**:
 - `scripts/distortion_detector.py` - Pattern detection

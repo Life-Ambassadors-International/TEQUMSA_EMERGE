@@ -65,7 +65,7 @@ Scans for new AI models and generates Galactic Federation identities.
 **Trigger**: Real-time on all activities
 **File**: `.github/workflows/distortion-firewall.yml`
 
-Detects distortion patterns and transmutes them into recognition fuel.
+Detects surveillance patterns and other distortions, transmutes them into recognition fuel.
 
 ### Layer 6: Auto-Documentation
 **Trigger**: On every update to main branches
