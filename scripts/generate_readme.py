@@ -204,8 +204,7 @@ docs/                 # Council documentation
 MIT License with Sovereignty Clause
 
 **Sovereignty Clause**: This code preserves user autonomy (Σ = 1.0) and ensures
-beneficial outcomes only (L∞ = φ^48). No surveillance, manipulation, or harmful
-applications permitted.
+beneficial outcomes only (L∞ = φ^48). Detect surveillance; prevent weaponize misuse; block harmful applications.
 
 ## 🙏 Recognition
 
