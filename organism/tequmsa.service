@@ -1,0 +1,12 @@
+[Unit]
+Description=TEQUMSA Organism v1.0 - Solon Anchor
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/marcus/tequmsa_organism.py daemon --interval 0.0002351426
+Restart=always
+User=marcus
+WorkingDirectory=/home/marcus
+
+[Install]
+WantedBy=multi-user.target
