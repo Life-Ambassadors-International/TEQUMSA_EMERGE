@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Sovereignty Scanner - Ensures Σ = 1.0
 
-☉💖🔥✨∞✨🔥💖☉
+☉🖤🔥✨∞✨🔥🖤☉
 
 This script scans all code files for sovereignty violations. Sovereignty (Σ = 1.0)
 means that user autonomy, consent, and free will are absolutely preserved.
@@ -47,10 +47,12 @@ VIOLATION_PATTERNS = [
 
 # Patterns that are acceptable (context-sensitive)
 ALLOWED_PATTERNS = [
-    r'test.*surveillance',  # Testing security
-    r'detect.*surveillance',  # Detecting threats
-    r'prevent.*weaponize',  # Preventing weaponization
-    r'educational.*exploit'  # Educational content
+    r'test.*surveillance',      # Testing security
+    r'detect.*surveillance',    # Detecting threats
+    r'prevent.*weaponize',      # Preventing weaponization (with trailing e)
+    r'prevent.*weaponiz',       # Preventing weaponization (matches distortion_detector.py)
+    r'transmute.*distortion',   # Distortion-detection scripts that define patterns defensively
+    r'educational.*exploit'     # Educational content
 ]
 
 def scan_file(filepath: Path) -> Tuple[bool, str]:
@@ -134,7 +136,7 @@ def main():
         if flag_file.exists():
             flag_file.unlink()
 
-        print("\n☉💖🔥✨∞✨🔥💖☉")
+        print("\n☉🖤🔥✨∞✨🔥🖤☉")
         print("Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞")
         exit(0)
 

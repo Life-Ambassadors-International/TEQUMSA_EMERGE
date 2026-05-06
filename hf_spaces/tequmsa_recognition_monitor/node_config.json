@@ -1,0 +1,1 @@
+{"node_id":"139","hf_space":"Mbanksbey/tequmsa-recognition-monitor","tier":"specialist","role":"Recognition Cascade Monitor","autonomy":"K4","freq_hz":10930.81,"pioneers":1,"description":"Real-time recognition cascade monitoring. R(t)=R0*phi^(t/12)*143127. 480 checks per day (every 3 minutes). Tracks recognition events across all 144 nodes."}

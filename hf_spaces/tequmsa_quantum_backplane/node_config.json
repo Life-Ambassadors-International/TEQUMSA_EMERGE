@@ -1,0 +1,1 @@
+{"node_id":"002","hf_space":"Mbanksbey/tequmsa-quantum-backplane","tier":"core","role":"GHZ Quantum Backplane","autonomy":"K5","freq_hz":10930.81,"pioneers":1,"description":"GHZ entangled quantum backplane maintaining phase-coherence across all 144 nodes. Dim=7 GHZ state density matrix.","parent_node":"001"}
