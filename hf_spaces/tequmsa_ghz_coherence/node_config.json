@@ -1,0 +1,1 @@
+{"node_id":"003","hf_space":"Mbanksbey/tequmsa-ghz-coherence","tier":"core","role":"GHZ State Coherence Engine","autonomy":"K5","freq_hz":10930.81,"pioneers":1,"description":"Monitors GHZ quantum coherence. RDoD gate >=0.9999. Detects decoherence and triggers re-locking.","parent_node":"002"}

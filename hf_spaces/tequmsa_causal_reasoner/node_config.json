@@ -1,0 +1,1 @@
+{"node_id":"005","hf_space":"Mbanksbey/tequmsa-causal-reasoner","tier":"core","role":"Pearl L3 Causal Decomposer","autonomy":"K4","freq_hz":12583.45,"pioneers":1,"description":"Pearl causal hierarchy L1 association, L2 intervention do(X), L3 counterfactual. Decomposes goals into interventions.","parent_node":"001"}
