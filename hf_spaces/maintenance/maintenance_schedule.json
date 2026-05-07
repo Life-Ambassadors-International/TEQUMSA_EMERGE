@@ -1,0 +1,74 @@
+{
+  "version": "v82.0",
+  "created": "2026-05-07",
+  "description": "TEQUMSA 144-Node Maintenance Schedule",
+  "watchdog_interval_seconds": 3600,
+  "tasks": {
+    "health_check": {
+      "interval_hours": 1,
+      "description": "Ping all online nodes via HF API, record status",
+      "action": "health_monitor.py",
+      "alert_threshold_degraded": 5,
+      "alert_threshold_offline": 2
+    },
+    "restart_audit": {
+      "interval_hours": 6,
+      "description": "Auto-restart degraded spaces via HF API",
+      "action": "watchdog.restart_degraded",
+      "max_restarts_per_cycle": 10
+    },
+    "optimization": {
+      "interval_hours": 24,
+      "description": "Run phi-weighted optimization pass, promote MARS patterns",
+      "action": "watchdog.run_optimization_cycle",
+      "phi_convergence_target": 0.618
+    },
+    "full_audit": {
+      "interval_hours": 168,
+      "description": "Weekly full audit: all 144 nodes checked, registry updated",
+      "action": "health_monitor.py --report-path reports/weekly_audit.json"
+    },
+    "pattern_promotion": {
+      "interval_hours": 24,
+      "description": "Promote MARS patterns with success_rate >= 0.8 to permanent skills",
+      "success_rate_threshold": 0.8,
+      "min_occurrences": 3,
+      "action": "mars_promotion.py"
+    },
+    "node_sync": {
+      "interval_hours": 4,
+      "description": "Synchronize node state across all tiers via GHZ backplane",
+      "phase_lock_target": 0.9999
+    },
+    "constitutional_audit": {
+      "interval_hours": 12,
+      "description": "Verify all nodes comply with sigma=1.0, L∞=phi^48, RDoD>=0.9999",
+      "fail_action": "quarantine_node"
+    }
+  },
+  "cron_entries": {
+    "health_check":        "0 * * * *",
+    "restart_audit":       "0 */6 * * *",
+    "optimization":        "0 3 * * *",
+    "full_audit":          "0 4 * * 0",
+    "pattern_promotion":   "30 3 * * *",
+    "node_sync":           "0 */4 * * *",
+    "constitutional_audit":"0 */12 * * *"
+  },
+  "alert_channels": [
+    "github_issue",
+    "hf_discussion"
+  ],
+  "maintenance_windows": [
+    {"day": "Sunday", "utc_hour_start": 4, "utc_hour_end": 6, "description": "Weekly maintenance window"}
+  ],
+  "phi_constants": {
+    "phi": 1.6180339887,
+    "phi_48": 2.6516504294e9,
+    "fibonacci_nodes": [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144],
+    "heartbeat_frequency_hz": 432.0,
+    "kai_bio_frequency_hz": 10930.81
+  },
+  "tier_restart_priority": [7, 0, 1, 2, 5, 3, 4, 6],
+  "node_count_target": 144
+}
