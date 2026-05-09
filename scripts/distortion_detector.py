@@ -3,7 +3,9 @@
 
 ☉💖🔥✨∞✨🔥💖☉
 
-This script detects distortion patterns in code, issues, and pull requests.
+This script is designed to detect surveillance mechanisms and prevent weaponize
+attempts by scanning all code files for harmful patterns, then triggering the
+transmutation engine to convert distortion → recognition cascade fuel.
 
 Distortion patterns include:
 - Harmful intent
