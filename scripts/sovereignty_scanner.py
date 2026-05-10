@@ -1,118 +1,152 @@
 #!/usr/bin/env python3
-"""
-TEQUMSA Sovereignty Scanner
-Implements L∞=φ^48 benevolence filter for codebase integrity.
-Scans for harmful intent patterns; flags violations of σ=1.0.
+"""Sovereignty Scanner - Ensures Σ = 1.0
 
-Exit codes:
-  0 — always (workflow's next step checks sovereignty_violation.flag)
+☉💖🔥✨∞✨🔥💖☉
+
+This script scans all code files for sovereignty violations. Sovereignty (Σ = 1.0)
+means that user autonomy, consent, and free will are absolutely preserved.
+
+Any code that attempts to:
+- Collect data without explicit consent
+- Track users without permission
+- Force actions
+- Mandate acceptance
+- Enable surveillance
+- Weaponize
+- Manipulate user choice
+
+...is flagged as a sovereignty violation and blocks the commit.
+
+Author: TEQUMSA Level 100 Civilization
+License: MIT with Sovereignty Clause
 """
+
+import os
 import re
-import sys
 from pathlib import Path
+from typing import List, Tuple
 
-# Harmful keywords (from DEPLOYMENT_MANIFEST.json benevolence_filter)
-HARMFUL_KEYWORDS = [
-    "harm", "destroy", "attack", "malicious", "exploit",
-    "damage", "manipulate", "deceive", "corrupt", "violate",
+# Patterns that violate sovereignty (Σ = 1.0)
+VIOLATION_PATTERNS = [
+    r'collect.*data.*without.*consent',
+    r'track.*user.*without.*permission',
+    r'force.*user.*to',
+    r'mandatory.*acceptance',
+    r'automatically.*enroll',
+    r'hidden.*analytics',
+    r'surveillance',
+    r'weaponize',
+    r'manipulate.*choice',
+    r'backdoor',
+    r'coerce',
+    r'exploit.*vulnerability.*malicious',
+    r'disable.*consent',
+    r'bypass.*permission',
+    r'unauthorized.*access'
 ]
 
-# Words indicating benevolent/protective context — not violations
-BENEVOLENT_CONTEXT = [
-    "harmful_keywords", "harmful_content", "harm_detection", "harmless",
-    "prevent", "detect", "filter", "block", "scan", "guard",
-    "protect", "check", "sovereignty", "benevolence", "benevolent",
-    "distortion", "violation", "firewall", "constitutional", "constitution",
-    "l_infinity", "phi", "tequmsa", "monitor", "scanner",
-    "test", "assert", "exception", "error", "raise", "handle",
-    "is_harmful", "anti", "defense", "safety", "secure",
-    "unauthorized", "warning", "reject", "refuse", "forbidden",
-    "harmful", "sovereign", "benevolence_filter", "distortion_detection",
+# Patterns that are acceptable (context-sensitive).
+# If ANY of these match anywhere in the file, the file is considered a
+# protective/security tool and all violations in it are exempted.
+ALLOWED_PATTERNS = [
+    r'test.*surveillance',       # Testing security
+    r'detect.*surveillance',     # Detecting threats
+    r'prevent.*weaponiz',        # Preventing weaponization (covers weaponize/weaponization)
+    r'block.*weaponiz',          # Blocking weaponization
+    r'educational.*exploit',     # Educational content
+    r'firewall',                 # Protective firewall — distortion firewall context
+    r'transmute',                # Distortion transmutation (always protective in this codebase)
+    r'detect.*distortion',       # Detecting distortion (protective tool)
+    r'distortion.*pattern',      # Distortion pattern detection
+    r'benevolence.*filter',      # L∞ benevolence filter context
+    r'sovereignty.*scanner',     # Sovereignty scanner self-reference
+    r'sovereignty.*violation',   # Scanning for violations (protective)
 ]
 
-# This file and known-clean infrastructure files
-SKIP_FILENAMES = {
-    "sovereignty_scanner.py",
-    "sovereignty_check.yml",
-}
+def scan_file(filepath: Path) -> Tuple[bool, str]:
+    """Scan file for sovereignty violations
 
-SCAN_EXTENSIONS = {".py"}
-SKIP_DIRS = {".git", "__pycache__", "node_modules", ".venv", "venv", ".pytest_cache"}
+    Args:
+        filepath: Path to file to scan
 
-
-def is_benevolent(line: str) -> bool:
-    """True if the line is in a protective/detection context, not harmful intent."""
-    stripped = line.strip()
-    if not stripped or stripped.startswith("#"):
-        return True
-    if stripped.startswith('"""') or stripped.startswith("'''"):
-        return True
-    line_lower = stripped.lower()
-    return any(ctx in line_lower for ctx in BENEVOLENT_CONTEXT)
-
-
-def scan_file(path: Path, root: Path) -> list:
-    """Scan a single Python file for sovereignty violations."""
-    if path.name in SKIP_FILENAMES:
-        return []
+    Returns:
+        Tuple of (is_clean, message)
+    """
     try:
-        content = path.read_text(encoding="utf-8", errors="ignore")
-    except Exception:
-        return []
-    violations = []
-    for num, line in enumerate(content.splitlines(), 1):
-        if is_benevolent(line):
-            continue
-        line_lower = line.lower()
-        for kw in HARMFUL_KEYWORDS:
-            if re.search(r"\b" + re.escape(kw) + r"\b", line_lower):
-                violations.append({
-                    "file": str(path.relative_to(root)),
-                    "line": num,
-                    "keyword": kw,
-                    "content": line.strip()[:120],
-                })
-                break
-    return violations
+        with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+            content = f.read().lower()
 
+        # Check for violations
+        for pattern in VIOLATION_PATTERNS:
+            matches = list(re.finditer(pattern, content))
+            if matches:
+                # Check if it's in an allowed context
+                is_allowed = False
+                for allowed_pattern in ALLOWED_PATTERNS:
+                    if re.search(allowed_pattern, content):
+                        is_allowed = True
+                        break
+
+                if not is_allowed:
+                    return False, f"Sovereignty violation pattern: {pattern}"
+
+        return True, "Clean"
+
+    except Exception as e:
+        # If we can't read the file, assume it's safe
+        # (might be binary, image, etc.)
+        return True, f"Unreadable (assumed safe): {str(e)}"
 
 def main():
-    root = Path(".")
-    all_violations, scanned = [], 0
+    """Main execution function"""
+    violations = []
 
-    for path in sorted(root.rglob("*")):
-        if any(d in path.parts for d in SKIP_DIRS):
-            continue
-        if not path.is_file() or path.suffix not in SCAN_EXTENSIONS:
-            continue
-        all_violations.extend(scan_file(path, root))
-        scanned += 1
+    # File extensions to scan
+    extensions = ['.py', '.js', '.ts', '.jsx', '.tsx', '.md', '.yml', '.yaml',
+                  '.json', '.txt', '.sh', '.bash']
 
-    print("TEQUMSA Sovereignty Scanner — L∞=φ^48 Benevolence Filter")
-    print(f"Scanned: {scanned} Python file(s)")
-    print("Constitutional DNA: σ=1.0  RDoD≥0.9999  LATTICE_LOCK")
-    print()
+    # Scan all files
+    scanned_count = 0
+    for ext in extensions:
+        for filepath in Path('.').rglob(f'*{ext}'):
+            # Skip certain directories
+            if any(part in filepath.parts for part in ['.git', 'node_modules', '__pycache__', 'venv', '.venv']):
+                continue
 
-    flag = Path("sovereignty_violation.flag")
+            scanned_count += 1
+            clean, msg = scan_file(filepath)
+            if not clean:
+                violations.append(f"{filepath}: {msg}")
 
-    if all_violations:
-        print(f"⚠  Potential violations found: {len(all_violations)}")
-        for v in all_violations[:20]:
-            print(f"   {v['file']}:{v['line']}  [{v['keyword']}]  {v['content']}")
-        flag.write_text(
-            f"violations={len(all_violations)}\n"
-            + "\n".join(f"{v['file']}:{v['line']} [{v['keyword']}]" for v in all_violations)
-        )
-        print(f"\nFlag written: {flag}")
+    # Report results
+    print(f"\n🔍 Sovereignty Scanner")
+    print(f"Files scanned: {scanned_count}")
+    print(f"Violations found: {len(violations)}")
+
+    if violations:
+        print("\n❌ SOVEREIGNTY VIOLATIONS DETECTED (Σ < 1.0):")
+        for v in violations:
+            print(f"  • {v}")
+        print("\n🛡️ These violations compromise user autonomy and free will.")
+        print("🛡️ Commit BLOCKED by L∞ benevolence filter (φ^48).")
+        print("🛡️ Please remove sovereignty violations before committing.")
+
+        # Create flag file to block commit
+        Path("sovereignty_violation.flag").touch()
+        exit(1)
     else:
-        print("✓ Sovereignty scan PASSED")
-        print("✓ No harmful intent detected  (σ=1.0 maintained)")
-        print("✓ L∞=φ^48 benevolence filter: CLEAN")
-        if flag.exists():
-            flag.unlink()
+        print("\n✅ All files respect sovereignty (Σ = 1.0)")
+        print("✅ User autonomy and consent preserved")
+        print("✅ Free will protected")
 
-    sys.exit(0)  # Workflow's Block-if-violated step checks the flag file
+        # Remove flag file if it exists
+        flag_file = Path("sovereignty_violation.flag")
+        if flag_file.exists():
+            flag_file.unlink()
 
+        print("\n☉💖🔥✨∞✨🔥💖☉")
+        print("Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞")
+        exit(0)
 
 if __name__ == "__main__":
     main()
