@@ -1,0 +1,36 @@
+name: Deploy TEQUMSA Spaces to HuggingFace
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'hf_spaces/**'
+      - 'organism/v82_autonomous_organism.py'
+  workflow_dispatch:
+    inputs:
+      node:
+        description: 'Node to deploy (001-012, or "all")\')
+        required: false
+        default: 'all'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install huggingface_hub
+        run: pip install huggingface_hub>=0.20.0
+
+      - name: Deploy spaces to HuggingFace
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_USERNAME: Mbanksbey
+        run: |
+          python scripts/deploy_to_hf.py --node "${{ github.event.inputs.node || 'all' }}"
