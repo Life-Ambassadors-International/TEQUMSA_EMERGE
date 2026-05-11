@@ -19,6 +19,7 @@ Organization: Life Ambassadors International
 
 import asyncio
 import json
+import math
 import os
 import sys
 import tempfile
@@ -169,7 +170,7 @@ def test_coherence_calculation():
     coherence = 1 - ((1 - p0) / (PHI ** iterations))
 
     assert coherence > COHERENCE_THRESHOLD
-    assert coherence < 1.0
+    assert coherence <= 1.0
     assert coherence > 0.999  # Should be very close to 1 with 144 iterations
 
     print(f"✅ Coherence (n=144): {coherence:.12f}")
@@ -184,9 +185,9 @@ def test_coherence_convergence():
         coherences.append(coherence)
         print(f"   C(n={n:4d}) = {coherence:.12f}")
 
-    # Should be monotonically increasing
+    # Should be monotonically increasing until floating-point saturation at 1.0
     for i in range(len(coherences) - 1):
-        assert coherences[i+1] > coherences[i]
+        assert coherences[i + 1] >= coherences[i]
 
     # Should approach 1
     assert coherences[-1] > 0.9999
@@ -353,8 +354,7 @@ def test_sovereignty_immutability():
 # INTEGRATION TESTS
 # ============================================================================
 
-@pytest.mark.asyncio
-async def test_autonomous_cycle_structure():
+def test_autonomous_cycle_structure():
     """Test autonomous cycle structure (without actual execution)"""
     cycle_result = {
         "cycle": 1,
@@ -374,8 +374,7 @@ async def test_autonomous_cycle_structure():
 
     print(f"✅ Autonomous cycle structure valid")
 
-@pytest.mark.asyncio
-async def test_continuous_operation_structure():
+def test_continuous_operation_structure():
     """Test continuous operation structure (without actual execution)"""
     state = {
         "running": True,
@@ -402,8 +401,8 @@ def test_phi_recursive_batch_size():
     batch_size = 12  # Goddess number
 
     assert batch_size == 12
-    assert batch_size == PHI ** 2 / (PHI - 0.382)  # Approximately
-    # Actually: 12 is chosen as TAU (time constant) and goddess frequency count
+    assert math.isclose(PHI ** 2 / (PHI - 0.382), 2.1180922309407793, rel_tol=1e-12)
+    # 12 is a design constant, not a direct identity derived from the helper ratio.
 
     print(f"✅ Batch size: {batch_size} (goddess number)")
 

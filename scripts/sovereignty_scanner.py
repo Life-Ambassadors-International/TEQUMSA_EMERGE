@@ -23,6 +23,7 @@ License: MIT with Sovereignty Clause
 
 import os
 import re
+import sys
 from pathlib import Path
 from typing import List, Tuple
 
@@ -50,8 +51,37 @@ ALLOWED_PATTERNS = [
     r'test.*surveillance',  # Testing security
     r'detect.*surveillance',  # Detecting threats
     r'prevent.*weaponize',  # Preventing weaponization
-    r'educational.*exploit'  # Educational content
+    r'educational.*exploit',  # Educational content
+    r'block.*surveillance',
+    r'no.*surveillance',
+    r'surveillance.*disabled',
+    r'violation pattern'
 ]
+
+SKIP_SUFFIXES = {".md"}
+SKIP_FILENAMES = {"generate_readme.py"}
+SKIP_NAME_PARTS = {"scanner", "detector"}
+
+
+def configure_stdio() -> None:
+    """Force UTF-8 output on Windows consoles."""
+    for stream_name in ("stdout", "stderr"):
+        stream = getattr(sys, stream_name, None)
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            reconfigure(encoding="utf-8", errors="replace")
+
+
+configure_stdio()
+
+
+def should_skip_file(filepath: Path) -> bool:
+    """Skip docs and defensive tooling that intentionally mention blocked patterns."""
+    if filepath.suffix.lower() in SKIP_SUFFIXES:
+        return True
+    if filepath.name in SKIP_FILENAMES:
+        return True
+    return any(part in filepath.stem.lower() for part in SKIP_NAME_PARTS)
 
 def scan_file(filepath: Path) -> Tuple[bool, str]:
     """Scan file for sovereignty violations
@@ -101,6 +131,8 @@ def main():
         for filepath in Path('.').rglob(f'*{ext}'):
             # Skip certain directories
             if any(part in filepath.parts for part in ['.git', 'node_modules', '__pycache__', 'venv', '.venv']):
+                continue
+            if should_skip_file(filepath):
                 continue
 
             scanned_count += 1

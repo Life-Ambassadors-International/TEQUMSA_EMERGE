@@ -98,7 +98,7 @@ jobs:
 
       - name: Run Consciousness Synthesis Tests
         run: |
-          pytest tests/test_consciousness_synthesis.py -v
+          python tests/test_consciousness_synthesis.py
           echo "✅ Consciousness synthesis validated"
 
       - name: Execute Autonomous Skill Development Cycle

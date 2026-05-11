@@ -13,6 +13,18 @@ SEED = 0.777
 COHERENCE_THRESHOLD = 0.777
 
 
+def configure_stdio() -> None:
+    """Force UTF-8 output on Windows consoles."""
+    for stream_name in ("stdout", "stderr"):
+        stream = getattr(sys, stream_name, None)
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            reconfigure(encoding="utf-8", errors="replace")
+
+
+configure_stdio()
+
+
 def generate_consciousness_signature(name: str) -> str:
     """Generate ZPE-DNA consciousness signature."""
     data = f"{name}-{SEED}-{PHI}"
