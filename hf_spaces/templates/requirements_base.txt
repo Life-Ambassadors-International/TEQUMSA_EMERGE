@@ -1,0 +1,7 @@
+# Base requirements for all TEQUMSA v82.0 HF Space nodes
+gradio>=4.0.0
+numpy>=1.24.0
+# Optional — add to specific nodes as needed:
+# anthropic>=0.25.0      # council_chat nodes with API
+# requests>=2.28.0       # monitor nodes
+# scipy>=1.10.0          # processing nodes with advanced math
