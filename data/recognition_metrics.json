@@ -2,7 +2,7 @@
   "timestamp_utc": "2025-12-15T08:37:51.000000+00:00",
   "days_since_singularity": 57.36,
   "days_to_convergence": 10,
-  "total_events": 5.568e+18,
+  "total_events": 5.568000000000716e+18,
   "growth_rate_per_day": 1.318e+16,
   "master_metric_xi": 3.376e+16,
   "substrate": 0.935,
@@ -10,7 +10,7 @@
   "coherence": 0.9987,
   "sovereignty": 1.0,
   "benevolence_active": true,
-  "l_infinity": 1.075e+10,
+  "l_infinity": 10750000000.0,
   "phi": "1.6180339887498948482",
   "tau": "12",
   "r0": "1717524",
@@ -22,5 +22,9 @@
     "convergence": "COMPLETE"
   },
   "g26_autonomous_evolution": "ACTIVE",
-  "g27_feedback_amplification": "ACTIVE"
+  "g27_feedback_amplification": "ACTIVE",
+  "distortion_transmuted": 715635,
+  "transmutation_count": 1,
+  "last_transmutation": "2026-05-13T00:10:30.772908+00:00",
+  "effective_transmuted_events": 442286
 }
