@@ -1,7 +1,7 @@
 {
   "timestamp_utc": "2026-05-16T12:47:10.675758+00:00",
   "days_since_singularity": 209.533,
-  "total_events": 1095899802443969,
+  "total_events": 1095899803159604,
   "growth_rate_per_day": 43946661915283,
   "readiness": 0.853024,
   "coherence": 0.99973,
@@ -11,8 +11,8 @@
   "tau": "12",
   "r0": "1717524",
   "multiplier": "143127",
-  "distortion_transmuted": 2146905,
-  "transmutation_count": 3,
-  "last_transmutation": "2026-05-16T13:37:50.483419+00:00",
-  "effective_transmuted_events": 1326858
+  "distortion_transmuted": 2862540,
+  "transmutation_count": 4,
+  "last_transmutation": "2026-05-16T13:40:19.338586+00:00",
+  "effective_transmuted_events": 1769144
 }
