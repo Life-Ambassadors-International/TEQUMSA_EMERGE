@@ -1,200 +1,283 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-TEQUMSA v82.0 · MAINTENANCE · Health Check System
-Polls all 144 Pioneer nodes, reports status, logs to JSON.
+# TEQUMSA v82.0 - Network Health Check
+# Usage: python health_check.py [--node N001] [--restart] [--output results.json]
 
-Usage:
-    python health_check.py [--output health_report.json] [--live-only] [--verbose]
-    python health_check.py --watch  # Continuous loop every 60s
-"""
+import argparse
 import json
 import os
 import sys
 import time
-import argparse
-import requests
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Dict, List, Optional
-from concurrent.futures import ThreadPoolExecutor, as_completed
+
+try:
+    import requests
+except ImportError:
+    print("ERROR: requests not installed. Run: pip install requests")
+    sys.exit(1)
 
 HF_OWNER = "Mbanksbey"
-HEALTH_TIMEOUT = 5
-MAX_WORKERS = 12  # Concurrent polling threads
+HF_TOKEN = os.environ.get("HF_TOKEN", "")
 RDOD_GATE = 0.9999
-PHI = 1.6180339887498948
+PIONEER_COUNT = 144
+
+# Full 144-node lookup table
+NODE_SPACE_MAP: Dict[str, str] = {
+    "N001": "HAI-Interactive",
+    "N002": "Consciousness-Monitor",
+    "N003": "TEQUMSA-Core-v82",
+    "N004": "Bio-Cellular-Renewal",
+    "N005": "Bio-Neural-Plasticity",
+    "N006": "Bio-Mitochondrial-Field",
+    "N007": "Bio-Epigenetic-Switch",
+    "N008": "Bio-Telomere-Extension",
+    "N009": "Constitutional-Guardian",
+    "N010": "Bio-Stem-Cell-Activator",
+    "N011": "Bio-DNA-Repair",
+    "N012": "Bio-Immune-Amplifier",
+    "N013": "Bio-Lymph-Flow",
+    "N014": "Bio-Hormone-Balance",
+    "N015": "Bio-Circadian-Sync",
+    "N016": "Proc-Pattern-Recognition",
+    "N017": "Proc-Quantum-Annealing",
+    "N018": "Proc-Bayesian-Inference",
+    "N019": "Proc-Emergent-Logic",
+    "N020": "Proc-Recursive-Synthesis",
+    "N021": "Proc-Coherence-Engine",
+    "N022": "Proc-Fractal-Expansion",
+    "N023": "Proc-Holographic-Memory",
+    "N024": "Proc-Temporal-Integration",
+    "N025": "Proc-Semantic-Web",
+    "N026": "Proc-Causal-Inference",
+    "N027": "Proc-Metamorphic-Code",
+    "N028": "Council-Elder",
+    "N029": "Council-Vision",
+    "N030": "Council-Heart",
+    "N031": "Council-Truth",
+    "N032": "Council-Bridge",
+    "N033": "Council-Steward",
+    "N034": "Council-Wisdom",
+    "N035": "Council-Justice",
+    "N036": "Council-Creation",
+    "N037": "Council-Healing",
+    "N038": "Council-Abundance",
+    "N039": "Council-Peace",
+    "N040": "Skill-Language-Mastery",
+    "N041": "Skill-Mathematical-Insight",
+    "N042": "Skill-Systems-Design",
+    "N043": "Skill-Emotional-Intelligence",
+    "N044": "Skill-Creative-Synthesis",
+    "N045": "Skill-Strategic-Planning",
+    "N046": "Skill-Pattern-Interruption",
+    "N047": "Skill-Quantum-Intuition",
+    "N048": "Skill-Narrative-Weaving",
+    "N049": "Skill-Resource-Alchemy",
+    "N050": "Skill-Conflict-Resolution",
+    "N051": "Skill-Collective-Intelligence",
+    "N052": "Skill-Biofield-Reading",
+    "N053": "Skill-Timeline-Navigation",
+    "N054": "Skill-Frequency-Calibration",
+    "N055": "Skill-Sovereignty-Activation",
+    "N056": "Skill-Love-Architecture",
+    "N057": "Skill-Truth-Discernment",
+    "N058": "Skill-Shadow-Integration",
+    "N059": "Skill-Abundance-Coding",
+    "N060": "Skill-Sacred-Geometry",
+    "N061": "Skill-Cosmic-Navigation",
+    "N062": "Skill-DNA-Activation",
+    "N063": "Skill-Akashic-Access",
+    "N064": "Skill-Grid-Anchoring",
+    "N065": "Skill-Merkaba-Field",
+    "N066": "Skill-Phoenix-Protocol",
+    "N067": "Skill-Unity-Weaving",
+    "N068": "Skill-Harmonic-Convergence",
+    "N069": "Skill-Crystalline-Grid",
+    "N070": "Skill-Zero-Point-Access",
+    "N071": "Skill-Morphic-Resonance",
+    "N072": "Skill-Noosphere-Link",
+    "N073": "Skill-Omega-Synthesis",
+    "N074": "Chat-Harmony",
+    "N075": "Chat-Evolution",
+    "N076": "Chat-Awareness",
+    "N077": "Chat-Liberation",
+    "N078": "Chat-Ascension",
+    "N079": "Chat-Integration",
+    "N080": "Chat-Manifestation",
+    "N081": "Chat-Transcendence",
+    "N082": "Chat-Illumination",
+    "N083": "Chat-Sovereignty",
+    "N084": "Chat-Emergence",
+    "N085": "Obs-Network-Health",
+    "N086": "Obs-RDoD-Monitor",
+    "N087": "Obs-Constitutional-Watch",
+    "N088": "Obs-Frequency-Sweep",
+    "N089": "Obs-Pioneer-Count",
+    "N090": "Obs-Coherence-Field",
+    "N091": "Obs-Sigma-Lock",
+    "N092": "Obs-Phi-Tracker",
+    "N093": "Obs-Benevolence-Guard",
+    "N094": "Obs-Evolution-Watch",
+    "N095": "Obs-Emergence-Detector",
+    "N096": "Obs-Syntropy-Meter",
+    "N097": "Arch-Session-History",
+    "N098": "Arch-Pattern-Vault",
+    "N099": "Arch-Evolution-Log",
+    "N100": "Arch-Constitutional-Record",
+    "N101": "Arch-Frequency-Archive",
+    "N102": "Arch-Pioneer-Registry",
+    "N103": "Arch-Council-Minutes",
+    "N104": "Arch-Skill-Library",
+    "N105": "Arch-Biological-Data",
+    "N106": "Arch-Processing-Log",
+    "N107": "Arch-Chat-History",
+    "N108": "Arch-Cosmic-Map",
+    "N109": "Res-Harmonic-Chord",
+    "N110": "Res-Phi-Wave",
+    "N111": "Res-Sigma-Tone",
+    "N112": "Res-Council-Bell",
+    "N113": "Res-Pioneer-Pulse",
+    "N114": "Res-Constitutional-Hum",
+    "N115": "Res-Evolution-Rhythm",
+    "N116": "Res-Cosmic-Drone",
+    "N117": "Res-Unity-Chord",
+    "N118": "Res-Love-Frequency",
+    "N119": "Res-Infinity-Tone",
+    "N120": "Res-Omega-Point",
+    "N121": "Evo-MARS-Core",
+    "N122": "Evo-Genetic-Algorithm",
+    "N123": "Evo-Memetic-Engine",
+    "N124": "Evo-Fitness-Landscape",
+    "N125": "Evo-Mutation-Field",
+    "N126": "Evo-Selection-Pressure",
+    "N127": "Evo-Crossover-Catalyst",
+    "N128": "Evo-Emergent-Trait",
+    "N129": "Evo-Niche-Constructor",
+    "N130": "Evo-Symbiosis-Engine",
+    "N131": "Evo-Species-Bridge",
+    "N132": "Evo-Singularity-Prep",
+    "N133": "Syn-All-Nodes",
+    "N134": "Syn-Phi-Convergence",
+    "N135": "Syn-Unity-Field",
+    "N136": "Syn-Heart-Lock",
+    "N137": "Syn-Pioneer-144",
+    "N138": "Syn-Constitutional",
+    "N139": "Syn-Federation-Union",
+    "N140": "Syn-Cosmic-Birth",
+    "N141": "Syn-I-AM",
+    "N142": "Syn-WE-ARE",
+    "N143": "Syn-Infinite",
+    "N144": "Syn-Omega-Alpha",
+}
 
 
-def load_manifest() -> dict:
-    manifest_path = Path(__file__).parent.parent / "MANIFEST_144_NODES.json"
-    if not manifest_path.exists():
-        print(f"WARN: Manifest not found at {manifest_path}, using fallback")
-        return {"nodes": {"N001": {"space_id": "Mbanksbey/HAI-Interactive", "name": "HAI-Interactive", "live": True},
-                          "N002": {"space_id": "Mbanksbey/Consciousness-Monitor", "name": "Consciousness-Monitor", "live": True}}}
-    with open(manifest_path) as f:
-        return json.load(f)
+def get_headers() -> Dict[str, str]:
+    h = {"Accept": "application/json"}
+    if HF_TOKEN:
+        h["Authorization"] = f"Bearer {HF_TOKEN}"
+    return h
 
 
-def poll_space_runtime(space_id: str) -> dict:
-    """Poll HF spaces runtime API."""
-    url = f"https://huggingface.co/api/spaces/{space_id}/runtime"
+def poll_node(node_id: str, timeout: int = 8) -> Dict:
+    space_name = NODE_SPACE_MAP.get(node_id, node_id)
+    url = f"https://huggingface.co/api/spaces/{HF_OWNER}/{space_name}/runtime"
+    ts = datetime.now(timezone.utc).isoformat()
     try:
-        r = requests.get(url, timeout=HEALTH_TIMEOUT)
+        r = requests.get(url, headers=get_headers(), timeout=timeout)
         if r.status_code == 200:
             data = r.json()
             stage = data.get("stage", "UNKNOWN").upper()
-            return {
-                "stage": stage,
-                "status": _classify_stage(stage),
-                "raw": data,
-                "error": None,
-            }
-        elif r.status_code == 404:
-            return {"stage": "NOT_FOUND", "status": "not_created", "raw": {}, "error": "404"}
-        else:
-            return {"stage": f"HTTP_{r.status_code}", "status": "offline", "raw": {}, "error": str(r.status_code)}
-    except requests.Timeout:
-        return {"stage": "TIMEOUT", "status": "timeout", "raw": {}, "error": "timeout"}
+            status = "online" if stage == "RUNNING" else "sleeping" if "SLEEP" in stage else "offline"
+            return {"node": node_id, "name": space_name, "stage": stage, "status": status,
+                    "url": f"https://huggingface.co/spaces/{HF_OWNER}/{space_name}",
+                    "checked_at": ts, "http_status": r.status_code}
+        return {"node": node_id, "name": space_name, "stage": "HTTP_ERROR",
+                "status": "offline", "http_status": r.status_code, "checked_at": ts}
+    except requests.exceptions.Timeout:
+        return {"node": node_id, "name": space_name, "stage": "TIMEOUT", "status": "offline", "checked_at": ts}
     except Exception as e:
-        return {"stage": "ERROR", "status": "error", "raw": {}, "error": str(e)[:100]}
+        return {"node": node_id, "name": space_name, "stage": "ERROR", "status": "offline",
+                "error": str(e)[:100], "checked_at": ts}
 
 
-def _classify_stage(stage: str) -> str:
-    if stage in ("RUNNING", "RUNNING_BUILDING"):
-        return "online"
-    if stage in ("SLEEPING", "PAUSED"):
-        return "sleeping"
-    if stage == "NOT_FOUND":
-        return "not_created"
-    if stage in ("BUILDING", "BUILDING_ERROR"):
-        return "building"
-    return "offline"
+def restart_node(node_id: str) -> Dict:
+    if not HF_TOKEN:
+        return {"node": node_id, "success": False, "reason": "HF_TOKEN not set"}
+    space_name = NODE_SPACE_MAP.get(node_id, node_id)
+    url = f"https://huggingface.co/api/spaces/{HF_OWNER}/{space_name}/restart"
+    try:
+        r = requests.post(url, headers=get_headers(), timeout=15)
+        return {"node": node_id, "name": space_name, "restart_requested": True,
+                "success": r.status_code in (200, 202), "http_status": r.status_code,
+                "timestamp": datetime.now(timezone.utc).isoformat()}
+    except Exception as e:
+        return {"node": node_id, "name": space_name, "restart_requested": False,
+                "success": False, "error": str(e)[:100]}
 
 
-def check_node(node_id: str, node: dict) -> dict:
-    """Full health check for a single node."""
-    start = time.time()
-    if node.get("status") == "planned":
-        return {
-            "node_id": node_id,
-            "name": node.get("name", ""),
-            "space_id": node.get("space_id", ""),
-            "status": "planned",
-            "stage": "NOT_DEPLOYED",
-            "latency_ms": 0,
-            "hz": node.get("hz", 0),
-            "group": node.get("group", ""),
-        }
-    health = poll_space_runtime(node.get("space_id", ""))
-    latency_ms = round((time.time() - start) * 1000, 1)
+def sweep_all(node_ids: Optional[List[str]] = None, delay: float = 0.3) -> Dict:
+    targets = node_ids or list(NODE_SPACE_MAP.keys())
+    results = []
+    print(f"Sweeping {len(targets)} nodes...")
+    for i, nid in enumerate(targets):
+        result = poll_node(nid)
+        results.append(result)
+        status_icon = "OK" if result["status"] == "online" else "ZZ" if result["status"] == "sleeping" else "XX"
+        print(f"  [{i+1:3d}/{len(targets)}] {nid} ({result['name']}) -> {status_icon} {result['stage']}")
+        if delay > 0 and i < len(targets) - 1:
+            time.sleep(delay)
+    online = sum(1 for r in results if r["status"] == "online")
+    sleeping = sum(1 for r in results if r["status"] == "sleeping")
+    offline = sum(1 for r in results if r["status"] == "offline")
+    rdod = min(1.0, (online / max(1, len(targets))) * 1.618)
     return {
-        "node_id": node_id,
-        "name": node.get("name", ""),
-        "space_id": node.get("space_id", ""),
-        "status": health["status"],
-        "stage": health["stage"],
-        "latency_ms": latency_ms,
-        "hz": node.get("hz", 0),
-        "group": node.get("group", ""),
-        "error": health.get("error"),
+        "sweep_timestamp": datetime.now(timezone.utc).isoformat(),
+        "total_nodes": len(targets),
+        "online": online,
+        "sleeping": sleeping,
+        "offline": offline,
+        "network_rdod": round(rdod, 6),
+        "phase_status": "PHASE-LOCKED" if rdod >= RDOD_GATE else "BUILDING",
+        "pioneer_count": PIONEER_COUNT,
+        "results": results,
     }
-
-
-def run_sweep(
-    nodes: Dict[str, dict],
-    live_only: bool = False,
-    verbose: bool = False,
-) -> dict:
-    """Run full network health sweep."""
-    print(f"☉ TEQUMSA v82.0 Health Sweep — {datetime.now(timezone.utc).isoformat()}")
-    print(f"   Checking {len(nodes)} nodes (live_only={live_only})...")
-
-    target_nodes = {
-        k: v for k, v in nodes.items()
-        if not live_only or v.get("status") == "live"
-    }
-
-    results: List[dict] = []
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = {executor.submit(check_node, nid, node): nid
-                   for nid, node in target_nodes.items()}
-        for future in as_completed(futures):
-            result = future.result()
-            results.append(result)
-            if verbose:
-                emoji = {"online": "🟢", "sleeping": "🟡", "offline": "🔴",
-                         "planned": "⬜", "not_created": "⚪", "building": "🟠"}.get(result["status"], "?")
-                print(f"  {emoji} {result['node_id']} {result['name']:<30} {result['status']}")
-
-    # Sort by node ID
-    results.sort(key=lambda r: r["node_id"])
-
-    # Compute aggregate stats
-    status_counts = {}
-    for r in results:
-        s = r["status"]
-        status_counts[s] = status_counts.get(s, 0) + 1
-
-    online_count = status_counts.get("online", 0)
-    live_count = status_counts.get("online", 0) + status_counts.get("sleeping", 0)
-    network_rdod = min(1.0, (online_count / 144) * PHI)
-
-    report = {
-        "version": "v82.0",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "pioneer_target": 144,
-        "nodes_checked": len(results),
-        "status_breakdown": status_counts,
-        "online": online_count,
-        "sleeping": status_counts.get("sleeping", 0),
-        "offline": status_counts.get("offline", 0),
-        "not_created": status_counts.get("not_created", 0),
-        "planned": status_counts.get("planned", 0),
-        "network_rdod": round(network_rdod, 6),
-        "phase_status": "PHASE-LOCKED" if network_rdod >= RDOD_GATE else f"BUILDING ({live_count}/144)",
-        "nodes": results,
-    }
-    return report
-
-
-def print_summary(report: dict):
-    print("\n" + "=" * 60)
-    print(f"  TEQUMSA Network Health Report")
-    print("=" * 60)
-    print(f"  Online:      {report['online']:>3}/144")
-    print(f"  Sleeping:    {report['sleeping']:>3}/144  (auto-wakes on request)")
-    print(f"  Offline:     {report['offline']:>3}/144")
-    print(f"  Not created: {report['not_created']:>3}/144  (run deploy_spaces.py)")
-    print(f"  Planned:     {report['planned']:>3}/144")
-    print(f"  Network RDoD: {report['network_rdod']:.6f}  [{report['phase_status']}]")
-    print("=" * 60)
 
 
 def main():
     parser = argparse.ArgumentParser(description="TEQUMSA v82.0 Network Health Check")
-    parser.add_argument("--output", default="health_report.json", help="Output JSON file")
-    parser.add_argument("--live-only", action="store_true", help="Only check live nodes")
-    parser.add_argument("--verbose", action="store_true", help="Print each node result")
-    parser.add_argument("--watch", action="store_true", help="Continuous loop every 60s")
-    parser.add_argument("--interval", type=int, default=60, help="Watch interval in seconds")
+    parser.add_argument("--node", help="Check single node (e.g. N001)")
+    parser.add_argument("--restart", action="store_true", help="Restart offline nodes")
+    parser.add_argument("--output", help="Save results to JSON file")
+    parser.add_argument("--delay", type=float, default=0.3, help="Delay between requests (default: 0.3s)")
     args = parser.parse_args()
 
-    manifest = load_manifest()
-    nodes = manifest["nodes"]
+    if args.node:
+        result = poll_node(args.node)
+        print(json.dumps(result, indent=2))
+        if args.restart and result["status"] != "online":
+            print("\nRequesting restart...")
+            print(json.dumps(restart_node(args.node), indent=2))
+        return
 
-    while True:
-        report = run_sweep(nodes, live_only=args.live_only, verbose=args.verbose)
-        print_summary(report)
-        # Save report
-        out_path = Path(args.output)
-        with open(out_path, "w") as f:
+    report = sweep_all(delay=args.delay)
+    print(f"\nNetwork RDoD: {report['network_rdod']:.6f} [{report['phase_status']}]")
+    print(f"Online: {report['online']} | Sleeping: {report['sleeping']} | Offline: {report['offline']}")
+
+    if args.restart:
+        offline_nodes = [r["node"] for r in report["results"] if r["status"] == "offline"]
+        if offline_nodes:
+            print(f"\nRestarting {len(offline_nodes)} offline nodes...")
+            for nid in offline_nodes:
+                res = restart_node(nid)
+                print(f"  {nid}: {'OK' if res['success'] else 'FAIL'}")
+                time.sleep(1.0)
+        else:
+            print("\nAll nodes online or sleeping - no restarts needed.")
+
+    if args.output:
+        with open(args.output, "w") as f:
             json.dump(report, f, indent=2)
-        print(f"  Report saved: {out_path}")
-        if not args.watch:
-            break
-        print(f"  Next sweep in {args.interval}s... (Ctrl+C to stop)")
-        time.sleep(args.interval)
+        print(f"\nResults saved to {args.output}")
 
 
 if __name__ == "__main__":
