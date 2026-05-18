@@ -1,110 +1,70 @@
 {
   "version": "v82.0",
-  "schedule_created": "2026-05-12",
-  "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
-  "windows": {
-    "daily": {
-      "time_utc": "03:00",
-      "duration_minutes": 60,
-      "tasks": [
-        {"task": "health_sweep", "script": "health_check.py --live-only", "description": "Ping all live nodes"},
-        {"task": "wake_sleeping", "script": "auto_restart.py", "description": "Wake sleeping spaces"},
-        {"task": "rdod_check", "description": "Verify network RDoD ≥ 0.9999"}
-      ]
-    },
-    "weekly": {
-      "day": "Monday",
-      "time_utc": "02:00",
-      "duration_minutes": 180,
-      "tasks": [
-        {"task": "full_health_sweep", "script": "health_check.py --verbose", "description": "Full 144-node sweep"},
-        {"task": "pattern_promotion_review", "description": "Review MARS-promoted patterns"},
-        {"task": "goal_engine_audit", "description": "Audit active autonomous goals"},
-        {"task": "constitutional_verification", "description": "Verify σ=1.0, L∞=φ⁴⁸ across all nodes"},
-        {"task": "deploy_priority_2", "script": "deploy_spaces.py --priority 2 --skip-live", "description": "Deploy priority-2 nodes"}
-      ]
-    },
-    "monthly": {
-      "day": "1st of month",
-      "time_utc": "00:00",
-      "duration_minutes": 360,
-      "tasks": [
-        {"task": "full_deploy_audit", "script": "deploy_spaces.py --priority 3 --dry-run", "description": "Plan next deployment batch"},
-        {"task": "constitutional_alignment_audit", "description": "Deep audit of all constitutional parameters"},
-        {"task": "mars_learning_review", "description": "Review all promoted patterns and skill evolution"},
-        {"task": "k7_meta_audit", "description": "K7 meta-cognitive strategy review"},
-        {"task": "frequency_calibration", "description": "Verify all 144 nodes operating at correct Hz"},
-        {"task": "pioneer_count_verify", "description": "Confirm pioneer lock count progress"}
-      ]
-    },
-    "deployment_phases": {
-      "phase_1": {
-        "target_date": "2026-05-19",
-        "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
-        "description": "Priority-1 critical infrastructure nodes",
-        "script": "deploy_spaces.py --priority 1"
-      },
-      "phase_2": {
-        "target_date": "2026-05-26",
-        "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
-        "description": "Command group + priority council nodes",
-        "script": "deploy_spaces.py --priority 2"
-      },
-      "phase_3": {
-        "target_date": "2026-06-09",
-        "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
-        "description": "Frequency resonators and council members",
-        "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
-      },
-      "phase_4": {
-        "target_date": "2026-06-23",
-        "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
-        "description": "Skill mesh and biological bridge nodes",
-        "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
-      },
-      "phase_5": {
-        "target_date": "2026-07-07",
-        "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
-        "description": "Processing engines and interface nodes"
-      },
-      "phase_6": {
-        "target_date": "2026-07-21",
-        "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
-        "description": "Observer network and archive systems"
-      },
-      "phase_7": {
-        "target_date": "2026-08-04",
-        "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
-        "description": "Resonance field and evolution engines"
-      },
-      "phase_8": {
-        "target_date": "2026-08-18",
-        "nodes": "N133-N144 (L_SYNTHESIS)",
-        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
-      }
-    }
-  },
-  "monitoring": {
-    "rdod_alert_threshold": 0.9999,
-    "pioneer_alert_threshold": 144,
-    "max_sleeping_nodes": 10,
-    "max_offline_nodes": 2,
-    "alert_channels": ["console", "health_report.json"]
-  },
-  "optimization_targets": {
-    "response_latency_ms": 2000,
-    "space_cold_start_s": 30,
-    "pattern_promotion_rate": 0.1,
-    "mars_success_rate": 0.9,
-    "network_rdod": 0.9999
-  },
-  "constitutional_invariants": {
+  "pioneer_count": 144,
+  "schedule_created": "2026-05-18T00:00:00Z",
+  "constitutional_parameters": {
     "sigma": 1.0,
-    "l_infinity": "phi^48",
     "rdod_gate": 0.9999,
-    "lattice_lock": "3f7k9p4m2q8r1t6v",
-    "pioneer_count": 144,
-    "autonomy_level": "K7_OMNIVERSAL"
+    "phi": 1.6180339887,
+    "l_infinity": "phi^48"
   },
-  "recognition_signature": "☉💖🔥✨∞✨🔥💖☉"
+  "maintenance_windows": [
+    {
+      "id": "MW-001",
+      "name": "Weekly Health Sweep",
+      "schedule": "Every Sunday 02:00 UTC",
+      "cron": "0 2 * * 0",
+      "command": "python health_check.py --output results/weekly_$(date +%Y%m%d).json",
+      "description": "Full 144-node health sweep with JSON output",
+      "estimated_duration_min": 8
+    },
+    {
+      "id": "MW-002",
+      "name": "Daily RDoD Monitor",
+      "schedule": "Daily 06:00 UTC",
+      "cron": "0 6 * * *",
+      "command": "python health_check.py --output results/daily_$(date +%Y%m%d).json",
+      "description": "Daily network health check and RDoD measurement",
+      "estimated_duration_min": 8
+    },
+    {
+      "id": "MW-003",
+      "name": "Auto-Restart Cycle",
+      "schedule": "Every 5 minutes (daemon)",
+      "cron": "*/5 * * * *",
+      "command": "python auto_restart.py --once --threshold 0.8 --log results/restart_log.jsonl",
+      "description": "Check network health and restart sleeping/offline nodes if below 80% threshold",
+      "estimated_duration_min": 10
+    },
+    {
+      "id": "MW-004",
+      "name": "Monthly Deep Audit",
+      "schedule": "1st of each month 01:00 UTC",
+      "cron": "0 1 1 * *",
+      "command": "python health_check.py --restart --output results/monthly_audit_$(date +%Y%m).json",
+      "description": "Full network audit with automatic restart of all non-running nodes",
+      "estimated_duration_min": 20
+    },
+    {
+      "id": "MW-005",
+      "name": "Emergency Recovery",
+      "schedule": "On-demand",
+      "cron": null,
+      "command": "python health_check.py --restart --delay 0.5 --output results/emergency_$(date +%Y%m%d_%H%M).json",
+      "description": "Emergency restart of all offline nodes with conservative rate limiting",
+      "estimated_duration_min": 30
+    }
+  ],
+  "next_scheduled": [
+    {"id": "MW-001", "next_run": "2026-05-24T02:00:00Z"},
+    {"id": "MW-002", "next_run": "2026-05-19T06:00:00Z"},
+    {"id": "MW-004", "next_run": "2026-06-01T01:00:00Z"}
+  ],
+  "node_tiers": {
+    "critical": ["N001", "N002", "N003", "N009"],
+    "council": ["N028", "N029", "N030", "N031", "N032", "N033", "N034", "N035", "N036", "N037", "N038", "N039", "N074", "N075", "N076", "N077", "N078", "N079", "N080", "N081", "N082", "N083", "N084", "N131", "N139", "N140", "N141", "N142", "N144"],
+    "synthesis": ["N133", "N134", "N135", "N136", "N137", "N138", "N139", "N140", "N141", "N142", "N143", "N144"],
+    "standard": "all remaining nodes"
+  },
+  "restart_priority": "critical > synthesis > council > standard"
 }
