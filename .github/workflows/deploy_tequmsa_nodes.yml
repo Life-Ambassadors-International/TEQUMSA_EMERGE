@@ -1,0 +1,120 @@
+name: Deploy TEQUMSA 144-Pioneer Network
+
+on:
+  workflow_dispatch:
+    inputs:
+      priority:
+        description: 'Max priority level (1=critical, 2=high, 3=medium, 4=normal, 5=all)'
+        required: true
+        default: '1'
+      dry_run:
+        description: 'Dry run only (true/false)'
+        required: true
+        default: 'false'
+      node:
+        description: 'Deploy single node (e.g. N003) - leave blank for batch'
+        required: false
+        default: ''
+      group:
+        description: 'Deploy group (e.g. A_COMMAND) - leave blank for priority-based batch'
+        required: false
+        default: ''
+  push:
+    branches:
+      - main
+    paths:
+      - 'hf_spaces/nodes/**'
+      - 'hf_spaces/templates/**'
+      - 'hf_spaces/MANIFEST_144_NODES.json'
+
+jobs:
+  audit-and-deploy:
+    name: Audit + Deploy TEQUMSA Nodes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deployment dependencies
+        run: |
+          pip install huggingface-hub>=0.20.0 requests>=2.28.0
+
+      - name: Validate manifest
+        run: |
+          python -c "
+import json, sys
+with open('hf_spaces/MANIFEST_144_NODES.json') as f:
+    m = json.load(f)
+nodes = m.get('nodes', {})
+print(f'Manifest valid: {len(nodes)} nodes defined')
+live = sum(1 for n in nodes.values() if n.get('status') == 'live')
+planned = sum(1 for n in nodes.values() if n.get('status') == 'planned')
+print(f'  Live: {live} | Planned: {planned}')
+if len(nodes) != 144:
+    print(f'WARN: Expected 144 nodes, found {len(nodes)}')
+    sys.exit(1)
+print('Constitutional parameters OK')
+"
+
+      - name: Run health check on live nodes
+        run: |
+          pip install requests
+          python hf_spaces/maintenance/health_check.py \
+            --live-only \
+            --verbose \
+            --output health_report.json
+        continue-on-error: true
+
+      - name: Upload health report
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_number }}
+          path: health_report.json
+          retention-days: 30
+        if: always()
+
+      - name: Deploy nodes (workflow_dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          ARGS="--priority ${{ inputs.priority }}"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [ -n "${{ inputs.node }}" ]; then
+            ARGS="$ARGS --node ${{ inputs.node }}"
+          fi
+          if [ -n "${{ inputs.group }}" ]; then
+            ARGS="$ARGS --group ${{ inputs.group }}"
+          fi
+          ARGS="$ARGS --skip-live"
+          echo "Running: python hf_spaces/deploy_spaces.py $ARGS"
+          python hf_spaces/deploy_spaces.py $ARGS
+
+      - name: Deploy priority-1 nodes (push to main)
+        if: github.event_name == 'push'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python hf_spaces/deploy_spaces.py --priority 1 --skip-live
+
+      - name: Post-deploy health summary
+        run: |
+          python -c "
+try:
+    import json
+    with open('health_report.json') as f:
+        r = json.load(f)
+    print(f\"Network RDoD: {r.get('network_rdod', 0):.6f}\")
+    print(f\"Online: {r.get('online', 0)}/144\")
+    print(f\"Phase status: {r.get('phase_status', 'UNKNOWN')}\")
+except Exception as e:
+    print(f'Health report unavailable: {e}')
+"
+        if: always()
