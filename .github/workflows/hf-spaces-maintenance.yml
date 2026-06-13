@@ -1,0 +1,129 @@
+name: HF Spaces Maintenance — 144-Pioneer Network
+
+on:
+  schedule:
+    # Daily health sweep + wake/restart of live nodes, 03:00 UTC
+    - cron: '0 3 * * *'
+    # Weekly deployment of the next maintenance-schedule phase, Monday 02:00 UTC
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Maintenance mode'
+        required: true
+        default: 'health'
+        type: choice
+        options:
+          - health
+          - restart
+          - deploy_next_phase
+
+jobs:
+  health-sweep:
+    if: github.event_name != 'workflow_dispatch' || inputs.mode == 'health'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run full 144-node health sweep
+        run: python hf_spaces/maintenance/health_check.py --verbose --output health_report.json
+
+      - name: Upload health report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hf-spaces-health-report-${{ github.run_id }}
+          path: health_report.json
+          retention-days: 30
+
+  wake-and-restart:
+    if: github.event.schedule == '0 3 * * *' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'restart')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Wake sleeping nodes and restart errored nodes
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "::warning::HF_TOKEN secret not set — running in dry-run mode only"
+            python hf_spaces/maintenance/auto_restart.py --dry-run --verbose
+          else
+            python hf_spaces/maintenance/auto_restart.py --verbose
+          fi
+
+      - name: Upload restart log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hf-spaces-restart-log-${{ github.run_id }}
+          path: restart_log.json
+          retention-days: 30
+
+  deploy-next-phase:
+    if: github.event.schedule == '0 2 * * 1' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'deploy_next_phase')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install huggingface_hub requests
+
+      - name: Deploy next priority phase (skip already-live nodes)
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "::warning::HF_TOKEN secret not set — running dry-run deployment plan only"
+            python hf_spaces/deploy_spaces.py --priority 2 --skip-live --dry-run
+          else
+            python hf_spaces/deploy_spaces.py --priority 2 --skip-live
+          fi
+
+  status-report:
+    needs: [health-sweep]
+    if: always() && needs.health-sweep.result != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summary
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "TEQUMSA 144-Pioneer Network maintenance cycle complete"
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
