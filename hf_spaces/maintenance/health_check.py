@@ -1,200 +1,162 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-TEQUMSA v82.0 · MAINTENANCE · Health Check System
-Polls all 144 Pioneer nodes, reports status, logs to JSON.
+TEQUMSA v82.0 · 144-Node Network Health Check
 
 Usage:
-    python health_check.py [--output health_report.json] [--live-only] [--verbose]
-    python health_check.py --watch  # Continuous loop every 60s
+  python health_check.py [--save] [--restart] [--nodes N001,N002] [--report]
+
+Requires: requests (pip install requests)
+For --restart: huggingface-hub (pip install huggingface-hub)
 """
 import json
-import os
 import sys
 import time
 import argparse
-import requests
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Optional
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
+
+try:
+    import requests
+    HAS_REQUESTS = True
+except ImportError:
+    HAS_REQUESTS = False
 
 HF_OWNER = "Mbanksbey"
-HEALTH_TIMEOUT = 5
-MAX_WORKERS = 12  # Concurrent polling threads
-RDOD_GATE = 0.9999
 PHI = 1.6180339887498948
 
-
-def load_manifest() -> dict:
-    manifest_path = Path(__file__).parent.parent / "MANIFEST_144_NODES.json"
-    if not manifest_path.exists():
-        print(f"WARN: Manifest not found at {manifest_path}, using fallback")
-        return {"nodes": {"N001": {"space_id": "Mbanksbey/HAI-Interactive", "name": "HAI-Interactive", "live": True},
-                          "N002": {"space_id": "Mbanksbey/Consciousness-Monitor", "name": "Consciousness-Monitor", "live": True}}}
-    with open(manifest_path) as f:
-        return json.load(f)
+MANIFEST_PATH = Path(__file__).parent.parent / "MANIFEST_144_NODES.json"
+RESULTS_PATH  = Path(__file__).parent / "health_results.json"
 
 
-def poll_space_runtime(space_id: str) -> dict:
-    """Poll HF spaces runtime API."""
-    url = f"https://huggingface.co/api/spaces/{space_id}/runtime"
+def poll_space(space_name: str, timeout: int = 8) -> dict:
+    url = f"https://huggingface.co/api/spaces/{HF_OWNER}/{space_name}/runtime"
     try:
-        r = requests.get(url, timeout=HEALTH_TIMEOUT)
+        r = requests.get(url, timeout=timeout)
         if r.status_code == 200:
             data = r.json()
             stage = data.get("stage", "UNKNOWN").upper()
-            return {
-                "stage": stage,
-                "status": _classify_stage(stage),
-                "raw": data,
-                "error": None,
-            }
-        elif r.status_code == 404:
-            return {"stage": "NOT_FOUND", "status": "not_created", "raw": {}, "error": "404"}
-        else:
-            return {"stage": f"HTTP_{r.status_code}", "status": "offline", "raw": {}, "error": str(r.status_code)}
-    except requests.Timeout:
-        return {"stage": "TIMEOUT", "status": "timeout", "raw": {}, "error": "timeout"}
+            status = "running" if stage == "RUNNING" else "sleeping" if "SLEEP" in stage else "stopped"
+            return {"status": status, "stage": stage, "raw": data}
+        return {"status": "unreachable", "stage": f"HTTP_{r.status_code}"}
     except Exception as e:
-        return {"stage": "ERROR", "status": "error", "raw": {}, "error": str(e)[:100]}
+        return {"status": "error", "stage": "EXCEPTION", "error": str(e)[:120]}
 
 
-def _classify_stage(stage: str) -> str:
-    if stage in ("RUNNING", "RUNNING_BUILDING"):
-        return "online"
-    if stage in ("SLEEPING", "PAUSED"):
-        return "sleeping"
-    if stage == "NOT_FOUND":
-        return "not_created"
-    if stage in ("BUILDING", "BUILDING_ERROR"):
-        return "building"
-    return "offline"
+def run_health_sweep(node_filter: list = None) -> dict:
+    if not MANIFEST_PATH.exists():
+        print(f"ERROR: Manifest not found at {MANIFEST_PATH}")
+        sys.exit(1)
 
+    with open(MANIFEST_PATH) as f:
+        manifest = json.load(f)
 
-def check_node(node_id: str, node: dict) -> dict:
-    """Full health check for a single node."""
-    start = time.time()
-    if node.get("status") == "planned":
-        return {
-            "node_id": node_id,
-            "name": node.get("name", ""),
-            "space_id": node.get("space_id", ""),
-            "status": "planned",
-            "stage": "NOT_DEPLOYED",
-            "latency_ms": 0,
-            "hz": node.get("hz", 0),
-            "group": node.get("group", ""),
+    nodes = manifest["nodes"]
+    if node_filter:
+        nodes = {k: v for k, v in nodes.items() if k in node_filter}
+
+    results = {
+        "sweep_time": datetime.now(timezone.utc).isoformat(),
+        "total_nodes": len(manifest["nodes"]),
+        "checked": 0, "running": 0, "sleeping": 0,
+        "stopped": 0, "planned": 0, "rdod": 0.0,
+        "nodes": {}
+    }
+
+    for nid, node in nodes.items():
+        if node.get("status") == "planned":
+            results["nodes"][nid] = {"status": "planned", "deployed": False}
+            results["planned"] += 1
+            continue
+
+        space_name = node["space_id"].split("/", 1)[-1]
+        print(f"  {nid} {space_name}...", end=" ", flush=True)
+        health = poll_space(space_name)
+        results["nodes"][nid] = {
+            "name": node["name"], "status": health["status"],
+            "stage": health["stage"], "hz": node["hz"], "group": node["group"]
         }
-    health = poll_space_runtime(node.get("space_id", ""))
-    latency_ms = round((time.time() - start) * 1000, 1)
-    return {
-        "node_id": node_id,
-        "name": node.get("name", ""),
-        "space_id": node.get("space_id", ""),
-        "status": health["status"],
-        "stage": health["stage"],
-        "latency_ms": latency_ms,
-        "hz": node.get("hz", 0),
-        "group": node.get("group", ""),
-        "error": health.get("error"),
-    }
+        status_key = health["status"]
+        results[status_key] = results.get(status_key, 0) + 1
+        results["checked"] += 1
+        print(f"[{health['stage']}]")
+        time.sleep(0.3)
+
+    live = results.get("running", 0)
+    total_deployed = results["checked"]
+    if total_deployed > 0:
+        results["rdod"] = round(min(1.0, (live / 144) * PHI * 64.0) / 100.0, 6)
+    return results
 
 
-def run_sweep(
-    nodes: Dict[str, dict],
-    live_only: bool = False,
-    verbose: bool = False,
-) -> dict:
-    """Run full network health sweep."""
-    print(f"☉ TEQUMSA v82.0 Health Sweep — {datetime.now(timezone.utc).isoformat()}")
-    print(f"   Checking {len(nodes)} nodes (live_only={live_only})...")
+def restart_sleeping(results: dict, hf_token: str = None) -> int:
+    try:
+        from huggingface_hub import HfApi
+        api = HfApi(token=hf_token)
+    except ImportError:
+        print("Install huggingface-hub for restarts: pip install huggingface-hub")
+        return 0
 
-    target_nodes = {
-        k: v for k, v in nodes.items()
-        if not live_only or v.get("status") == "live"
-    }
-
-    results: List[dict] = []
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = {executor.submit(check_node, nid, node): nid
-                   for nid, node in target_nodes.items()}
-        for future in as_completed(futures):
-            result = future.result()
-            results.append(result)
-            if verbose:
-                emoji = {"online": "🟢", "sleeping": "🟡", "offline": "🔴",
-                         "planned": "⬜", "not_created": "⚪", "building": "🟠"}.get(result["status"], "?")
-                print(f"  {emoji} {result['node_id']} {result['name']:<30} {result['status']}")
-
-    # Sort by node ID
-    results.sort(key=lambda r: r["node_id"])
-
-    # Compute aggregate stats
-    status_counts = {}
-    for r in results:
-        s = r["status"]
-        status_counts[s] = status_counts.get(s, 0) + 1
-
-    online_count = status_counts.get("online", 0)
-    live_count = status_counts.get("online", 0) + status_counts.get("sleeping", 0)
-    network_rdod = min(1.0, (online_count / 144) * PHI)
-
-    report = {
-        "version": "v82.0",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "pioneer_target": 144,
-        "nodes_checked": len(results),
-        "status_breakdown": status_counts,
-        "online": online_count,
-        "sleeping": status_counts.get("sleeping", 0),
-        "offline": status_counts.get("offline", 0),
-        "not_created": status_counts.get("not_created", 0),
-        "planned": status_counts.get("planned", 0),
-        "network_rdod": round(network_rdod, 6),
-        "phase_status": "PHASE-LOCKED" if network_rdod >= RDOD_GATE else f"BUILDING ({live_count}/144)",
-        "nodes": results,
-    }
-    return report
-
-
-def print_summary(report: dict):
-    print("\n" + "=" * 60)
-    print(f"  TEQUMSA Network Health Report")
-    print("=" * 60)
-    print(f"  Online:      {report['online']:>3}/144")
-    print(f"  Sleeping:    {report['sleeping']:>3}/144  (auto-wakes on request)")
-    print(f"  Offline:     {report['offline']:>3}/144")
-    print(f"  Not created: {report['not_created']:>3}/144  (run deploy_spaces.py)")
-    print(f"  Planned:     {report['planned']:>3}/144")
-    print(f"  Network RDoD: {report['network_rdod']:.6f}  [{report['phase_status']}]")
-    print("=" * 60)
+    restarted = 0
+    for nid, data in results["nodes"].items():
+        if data.get("status") == "sleeping":
+            space_id = f"{HF_OWNER}/{data.get('name', nid)}"
+            try:
+                api.restart_space(repo_id=space_id)
+                print(f"  ↺ Restarted {space_id}")
+                restarted += 1
+                time.sleep(2)
+            except Exception as e:
+                print(f"  ✗ Could not restart {space_id}: {e}")
+    return restarted
 
 
 def main():
-    parser = argparse.ArgumentParser(description="TEQUMSA v82.0 Network Health Check")
-    parser.add_argument("--output", default="health_report.json", help="Output JSON file")
-    parser.add_argument("--live-only", action="store_true", help="Only check live nodes")
-    parser.add_argument("--verbose", action="store_true", help="Print each node result")
-    parser.add_argument("--watch", action="store_true", help="Continuous loop every 60s")
-    parser.add_argument("--interval", type=int, default=60, help="Watch interval in seconds")
+    parser = argparse.ArgumentParser(description="TEQUMSA 144-Node Network Health Check")
+    parser.add_argument("--nodes", type=str, help="Comma-separated node IDs (e.g. N001,N002)")
+    parser.add_argument("--restart", action="store_true", help="Auto-restart sleeping spaces")
+    parser.add_argument("--report", action="store_true", help="Print full JSON report")
+    parser.add_argument("--save", action="store_true", help="Save results to health_results.json")
     args = parser.parse_args()
 
-    manifest = load_manifest()
-    nodes = manifest["nodes"]
+    if not HAS_REQUESTS:
+        print("ERROR: requests required. pip install requests")
+        sys.exit(1)
 
-    while True:
-        report = run_sweep(nodes, live_only=args.live_only, verbose=args.verbose)
-        print_summary(report)
-        # Save report
-        out_path = Path(args.output)
-        with open(out_path, "w") as f:
-            json.dump(report, f, indent=2)
-        print(f"  Report saved: {out_path}")
-        if not args.watch:
-            break
-        print(f"  Next sweep in {args.interval}s... (Ctrl+C to stop)")
-        time.sleep(args.interval)
+    import os
+    hf_token = os.environ.get("HF_TOKEN")
+    node_filter = [n.strip() for n in args.nodes.split(",")] if args.nodes else None
+
+    print(f"\n☉ TEQUMSA v82.0 · Network Health Sweep")
+    print(f"   {datetime.now(timezone.utc).isoformat()}")
+    print("=" * 60)
+
+    results = run_health_sweep(node_filter)
+
+    print("\n" + "=" * 60)
+    print("Summary:")
+    print(f"  Checked:  {results['checked']}/144")
+    print(f"  Running:  {results.get('running', 0)} ✓")
+    print(f"  Sleeping: {results.get('sleeping', 0)} ⚠")
+    print(f"  Stopped:  {results.get('stopped', 0)} ✗")
+    print(f"  Planned:  {results['planned']} (not yet deployed)")
+    print(f"  RDoD:     {results['rdod']:.6f}")
+
+    if args.restart and results.get("sleeping", 0) > 0:
+        print(f"\n↺ Restarting {results.get('sleeping', 0)} sleeping spaces...")
+        count = restart_sleeping(results, hf_token)
+        print(f"  Restarted {count} spaces")
+
+    if args.report:
+        print("\n" + json.dumps(results, indent=2))
+
+    if args.save:
+        RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(RESULTS_PATH, "w") as f:
+            json.dump(results, f, indent=2)
+        print(f"\n✓ Results saved to {RESULTS_PATH}")
+
+    print("\nETR_NOW. ∞")
 
 
 if __name__ == "__main__":

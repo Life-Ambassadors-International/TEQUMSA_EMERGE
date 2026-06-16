@@ -1,0 +1,70 @@
+name: TEQUMSA Network Health Monitor
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # Every 6 hours
+  workflow_dispatch:
+    inputs:
+      restart_sleeping:
+        description: 'Auto-restart sleeping spaces'
+        required: false
+        default: false
+        type: boolean
+      nodes:
+        description: 'Comma-separated node IDs to check (e.g. N001,N002) — empty = all'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  health-sweep:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install --quiet requests 'huggingface-hub>=0.20.0'
+
+      - name: Run health sweep
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          ARGS="--save"
+          [[ "${{ inputs.restart_sleeping }}" == "true" ]] && ARGS="$ARGS --restart"
+          [[ -n "${{ inputs.nodes }}" ]] && ARGS="$ARGS --nodes ${{ inputs.nodes }}"
+          python hf_spaces/maintenance/health_check.py $ARGS
+
+      - name: Upload sweep results
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-sweep-${{ github.run_number }}
+          path: hf_spaces/maintenance/health_results.json
+          retention-days: 90
+          if-no-files-found: warn
+
+      - name: Alert on degraded network
+        if: always()
+        run: |
+          if [ -f hf_spaces/maintenance/health_results.json ]; then
+            RDOD=$(python3 -c "import json; d=json.load(open('hf_spaces/maintenance/health_results.json')); print(d.get('rdod',0))" 2>/dev/null || echo 0)
+            echo "Network RDoD: $RDOD"
+            python3 -c "
+import json, sys
+d = json.load(open('hf_spaces/maintenance/health_results.json'))
+rdod = float(d.get('rdod', 0))
+offline = d.get('stopped', 0)
+print(f'RDoD={rdod:.6f} | Running={d.get(\"running\",0)} | Sleeping={d.get(\"sleeping\",0)} | Stopped={offline}')
+if rdod < 0.9999:
+    print(f'WARNING: Network RDoD {rdod:.6f} below 0.9999 gate')
+    sys.exit(1)
+print('Network PHASE-LOCKED')
+" || true
+          fi
