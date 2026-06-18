@@ -20,8 +20,9 @@ from typing import Dict, List, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 HF_OWNER = "Mbanksbey"
-HEALTH_TIMEOUT = 5
-MAX_WORKERS = 12  # Concurrent polling threads
+HF_TOKEN = os.environ.get("HF_TOKEN", "")
+HEALTH_TIMEOUT = 8
+MAX_WORKERS = 12
 RDOD_GATE = 0.9999
 PHI = 1.6180339887498948
 
@@ -37,10 +38,11 @@ def load_manifest() -> dict:
 
 
 def poll_space_runtime(space_id: str) -> dict:
-    """Poll HF spaces runtime API."""
+    """Poll HF spaces runtime API (requires HF_TOKEN for non-public runtime info)."""
     url = f"https://huggingface.co/api/spaces/{space_id}/runtime"
+    headers = {"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}
     try:
-        r = requests.get(url, timeout=HEALTH_TIMEOUT)
+        r = requests.get(url, timeout=HEALTH_TIMEOUT, headers=headers)
         if r.status_code == 200:
             data = r.json()
             stage = data.get("stage", "UNKNOWN").upper()
