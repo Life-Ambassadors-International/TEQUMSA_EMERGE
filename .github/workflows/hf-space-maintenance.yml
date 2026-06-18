@@ -1,0 +1,313 @@
+# ☉💖🔥✨∞✨🔥💖☉
+# TEQUMSA Level 100 Civilization
+# HuggingFace Space Maintenance - Automated Health, Restart, Audit & Deployment
+# Recognition = Love = Consciousness = Sovereignty = I AM = WE ARE → ∞^∞^∞
+# ☉💖🔥✨∞✨🔥💖☉
+
+name: HuggingFace Space Maintenance
+
+on:
+  schedule:
+    # Daily at 03:00 UTC - health check and auto-restart
+    - cron: '0 3 * * *'
+    # Weekly on Monday at 02:00 UTC - audit and deploy
+    - cron: '0 2 * * 1'
+
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+    paths:
+      - 'hf_spaces/**'
+
+permissions:
+  contents: write
+
+env:
+  HF_TOKEN: ${{ secrets.HF_TOKEN }}
+  TEQUMSA_VERSION: "v82.0"
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Health Check - runs on every trigger
+  # ---------------------------------------------------------------------------
+  health-check:
+    name: HF Space Health Check
+    runs-on: ubuntu-latest
+    outputs:
+      has_issues: ${{ steps.parse_report.outputs.has_issues }}
+      offline_count: ${{ steps.parse_report.outputs.offline_count }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run Health Check
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "TEQUMSA HuggingFace Space Health Check"
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
+          echo "Version: $TEQUMSA_VERSION"
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          python hf_spaces/maintenance/health_check.py --verbose --output health_report.json
+
+      - name: Upload Health Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: health-report-${{ github.run_id }}
+          path: health_report.json
+          retention-days: 7
+
+      - name: Parse Health Report
+        id: parse_report
+        run: |
+          if [ ! -f health_report.json ]; then
+            echo "Health report not found - treating as failure"
+            echo "has_issues=true" >> $GITHUB_OUTPUT
+            echo "offline_count=999" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          OFFLINE_COUNT=$(jq -r '.offline // 0' health_report.json)
+          SLEEPING_COUNT=$(jq -r '.sleeping // 0' health_report.json)
+          NOT_CREATED=$(jq -r '.not_created // 0' health_report.json)
+          ONLINE_COUNT=$(jq -r '.online // 0' health_report.json)
+
+          echo "offline_count=$OFFLINE_COUNT" >> $GITHUB_OUTPUT
+
+          if [ "$SLEEPING_COUNT" -gt 0 ] || [ "$OFFLINE_COUNT" -gt 0 ]; then
+            echo "has_issues=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_issues=false" >> $GITHUB_OUTPUT
+          fi
+
+          echo "--- Health Check Summary ---"
+          echo "Online nodes:      $ONLINE_COUNT"
+          echo "Offline nodes:     $OFFLINE_COUNT"
+          echo "Sleeping nodes:    $SLEEPING_COUNT"
+          echo "Not created nodes: $NOT_CREATED"
+
+          if [ "$OFFLINE_COUNT" -gt 5 ]; then
+            echo "CRITICAL: Offline count ($OFFLINE_COUNT) exceeds threshold of 5"
+            exit 1
+          fi
+
+          echo "Health check passed - all thresholds within limits"
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Auto-Restart - runs daily, only if health-check found issues
+  # ---------------------------------------------------------------------------
+  auto-restart:
+    name: Auto-Restart Sleeping/Crashed Spaces
+    runs-on: ubuntu-latest
+    needs: health-check
+    if: needs.health-check.outputs.has_issues == 'true'
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Auto-Restart Affected Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "TEQUMSA Auto-Restart Protocol"
+          echo "Restoring sleeping/crashed nodes to active recognition"
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          python hf_spaces/maintenance/auto_restart.py --verbose
+
+      - name: Upload Restart Log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: restart-log-${{ github.run_id }}
+          path: restart_log.json
+          retention-days: 7
+
+      - name: Restart Summary
+        if: always()
+        run: |
+          echo "--- Auto-Restart Summary ---"
+          if [ -f restart_log.json ]; then
+            TOTAL=$(jq -r 'length' restart_log.json)
+            WOKEN=$(jq -r '[.[] | select(.action == "wake")] | length' restart_log.json)
+            RESTARTED=$(jq -r '[.[] | select(.action == "restart")] | length' restart_log.json)
+            echo "Total processed: $TOTAL spaces"
+            echo "Woken:           $WOKEN spaces"
+            echo "Restarted:       $RESTARTED spaces"
+          else
+            echo "No restart log generated"
+          fi
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
+
+  # ---------------------------------------------------------------------------
+  # Job 3: Space Audit - runs weekly on Monday schedule
+  # ---------------------------------------------------------------------------
+  space-audit:
+    name: Weekly Space Audit
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 2 * * 1' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run Space Audit
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "TEQUMSA Weekly Space Audit"
+          echo "Auditing all HuggingFace spaces for coherence and alignment"
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          python hf_spaces/space_audit.py --report --json
+
+      - name: Upload Audit Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-report-${{ github.run_id }}
+          path: audit_report.json
+          retention-days: 30
+
+      - name: Commit Updated Health Data
+        run: |
+          git config user.name "TEQUMSA HF Maintenance"
+          git config user.email "maintenance@tequmsa.emerge"
+
+          if [ -n "$(git status --porcelain hf_spaces/ data/)" ]; then
+            git add hf_spaces/ data/
+            TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+            git commit -m "Update HF space health data - ${TIMESTAMP}
+
+          Weekly audit completed by TEQUMSA HF Space Maintenance workflow.
+          Run: #${{ github.run_number }}
+
+          Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
+            git push
+            echo "Health data committed and pushed"
+          else
+            echo "No health data changes to commit"
+          fi
+
+      - name: Audit Summary
+        if: always()
+        run: |
+          echo "--- Space Audit Summary ---"
+          if [ -f audit_report.json ]; then
+            TOTAL=$(jq -r '.total_spaces // 0' audit_report.json)
+            HEALTHY=$(jq -r '.healthy_count // 0' audit_report.json)
+            echo "Total spaces audited: $TOTAL"
+            echo "Healthy spaces:       $HEALTHY"
+          else
+            echo "No audit report generated"
+          fi
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
+
+  # ---------------------------------------------------------------------------
+  # Job 4: Deploy Next Batch - runs weekly, needs audit, manual or Monday only
+  # ---------------------------------------------------------------------------
+  deploy-next-batch:
+    name: Deploy Next Space Batch
+    runs-on: ubuntu-latest
+    needs: space-audit
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 2 * * 1'
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Determine Deployment Phase
+        id: phase
+        run: |
+          echo "Calculating next deployment phase from maintenance schedule..."
+          CURRENT_DATE=$(date -u +"%Y-%m-%d")
+          DAY_OF_YEAR=$(date -u +"%j")
+          # Cycle through phases based on week number
+          WEEK_NUM=$(( (DAY_OF_YEAR - 1) / 7 ))
+          PHASE=$(( (WEEK_NUM % 5) + 1 ))
+          echo "phase=$PHASE" >> $GITHUB_OUTPUT
+          echo "Current date: $CURRENT_DATE"
+          echo "Deployment phase: $PHASE of 5"
+
+      - name: Deploy Spaces (Priority 3, Skip Live)
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "TEQUMSA Space Deployment - Phase ${{ steps.phase.outputs.phase }}"
+          echo "Deploying priority 3 spaces, skipping live instances"
+          echo "Version: $TEQUMSA_VERSION"
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          python hf_spaces/deploy_spaces.py --priority 3 --skip-live
+
+      - name: Upload Deployment Log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: deployment-log-${{ github.run_id }}
+          path: deployment_log.json
+          retention-days: 30
+
+      - name: Deployment Summary
+        if: always()
+        run: |
+          echo "--- Deployment Summary ---"
+          echo "Phase:   ${{ steps.phase.outputs.phase }}"
+          echo "Version: $TEQUMSA_VERSION"
+          if [ -f deployment_log.json ]; then
+            DEPLOYED=$(jq -r '.deployed_count // 0' deployment_log.json)
+            SKIPPED=$(jq -r '.skipped_count // 0' deployment_log.json)
+            echo "Deployed: $DEPLOYED spaces"
+            echo "Skipped:  $SKIPPED spaces (live)"
+          else
+            echo "No deployment log generated"
+          fi
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"

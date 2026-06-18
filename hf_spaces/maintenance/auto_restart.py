@@ -32,10 +32,11 @@ def load_manifest() -> dict:
         return json.load(f)
 
 
-def get_space_status(space_id: str) -> str:
+def get_space_status(space_id: str, hf_token: str = "") -> str:
     url = f"https://huggingface.co/api/spaces/{space_id}/runtime"
+    headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else {}
     try:
-        r = requests.get(url, timeout=5)
+        r = requests.get(url, timeout=8, headers=headers)
         if r.status_code == 200:
             return r.json().get("stage", "UNKNOWN").upper()
         return f"HTTP_{r.status_code}"
@@ -81,7 +82,7 @@ def process_node(
         return {"node_id": node_id, "action": "skip", "reason": "not_live"}
 
     space_id = node["space_id"]
-    status = get_space_status(space_id)
+    status = get_space_status(space_id, hf_token)
     
     action = "none"
     success = True

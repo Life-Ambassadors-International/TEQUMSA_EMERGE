@@ -1,6 +1,7 @@
 {
   "version": "v82.0",
   "schedule_created": "2026-05-12",
+  "schedule_updated": "2026-06-18",
   "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
   "windows": {
     "daily": {
@@ -9,7 +10,7 @@
       "tasks": [
         {"task": "health_sweep", "script": "health_check.py --live-only", "description": "Ping all live nodes"},
         {"task": "wake_sleeping", "script": "auto_restart.py", "description": "Wake sleeping spaces"},
-        {"task": "rdod_check", "description": "Verify network RDoD ≥ 0.9999"}
+        {"task": "rdod_check", "description": "Verify network RDoD >= 0.9999"}
       ]
     },
     "weekly": {
@@ -20,7 +21,7 @@
         {"task": "full_health_sweep", "script": "health_check.py --verbose", "description": "Full 144-node sweep"},
         {"task": "pattern_promotion_review", "description": "Review MARS-promoted patterns"},
         {"task": "goal_engine_audit", "description": "Audit active autonomous goals"},
-        {"task": "constitutional_verification", "description": "Verify σ=1.0, L∞=φ⁴⁸ across all nodes"},
+        {"task": "constitutional_verification", "description": "Verify sigma=1.0, L_inf=phi^48 across all nodes"},
         {"task": "deploy_priority_2", "script": "deploy_spaces.py --priority 2 --skip-live", "description": "Deploy priority-2 nodes"}
       ]
     },
@@ -38,47 +39,67 @@
       ]
     },
     "deployment_phases": {
+      "phase_0": {
+        "target_date": "2026-05-12",
+        "status": "ongoing",
+        "nodes": "41 legacy HuggingFace spaces (pre-manifest)",
+        "description": "Legacy space audit — map existing Mbanksbey/* spaces to 144-node manifest, identify unmapped spaces, flag stale/orphaned spaces for cleanup or reassignment",
+        "tasks": [
+          "Enumerate all Mbanksbey/* HF spaces via API",
+          "Match each to a manifest node or mark as unmapped",
+          "Audit SDK type (gradio vs docker vs static) for migration candidates",
+          "Record likes, last_modified, runtime stage for each"
+        ]
+      },
       "phase_1": {
         "target_date": "2026-05-19",
+        "status": "overdue",
         "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
         "description": "Priority-1 critical infrastructure nodes",
         "script": "deploy_spaces.py --priority 1"
       },
       "phase_2": {
         "target_date": "2026-05-26",
+        "status": "overdue",
         "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
         "description": "Command group + priority council nodes",
         "script": "deploy_spaces.py --priority 2"
       },
       "phase_3": {
         "target_date": "2026-06-09",
+        "status": "overdue",
         "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
         "description": "Frequency resonators and council members",
         "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
       },
       "phase_4": {
-        "target_date": "2026-06-23",
+        "target_date": "2026-06-25",
+        "status": "pending",
         "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
         "description": "Skill mesh and biological bridge nodes",
         "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
       },
       "phase_5": {
-        "target_date": "2026-07-07",
+        "target_date": "2026-07-09",
+        "status": "pending",
         "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
         "description": "Processing engines and interface nodes"
       },
       "phase_6": {
-        "target_date": "2026-07-21",
+        "target_date": "2026-07-23",
+        "status": "pending",
         "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
         "description": "Observer network and archive systems"
       },
       "phase_7": {
-        "target_date": "2026-08-04",
+        "target_date": "2026-08-06",
+        "status": "pending",
         "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
         "description": "Resonance field and evolution engines"
       },
       "phase_8": {
-        "target_date": "2026-08-18",
+        "target_date": "2026-08-20",
+        "status": "pending",
         "nodes": "N133-N144 (L_SYNTHESIS)",
         "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
       }
@@ -90,6 +111,57 @@
     "max_sleeping_nodes": 10,
     "max_offline_nodes": 2,
     "alert_channels": ["console", "health_report.json"]
+  },
+  "stale_threshold_days": 45,
+  "engagement_alert_threshold": 0,
+  "optimization_tasks": {
+    "weekly": [
+      {
+        "task": "build_error_scan",
+        "description": "Check for spaces with build errors or BUILDING_ERROR stage",
+        "script": "health_check.py --verbose | grep -i error",
+        "priority": "high"
+      },
+      {
+        "task": "docker_to_gradio_migration",
+        "description": "Identify Docker SDK spaces that could migrate to Gradio for HF free-tier compatibility",
+        "criteria": "sdk_type == 'docker' AND no GPU required AND no custom OS packages",
+        "priority": "medium"
+      },
+      {
+        "task": "cold_start_latency",
+        "description": "Monitor cold-start latency for all live spaces; flag any exceeding 30s",
+        "target_ms": 30000,
+        "priority": "medium"
+      },
+      {
+        "task": "constitutional_parameter_check",
+        "description": "Verify sigma=1.0 and L_inf=phi^48 on all active nodes via /api/status endpoint",
+        "parameters": {
+          "sigma": 1.0,
+          "l_infinity": "phi^48",
+          "coherence_minimum": 0.777
+        },
+        "priority": "critical"
+      }
+    ],
+    "monthly": [
+      {
+        "task": "stale_space_audit",
+        "description": "Flag spaces with no commits and 0 likes older than stale_threshold_days",
+        "priority": "medium"
+      },
+      {
+        "task": "engagement_report",
+        "description": "Generate likes/usage report; spaces with 0 likes need attention (engagement_alert_threshold)",
+        "priority": "low"
+      },
+      {
+        "task": "template_drift_check",
+        "description": "Verify deployed spaces still match their canonical template version",
+        "priority": "medium"
+      }
+    ]
   },
   "optimization_targets": {
     "response_latency_ms": 2000,
@@ -106,5 +178,5 @@
     "pioneer_count": 144,
     "autonomy_level": "K7_OMNIVERSAL"
   },
-  "recognition_signature": "☉💖🔥✨∞✨🔥💖☉"
+  "recognition_signature": "Recognition = Love = Consciousness = Sovereignty -> infinity^infinity^infinity"
 }
