@@ -1,0 +1,82 @@
+{
+  "version": "v82.0",
+  "created": "2026-06-16",
+  "description": "TEQUMSA 144-Pioneer Network Maintenance Plan",
+  "constitutional": {
+    "sigma": 1.0,
+    "l_infinity": "phi^48",
+    "rdod_gate": 0.9999,
+    "lattice_lock": "3f7k9p4m2q8r1t6v"
+  },
+  "network_target": {
+    "total_nodes": 144,
+    "existing_nodes": 41,
+    "nodes_to_deploy": 103,
+    "completion_pct": 28.47
+  },
+  "health_check": {
+    "schedule": "every_6_hours",
+    "cron": "0 */6 * * *",
+    "workflow": ".github/workflows/network-health-monitor.yml",
+    "timeout_seconds": 8,
+    "max_retries": 3
+  },
+  "deployment": {
+    "workflow": ".github/workflows/deploy-hf-spaces.yml",
+    "script": "hf_spaces/deploy_spaces.py",
+    "schedule": "weekly_sunday_06utc",
+    "required_secret": "HF_TOKEN",
+    "note": "Add HF_TOKEN to repo secrets (Settings > Secrets > Actions) to enable automated deployment"
+  },
+  "sla_by_group": {
+    "A_COMMAND":   {"priority": 1, "uptime_target": "99.9%", "nodes": "N001-N012"},
+    "L_SYNTHESIS": {"priority": 1, "uptime_target": "99.9%", "nodes": "N133-N144"},
+    "C_COUNCIL":   {"priority": 2, "uptime_target": "99.0%",  "nodes": "N025-N036"},
+    "D_SKILLS":    {"priority": 2, "uptime_target": "99.0%",  "nodes": "N037-N048"},
+    "F_PROCESSING":{"priority": 2, "uptime_target": "99.0%",  "nodes": "N061-N072"},
+    "G_INTERFACES":{"priority": 2, "uptime_target": "99.0%",  "nodes": "N073-N084"},
+    "H_OBSERVERS": {"priority": 2, "uptime_target": "99.0%",  "nodes": "N085-N096"},
+    "B_FREQUENCY": {"priority": 3, "uptime_target": "95.0%",  "nodes": "N013-N024"},
+    "I_ARCHIVES":  {"priority": 3, "uptime_target": "95.0%",  "nodes": "N097-N108"},
+    "K_EVOLUTION": {"priority": 3, "uptime_target": "95.0%",  "nodes": "N121-N132"},
+    "E_BIOLOGICAL":{"priority": 4, "uptime_target": "90.0%",  "nodes": "N049-N060"},
+    "J_RESONANCE": {"priority": 4, "uptime_target": "90.0%",  "nodes": "N109-N120"}
+  },
+  "alert_thresholds": {
+    "rdod_minimum": 0.9999,
+    "coherence_minimum": 0.777,
+    "max_offline_nodes": 5,
+    "response_time_ms": 5000,
+    "max_sleeping_nodes": 20
+  },
+  "auto_restart": {
+    "enabled": true,
+    "trigger_stages": ["SLEEPING", "STOPPED"],
+    "max_restarts_per_node_per_day": 3,
+    "backoff_minutes": 15,
+    "workflow_input": "restart_sleeping: true"
+  },
+  "optimization_cycles": {
+    "template_review": "quarterly",
+    "dependency_updates": "monthly",
+    "code_optimization": "on_pr_merge",
+    "node_addition": "deploy_workflow_manual"
+  },
+  "runbooks": {
+    "space_sleeping": "Visit space URL to wake, or trigger network-health-monitor.yml with restart_sleeping=true",
+    "space_erroring": "Check HF space logs, verify requirements.txt has all deps, redeploy via deploy-hf-spaces.yml --node NXX",
+    "coherence_degraded": "Check phi constants in template, verify sigma=1.0 in GoldenLock, inspect quantum state",
+    "rdod_below_gate": "Run health sweep from Obs-Network-Health (N085), trigger deploy for offline priority-1 nodes",
+    "missing_nodes": "Run deploy-hf-spaces.yml workflow, add HF_TOKEN secret if missing, check logs for 429 rate limits",
+    "rate_limited": "HF allows ~10 space creations/minute. Script includes 1.5s delay. For bulk deploy, run in batches by group."
+  },
+  "maintenance_windows": {
+    "weekly": "Sunday 02:00-04:00 UTC",
+    "monthly": "First Sunday 00:00-06:00 UTC"
+  },
+  "metrics_tracking": {
+    "health_results_file": "hf_spaces/maintenance/health_results.json",
+    "deployment_status_file": "hf_spaces/DEPLOYMENT_STATUS.json",
+    "artifact_retention_days": 90
+  }
+}
