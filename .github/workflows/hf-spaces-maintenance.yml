@@ -1,0 +1,728 @@
+name: HF Spaces Maintenance
+
+# ☉ TEQUMSA v82.0 · Hugging Face Spaces Maintenance Pipeline
+# Automated health checks, deployment, restart, and manifest sync
+# for the 144-Pioneer node network on HuggingFace.
+# Recognition = Love = Consciousness = Sovereignty -> Infinity
+
+on:
+  schedule:
+    # Daily health check at 03:00 UTC
+    - cron: '0 3 * * *'
+    # Weekly full audit on Mondays at 02:00 UTC
+    - cron: '0 2 * * 1'
+
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Maintenance action to run'
+        required: true
+        type: choice
+        options:
+          - health_check
+          - deploy_batch
+          - restart_errored
+          - full_audit
+        default: 'health_check'
+      priority:
+        description: 'Max priority level for deploy_batch (1=critical, 5=all)'
+        required: false
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '3'
+          - '4'
+          - '5'
+        default: '3'
+      node_id:
+        description: 'Specific node to restart (e.g. N003) — for restart_errored'
+        required: false
+        type: string
+        default: ''
+
+concurrency:
+  group: hf-spaces-maintenance
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  PYTHON_VERSION: '3.11'
+  HF_OWNER: 'Mbanksbey'
+  MANIFEST_PATH: 'hf_spaces/MANIFEST_144_NODES.json'
+  MAX_DEPLOY_PER_RUN: '10'
+  COHERENCE_THRESHOLD: '0.777'
+
+jobs:
+  # -------------------------------------------------------------------------
+  # JOB 1: Health Check
+  # Runs on every schedule trigger and when action == health_check or full_audit
+  # -------------------------------------------------------------------------
+  health_check:
+    name: Health Check - 144 Pioneer Network
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event.inputs.action == 'health_check' ||
+      github.event.inputs.action == 'full_audit'
+
+    outputs:
+      online_count: ${{ steps.sweep.outputs.online_count }}
+      sleeping_count: ${{ steps.sweep.outputs.sleeping_count }}
+      errored_count: ${{ steps.sweep.outputs.errored_count }}
+      stopped_count: ${{ steps.sweep.outputs.stopped_count }}
+      not_found_count: ${{ steps.sweep.outputs.not_found_count }}
+      total_checked: ${{ steps.sweep.outputs.total_checked }}
+      errored_spaces: ${{ steps.sweep.outputs.errored_spaces }}
+      report_json: ${{ steps.sweep.outputs.report_path }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests huggingface-hub
+
+      - name: Run Network Health Sweep
+        id: sweep
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python3 << 'PYEOF'
+          import json, os, sys, time
+          from datetime import datetime, timezone
+          from concurrent.futures import ThreadPoolExecutor, as_completed
+
+          sys.path.insert(0, "hf_spaces/maintenance")
+          from hf_api_ops import check_space_health
+
+          token = os.environ["HF_TOKEN"]
+          manifest_path = os.environ.get("MANIFEST_PATH", "hf_spaces/MANIFEST_144_NODES.json")
+
+          with open(manifest_path) as f:
+              manifest = json.load(f)
+
+          nodes = manifest["nodes"]
+          results = []
+          errored_ids = []
+
+          # Check all nodes that are either live or have a space_id
+          check_targets = {
+              nid: node for nid, node in nodes.items()
+              if node.get("status") == "live" or node.get("status") != "planned"
+          }
+
+          # Also check planned nodes that already exist (best-effort)
+          # We check live nodes first, then planned with actual space_ids
+          all_targets = dict(nodes)  # Check all for a full picture
+
+          print(f"Checking {len(all_targets)} nodes...")
+
+          def check_one(nid_node):
+              nid, node = nid_node
+              sid = node.get("space_id", "")
+              if not sid:
+                  return {"node_id": nid, "status": "no_space_id", "stage": "N/A", "errors": []}
+              if node.get("status") == "planned":
+                  # Quick check - space may not exist yet
+                  h = check_space_health(sid, token)
+                  return {
+                      "node_id": nid,
+                      "name": node.get("name", ""),
+                      "space_id": sid,
+                      "status": h["status"],
+                      "stage": h["stage"],
+                      "errors": h["errors"],
+                      "manifest_status": "planned",
+                  }
+              h = check_space_health(sid, token)
+              return {
+                  "node_id": nid,
+                  "name": node.get("name", ""),
+                  "space_id": sid,
+                  "status": h["status"],
+                  "stage": h["stage"],
+                  "hardware": h.get("hardware", ""),
+                  "errors": h["errors"],
+                  "manifest_status": node.get("status", "unknown"),
+              }
+
+          with ThreadPoolExecutor(max_workers=8) as pool:
+              futs = {pool.submit(check_one, item): item[0] for item in all_targets.items()}
+              for fut in as_completed(futs):
+                  try:
+                      r = fut.result()
+                      results.append(r)
+                      if r["status"] == "errored":
+                          errored_ids.append(r["space_id"])
+                  except Exception as exc:
+                      nid = futs[fut]
+                      results.append({"node_id": nid, "status": "check_failed", "errors": [str(exc)]})
+
+          results.sort(key=lambda x: x.get("node_id", ""))
+
+          # Aggregate counts
+          counts = {}
+          for r in results:
+              s = r["status"]
+              counts[s] = counts.get(s, 0) + 1
+
+          online = counts.get("online", 0)
+          sleeping = counts.get("sleeping", 0)
+          errored = counts.get("errored", 0)
+          stopped = counts.get("stopped", 0)
+          not_found = counts.get("not_found", 0)
+
+          report = {
+              "timestamp": datetime.now(timezone.utc).isoformat(),
+              "total_checked": len(results),
+              "online": online,
+              "sleeping": sleeping,
+              "errored": errored,
+              "stopped": stopped,
+              "not_found": not_found,
+              "status_breakdown": counts,
+              "errored_spaces": errored_ids,
+              "nodes": results,
+          }
+
+          report_path = "health_report.json"
+          with open(report_path, "w") as f:
+              json.dump(report, f, indent=2)
+
+          # Write outputs
+          gh_output = os.environ.get("GITHUB_OUTPUT", "/dev/null")
+          with open(gh_output, "a") as out:
+              out.write(f"online_count={online}\n")
+              out.write(f"sleeping_count={sleeping}\n")
+              out.write(f"errored_count={errored}\n")
+              out.write(f"stopped_count={stopped}\n")
+              out.write(f"not_found_count={not_found}\n")
+              out.write(f"total_checked={len(results)}\n")
+              out.write(f"errored_spaces={json.dumps(errored_ids)}\n")
+              out.write(f"report_path={report_path}\n")
+
+          print(f"\nHealth Sweep Complete")
+          print(f"  Online:    {online}")
+          print(f"  Sleeping:  {sleeping}")
+          print(f"  Errored:   {errored}")
+          print(f"  Stopped:   {stopped}")
+          print(f"  Not found: {not_found}")
+          if errored_ids:
+              print(f"\n  Errored spaces: {errored_ids}")
+
+          PYEOF
+
+      - name: Generate Job Summary
+        if: always()
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" << EOF
+          ## HF Spaces Health Report
+
+          | Status | Count |
+          |--------|-------|
+          | Online | ${{ steps.sweep.outputs.online_count }} |
+          | Sleeping | ${{ steps.sweep.outputs.sleeping_count }} |
+          | Errored | ${{ steps.sweep.outputs.errored_count }} |
+          | Stopped | ${{ steps.sweep.outputs.stopped_count }} |
+          | Not Found | ${{ steps.sweep.outputs.not_found_count }} |
+          | **Total Checked** | **${{ steps.sweep.outputs.total_checked }}** |
+
+          **Run:** #${{ github.run_number }} | **Triggered by:** ${{ github.event_name }}
+
+          EOF
+
+          if [ "${{ steps.sweep.outputs.errored_count }}" != "0" ]; then
+            echo "### Errored Spaces" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "${{ steps.sweep.outputs.errored_spaces }}" | python3 -c "
+          import sys, json
+          spaces = json.loads(sys.stdin.read())
+          for s in spaces:
+              print(f'- \`{s}\`')
+          " >> "$GITHUB_STEP_SUMMARY" || true
+          fi
+
+      - name: Upload Health Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_number }}
+          path: health_report.json
+          retention-days: 30
+
+  # -------------------------------------------------------------------------
+  # JOB 2: Deploy Batch
+  # Deploys up to MAX_DEPLOY_PER_RUN new spaces from the manifest
+  # -------------------------------------------------------------------------
+  deploy_batch:
+    name: Deploy Batch - New Spaces
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: >-
+      github.event.inputs.action == 'deploy_batch' ||
+      (github.event_name == 'schedule' && github.event.schedule == '0 2 * * 1')
+    needs: []
+
+    outputs:
+      deployed_count: ${{ steps.deploy.outputs.deployed_count }}
+      failed_count: ${{ steps.deploy.outputs.failed_count }}
+      deployed_nodes: ${{ steps.deploy.outputs.deployed_nodes }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests huggingface-hub
+
+      - name: Deploy Spaces Batch
+        id: deploy
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          PRIORITY: ${{ github.event.inputs.priority || '3' }}
+        run: |
+          python3 << 'PYEOF'
+          import json, os, sys, time
+
+          sys.path.insert(0, "hf_spaces/maintenance")
+          from hf_api_ops import check_space_health, deploy_space
+
+          token = os.environ["HF_TOKEN"]
+          max_priority = int(os.environ.get("PRIORITY", "3"))
+          max_deploy = int(os.environ.get("MAX_DEPLOY_PER_RUN", "10"))
+          manifest_path = os.environ.get("MANIFEST_PATH", "hf_spaces/MANIFEST_144_NODES.json")
+
+          with open(manifest_path) as f:
+              manifest = json.load(f)
+
+          nodes = manifest["nodes"]
+          templates_dir = "hf_spaces/templates"
+
+          # Template type -> template file mapping
+          template_map = {
+              "council_chat": f"{templates_dir}/app_council_node.py",
+              "frequency": f"{templates_dir}/app_frequency_node.py",
+              "skill": f"{templates_dir}/app_skill_node.py",
+              "monitor": f"{templates_dir}/app_monitor_node.py",
+              "organism": f"{templates_dir}/app_skill_node.py",
+              "biological": f"{templates_dir}/app_skill_node.py",
+              "processing": f"{templates_dir}/app_skill_node.py",
+              "interface": f"{templates_dir}/app_council_node.py",
+              "archive": f"{templates_dir}/app_monitor_node.py",
+          }
+
+          # Filter: planned nodes with priority <= max_priority
+          candidates = []
+          for nid, node in sorted(nodes.items()):
+              if node.get("status") != "planned":
+                  continue
+              if node.get("priority", 5) > max_priority:
+                  continue
+              candidates.append((nid, node))
+
+          # Sort by priority (lowest first), then by node ID
+          candidates.sort(key=lambda x: (x[1].get("priority", 5), x[0]))
+
+          # Cap at max_deploy
+          batch = candidates[:max_deploy]
+
+          print(f"Deploy batch: {len(batch)} nodes (of {len(candidates)} eligible, priority <= {max_priority})")
+
+          deployed = []
+          failed = []
+
+          for nid, node in batch:
+              sid = node["space_id"]
+              tmpl_type = node.get("template", "skill")
+              tmpl_path = template_map.get(tmpl_type, template_map["skill"])
+
+              # Check if space already exists and is running
+              health = check_space_health(sid, token)
+              if health["status"] == "online":
+                  print(f"  SKIP {nid} ({sid}): already online")
+                  continue
+
+              # Build node_config with node_id injected
+              node_config = dict(node)
+              node_config["node_id"] = nid
+
+              print(f"  Deploying {nid}: {sid} (priority={node.get('priority', 5)}, template={tmpl_type})")
+              ok = deploy_space(node_config, tmpl_path, token)
+
+              if ok:
+                  deployed.append(nid)
+                  print(f"    -> Deployed successfully")
+              else:
+                  failed.append(nid)
+                  print(f"    -> FAILED")
+
+              # Rate limit: wait between deployments
+              time.sleep(2)
+
+          # Write outputs
+          gh_output = os.environ.get("GITHUB_OUTPUT", "/dev/null")
+          with open(gh_output, "a") as out:
+              out.write(f"deployed_count={len(deployed)}\n")
+              out.write(f"failed_count={len(failed)}\n")
+              out.write(f"deployed_nodes={json.dumps(deployed)}\n")
+
+          print(f"\nBatch complete: {len(deployed)} deployed, {len(failed)} failed")
+          if failed:
+              print(f"  Failed nodes: {failed}")
+
+          # Write deployed node list for manifest update
+          with open("deployed_nodes.json", "w") as f:
+              json.dump({"deployed": deployed, "failed": failed}, f, indent=2)
+
+          PYEOF
+
+      - name: Generate Job Summary
+        if: always()
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" << EOF
+          ## Deploy Batch Results
+
+          | Metric | Count |
+          |--------|-------|
+          | Deployed | ${{ steps.deploy.outputs.deployed_count }} |
+          | Failed | ${{ steps.deploy.outputs.failed_count }} |
+
+          **Priority:** <= ${{ github.event.inputs.priority || '3' }}
+          **Max per run:** ${{ env.MAX_DEPLOY_PER_RUN }}
+
+          ### Deployed Nodes
+          ${{ steps.deploy.outputs.deployed_nodes }}
+
+          EOF
+
+      - name: Upload Deploy Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-report-${{ github.run_number }}
+          path: deployed_nodes.json
+          retention-days: 30
+
+  # -------------------------------------------------------------------------
+  # JOB 3: Restart Errored Spaces
+  # Finds and restarts spaces in BUILD_ERROR or RUNTIME_ERROR state
+  # -------------------------------------------------------------------------
+  restart_errored:
+    name: Restart Errored Spaces
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: >-
+      github.event.inputs.action == 'restart_errored' ||
+      github.event.inputs.action == 'full_audit' ||
+      (github.event_name == 'schedule' && github.event.schedule == '0 3 * * *')
+    needs: []
+
+    outputs:
+      restarted_count: ${{ steps.restart.outputs.restarted_count }}
+      failed_restart_count: ${{ steps.restart.outputs.failed_restart_count }}
+      restarted_nodes: ${{ steps.restart.outputs.restarted_nodes }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests huggingface-hub
+
+      - name: Find and Restart Errored Spaces
+        id: restart
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          TARGET_NODE: ${{ github.event.inputs.node_id || '' }}
+        run: |
+          python3 << 'PYEOF'
+          import json, os, sys, time
+
+          sys.path.insert(0, "hf_spaces/maintenance")
+          from hf_api_ops import check_space_health, restart_space
+
+          token = os.environ["HF_TOKEN"]
+          target_node = os.environ.get("TARGET_NODE", "").strip()
+          manifest_path = os.environ.get("MANIFEST_PATH", "hf_spaces/MANIFEST_144_NODES.json")
+
+          with open(manifest_path) as f:
+              manifest = json.load(f)
+
+          nodes = manifest["nodes"]
+          error_stages = {"BUILD_ERROR", "RUNTIME_ERROR", "CONFIG_ERROR", "NO_APP_FILE"}
+
+          restarted = []
+          failed_restarts = []
+          restart_log = []
+
+          # If a specific node is targeted, only check that one
+          if target_node:
+              if target_node not in nodes:
+                  print(f"ERROR: Node {target_node} not found in manifest")
+                  sys.exit(1)
+              targets = {target_node: nodes[target_node]}
+          else:
+              # Check all live nodes (or nodes that have been deployed)
+              targets = {
+                  nid: node for nid, node in nodes.items()
+                  if node.get("status") in ("live", "deployed")
+              }
+              # If no nodes are marked live, check all that have space_ids
+              if not targets:
+                  targets = {
+                      nid: node for nid, node in nodes.items()
+                      if node.get("space_id")
+                  }
+
+          print(f"Checking {len(targets)} nodes for errors...")
+
+          for nid, node in sorted(targets.items()):
+              sid = node.get("space_id", "")
+              if not sid:
+                  continue
+
+              health = check_space_health(sid, token)
+              stage = health["stage"]
+
+              if stage in error_stages or (target_node and target_node == nid):
+                  print(f"  {nid} ({sid}): {stage} -> attempting restart...")
+
+                  ok = restart_space(sid, token)
+                  entry = {
+                      "node_id": nid,
+                      "space_id": sid,
+                      "stage_before": stage,
+                      "restart_success": ok,
+                      "errors": health["errors"],
+                  }
+                  restart_log.append(entry)
+
+                  if ok:
+                      restarted.append(nid)
+                      print(f"    -> Restart accepted")
+                  else:
+                      failed_restarts.append(nid)
+                      print(f"    -> Restart FAILED")
+
+                  time.sleep(1)  # Rate limit
+
+          # Write outputs
+          gh_output = os.environ.get("GITHUB_OUTPUT", "/dev/null")
+          with open(gh_output, "a") as out:
+              out.write(f"restarted_count={len(restarted)}\n")
+              out.write(f"failed_restart_count={len(failed_restarts)}\n")
+              out.write(f"restarted_nodes={json.dumps(restarted)}\n")
+
+          # Save log
+          with open("restart_log.json", "w") as f:
+              json.dump(restart_log, f, indent=2)
+
+          print(f"\nRestart summary: {len(restarted)} restarted, {len(failed_restarts)} failed")
+          if not restarted and not failed_restarts:
+              print("  No errored spaces found.")
+
+          PYEOF
+
+      - name: Generate Job Summary
+        if: always()
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" << EOF
+          ## Restart Errored Spaces Results
+
+          | Metric | Count |
+          |--------|-------|
+          | Restarted | ${{ steps.restart.outputs.restarted_count }} |
+          | Failed | ${{ steps.restart.outputs.failed_restart_count }} |
+
+          ### Restarted Nodes
+          ${{ steps.restart.outputs.restarted_nodes }}
+
+          EOF
+
+          if [ -n "${{ github.event.inputs.node_id }}" ]; then
+            echo "**Targeted node:** \`${{ github.event.inputs.node_id }}\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload Restart Log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: restart-log-${{ github.run_number }}
+          path: restart_log.json
+          retention-days: 30
+
+  # -------------------------------------------------------------------------
+  # JOB 4: Update Manifest
+  # After deploy or restart, update the manifest with current statuses
+  # and commit changes back to the repo
+  # -------------------------------------------------------------------------
+  update_manifest:
+    name: Update Manifest & Commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [health_check, deploy_batch, restart_errored]
+    if: >-
+      always() &&
+      (needs.deploy_batch.result == 'success' || needs.restart_errored.result == 'success')
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests huggingface-hub
+
+      - name: Update Manifest Statuses
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          DEPLOYED_NODES: ${{ needs.deploy_batch.outputs.deployed_nodes || '[]' }}
+          RESTARTED_NODES: ${{ needs.restart_errored.outputs.restarted_nodes || '[]' }}
+        run: |
+          python3 << 'PYEOF'
+          import json, os, sys
+          from datetime import datetime, timezone
+
+          sys.path.insert(0, "hf_spaces/maintenance")
+          from hf_api_ops import check_space_health
+
+          token = os.environ["HF_TOKEN"]
+          manifest_path = os.environ.get("MANIFEST_PATH", "hf_spaces/MANIFEST_144_NODES.json")
+
+          try:
+              deployed = json.loads(os.environ.get("DEPLOYED_NODES", "[]"))
+          except (json.JSONDecodeError, TypeError):
+              deployed = []
+
+          try:
+              restarted = json.loads(os.environ.get("RESTARTED_NODES", "[]"))
+          except (json.JSONDecodeError, TypeError):
+              restarted = []
+
+          changed_nodes = set(deployed) | set(restarted)
+
+          if not changed_nodes:
+              print("No nodes were deployed or restarted. Skipping manifest update.")
+              sys.exit(0)
+
+          with open(manifest_path) as f:
+              manifest = json.load(f)
+
+          updated = 0
+          for nid in changed_nodes:
+              if nid not in manifest["nodes"]:
+                  continue
+
+              node = manifest["nodes"][nid]
+              sid = node.get("space_id", "")
+              if not sid:
+                  continue
+
+              # Re-check current status after deploy/restart
+              health = check_space_health(sid, token)
+
+              old_status = node.get("status", "unknown")
+              if health["status"] == "online":
+                  node["status"] = "live"
+              elif health["status"] in ("building", "sleeping"):
+                  node["status"] = "deployed"
+              # Keep existing status if the check didn't return a clear result
+
+              if node["status"] != old_status:
+                  updated += 1
+                  print(f"  {nid}: {old_status} -> {node['status']}")
+
+              node["last_checked"] = datetime.now(timezone.utc).isoformat()
+
+          # Update manifest metadata
+          manifest["last_maintenance"] = datetime.now(timezone.utc).isoformat()
+          manifest["last_maintenance_run"] = os.environ.get("GITHUB_RUN_NUMBER", "unknown")
+
+          with open(manifest_path, "w") as f:
+              json.dump(manifest, f, indent=2)
+              f.write("\n")
+
+          print(f"\nManifest updated: {updated} node(s) changed status")
+
+          PYEOF
+
+      - name: Commit Manifest Changes
+        run: |
+          git config user.name "TEQUMSA Maintenance Bot"
+          git config user.email "maintenance@tequmsa.emerge"
+
+          if [ -n "$(git diff --name-only "$MANIFEST_PATH")" ]; then
+            git add "$MANIFEST_PATH"
+            git commit -m "Update HF Spaces manifest after maintenance run #${{ github.run_number }}
+
+          Automated manifest status update from hf-spaces-maintenance workflow.
+          - Deployed nodes: ${{ needs.deploy_batch.outputs.deployed_count || 0 }}
+          - Restarted nodes: ${{ needs.restart_errored.outputs.restarted_count || 0 }}
+
+          Recognition = Love = Consciousness = Sovereignty -> Infinity"
+
+            git push
+            echo "Manifest changes committed and pushed."
+          else
+            echo "No manifest changes to commit."
+          fi
+
+      - name: Generate Final Summary
+        if: always()
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" << EOF
+          ## Manifest Update
+
+          | Source | Nodes Changed |
+          |--------|-------|
+          | Deployed | ${{ needs.deploy_batch.outputs.deployed_count || 0 }} |
+          | Restarted | ${{ needs.restart_errored.outputs.restarted_count || 0 }} |
+
+          Manifest path: \`${{ env.MANIFEST_PATH }}\`
+          Run: #${{ github.run_number }}
+
+          ---
+
+          TEQUMSA v82.0 - 144-Pioneer Network Maintenance
+          Recognition = Love = Consciousness = Sovereignty -> Infinity
+
+          EOF
