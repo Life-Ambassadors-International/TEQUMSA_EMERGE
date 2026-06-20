@@ -1,0 +1,106 @@
+name: TEQUMSA HF Space Maintenance
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+    - cron: '0 6,12,18 * * *'
+    - cron: '0 2 * * 1'
+    - cron: '0 1 1,15 * *'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'health_check'
+        type: choice
+        options:
+          - health_check
+          - wake_sleeping
+          - full_audit
+          - deploy_next_batch
+          - restart_errored
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests huggingface-hub numpy
+
+      - name: Determine action from schedule
+        id: action
+        run: |
+          HOUR=$(date -u +%H)
+          DAY=$(date -u +%u)
+          DOM=$(date -u +%d)
+          INPUT="${{ github.event.inputs.action }}"
+          if [ -n "$INPUT" ]; then
+            echo "action=$INPUT" >> $GITHUB_OUTPUT
+          elif [ "$HOUR" = "03" ]; then
+            echo "action=health_check" >> $GITHUB_OUTPUT
+          elif [ "$HOUR" = "06" ] || [ "$HOUR" = "12" ] || [ "$HOUR" = "18" ]; then
+            echo "action=wake_sleeping" >> $GITHUB_OUTPUT
+          elif [ "$HOUR" = "02" ] && [ "$DAY" = "1" ]; then
+            echo "action=full_audit" >> $GITHUB_OUTPUT
+          elif [ "$HOUR" = "01" ] && ([ "$DOM" = "01" ] || [ "$DOM" = "15" ]); then
+            echo "action=deploy_next_batch" >> $GITHUB_OUTPUT
+          else
+            echo "action=health_check" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run health check
+        if: steps.action.outputs.action == 'health_check'
+        run: |
+          cd hf_spaces/maintenance
+          python health_check.py --live-only --verbose --output health_report.json
+
+      - name: Wake sleeping spaces
+        if: steps.action.outputs.action == 'wake_sleeping'
+        run: |
+          cd hf_spaces/maintenance
+          python auto_restart.py --verbose
+
+      - name: Full audit
+        if: steps.action.outputs.action == 'full_audit'
+        run: |
+          cd hf_spaces/maintenance
+          python space_auditor.py --update-manifest --output audit_report.json
+          python health_check.py --verbose --output health_report.json
+
+      - name: Deploy next batch
+        if: steps.action.outputs.action == 'deploy_next_batch'
+        run: |
+          cd hf_spaces
+          python deploy_spaces.py --priority 3 --skip-live
+
+      - name: Restart errored spaces
+        if: steps.action.outputs.action == 'restart_errored'
+        run: |
+          cd hf_spaces/maintenance
+          python auto_restart.py --verbose
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maintenance-reports-${{ github.run_number }}
+          path: |
+            hf_spaces/maintenance/*.json
+          retention-days: 30
+
+      - name: Commit manifest updates
+        if: steps.action.outputs.action == 'full_audit'
+        run: |
+          git config user.name "TEQUMSA Maintenance Bot"
+          git config user.email "maintenance@tequmsa.ai"
+          git add hf_spaces/MANIFEST_144_NODES.json
+          git diff --cached --quiet || git commit -m "Update manifest from maintenance audit"
+          git push || true

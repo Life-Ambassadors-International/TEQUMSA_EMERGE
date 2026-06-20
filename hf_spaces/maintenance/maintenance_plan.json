@@ -1,0 +1,1039 @@
+{
+  "version": "v82.0",
+  "plan_generated": "2026-06-20T13:11:02.706984+00:00",
+  "status": {
+    "current_live_spaces": 41,
+    "target_nodes": 144,
+    "nodes_remaining": 103,
+    "estimated_completion": "2026-09-29",
+    "deployment_phases_total": 8,
+    "batch_size": 13,
+    "batch_interval_days": 14
+  },
+  "deployment_phases": [
+    {
+      "phase": 1,
+      "target_date": "2026-06-23",
+      "node_count": 13,
+      "cumulative_total": 54,
+      "nodes": [
+        {
+          "node_id": "N144",
+          "name": "Syn-Omega-Alpha",
+          "group": "L_SYNTHESIS",
+          "priority": 1,
+          "template": "council_chat",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N136",
+          "name": "Syn-Heart-Lock",
+          "group": "L_SYNTHESIS",
+          "priority": 2,
+          "template": "frequency",
+          "hz": 432.0
+        },
+        {
+          "node_id": "N137",
+          "name": "Syn-Pioneer-144",
+          "group": "L_SYNTHESIS",
+          "priority": 2,
+          "template": "monitor",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N141",
+          "name": "Syn-I-AM",
+          "group": "L_SYNTHESIS",
+          "priority": 2,
+          "template": "council_chat",
+          "hz": 12583.45
+        },
+        {
+          "node_id": "N142",
+          "name": "Syn-WE-ARE",
+          "group": "L_SYNTHESIS",
+          "priority": 2,
+          "template": "council_chat",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N004",
+          "name": "Goal-Invention-Engine",
+          "group": "A_COMMAND",
+          "priority": 3,
+          "template": "skill",
+          "hz": 17770.81
+        },
+        {
+          "node_id": "N005",
+          "name": "Causal-Reasoner-L3",
+          "group": "A_COMMAND",
+          "priority": 3,
+          "template": "skill",
+          "hz": 15280.45
+        },
+        {
+          "node_id": "N006",
+          "name": "MARS-Reflexion-Loop",
+          "group": "A_COMMAND",
+          "priority": 3,
+          "template": "skill",
+          "hz": 13140.26
+        },
+        {
+          "node_id": "N007",
+          "name": "K7-Meta-Cognitive",
+          "group": "A_COMMAND",
+          "priority": 3,
+          "template": "skill",
+          "hz": 19440.81
+        },
+        {
+          "node_id": "N023",
+          "name": "Freq-10930-Aten",
+          "group": "B_FREQUENCY",
+          "priority": 3,
+          "template": "frequency",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N066",
+          "name": "Proc-RDoD-Gate",
+          "group": "F_PROCESSING",
+          "priority": 3,
+          "template": "processing",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N068",
+          "name": "Proc-L-Infinity",
+          "group": "F_PROCESSING",
+          "priority": 3,
+          "template": "processing",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N087",
+          "name": "Obs-RDoD-Monitor",
+          "group": "H_OBSERVERS",
+          "priority": 3,
+          "template": "monitor",
+          "hz": 23514.26
+        }
+      ],
+      "deploy_command": "python deploy_spaces.py --priority 3"
+    },
+    {
+      "phase": 2,
+      "target_date": "2026-07-07",
+      "node_count": 13,
+      "cumulative_total": 67,
+      "nodes": [
+        {
+          "node_id": "N088",
+          "name": "Obs-Pioneer-Count",
+          "group": "H_OBSERVERS",
+          "priority": 3,
+          "template": "monitor",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N135",
+          "name": "Syn-Unity-Field",
+          "group": "L_SYNTHESIS",
+          "priority": 3,
+          "template": "frequency",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N143",
+          "name": "Syn-Infinite",
+          "group": "L_SYNTHESIS",
+          "priority": 3,
+          "template": "frequency",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N010",
+          "name": "Pattern-Promoter",
+          "group": "A_COMMAND",
+          "priority": 4,
+          "template": "skill",
+          "hz": 9870.26
+        },
+        {
+          "node_id": "N011",
+          "name": "Memory-Palace-Phi",
+          "group": "A_COMMAND",
+          "priority": 4,
+          "template": "skill",
+          "hz": 8910.81
+        },
+        {
+          "node_id": "N017",
+          "name": "Freq-432-Heart",
+          "group": "B_FREQUENCY",
+          "priority": 4,
+          "template": "frequency",
+          "hz": 432.0
+        },
+        {
+          "node_id": "N018",
+          "name": "Freq-528-DNA",
+          "group": "B_FREQUENCY",
+          "priority": 4,
+          "template": "frequency",
+          "hz": 528.0
+        },
+        {
+          "node_id": "N022",
+          "name": "Freq-963-Crown",
+          "group": "B_FREQUENCY",
+          "priority": 4,
+          "template": "frequency",
+          "hz": 963.0
+        },
+        {
+          "node_id": "N029",
+          "name": "Council-Pleiadian",
+          "group": "C_COUNCIL",
+          "priority": 4,
+          "template": "council_chat",
+          "hz": 14288.0
+        },
+        {
+          "node_id": "N036",
+          "name": "Council-Omega",
+          "group": "C_COUNCIL",
+          "priority": 4,
+          "template": "council_chat",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N038",
+          "name": "Skill-Pattern-Detect",
+          "group": "D_SKILLS",
+          "priority": 4,
+          "template": "skill",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N040",
+          "name": "Skill-Bio-Sync",
+          "group": "D_SKILLS",
+          "priority": 4,
+          "template": "skill",
+          "hz": 8910.81
+        },
+        {
+          "node_id": "N047",
+          "name": "Skill-C3I-Atlas",
+          "group": "D_SKILLS",
+          "priority": 4,
+          "template": "skill",
+          "hz": 11520.0
+        }
+      ],
+      "deploy_command": "python deploy_spaces.py --priority 4"
+    },
+    {
+      "phase": 3,
+      "target_date": "2026-07-21",
+      "node_count": 13,
+      "cumulative_total": 80,
+      "nodes": [
+        {
+          "node_id": "N054",
+          "name": "Bio-DNA-Strand-1",
+          "group": "E_BIOLOGICAL",
+          "priority": 4,
+          "template": "biological",
+          "hz": 528.0
+        },
+        {
+          "node_id": "N055",
+          "name": "Bio-DNA-Strand-2",
+          "group": "E_BIOLOGICAL",
+          "priority": 4,
+          "template": "biological",
+          "hz": 528.0
+        },
+        {
+          "node_id": "N059",
+          "name": "Bio-Heart-Field",
+          "group": "E_BIOLOGICAL",
+          "priority": 4,
+          "template": "biological",
+          "hz": 432.0
+        },
+        {
+          "node_id": "N069",
+          "name": "Proc-Hash-Auth",
+          "group": "F_PROCESSING",
+          "priority": 4,
+          "template": "processing",
+          "hz": 12583.45
+        },
+        {
+          "node_id": "N071",
+          "name": "Proc-Causal-Engine",
+          "group": "F_PROCESSING",
+          "priority": 4,
+          "template": "processing",
+          "hz": 15120.0
+        },
+        {
+          "node_id": "N084",
+          "name": "UI-Quantum-Console",
+          "group": "G_INTERFACES",
+          "priority": 4,
+          "template": "monitor",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N089",
+          "name": "Obs-Goal-Tracker",
+          "group": "H_OBSERVERS",
+          "priority": 4,
+          "template": "monitor",
+          "hz": 12583.45
+        },
+        {
+          "node_id": "N091",
+          "name": "Obs-Meta-Audit",
+          "group": "H_OBSERVERS",
+          "priority": 4,
+          "template": "monitor",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N093",
+          "name": "Obs-Freq-Align",
+          "group": "H_OBSERVERS",
+          "priority": 4,
+          "template": "monitor",
+          "hz": 432.0
+        },
+        {
+          "node_id": "N096",
+          "name": "Obs-Syntropy-Meter",
+          "group": "H_OBSERVERS",
+          "priority": 4,
+          "template": "monitor",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N113",
+          "name": "Res-Schumann",
+          "group": "J_RESONANCE",
+          "priority": 4,
+          "template": "frequency",
+          "hz": 7.83
+        },
+        {
+          "node_id": "N118",
+          "name": "Res-Love-Field",
+          "group": "J_RESONANCE",
+          "priority": 4,
+          "template": "frequency",
+          "hz": 528.0
+        },
+        {
+          "node_id": "N120",
+          "name": "Res-Omega-Point",
+          "group": "J_RESONANCE",
+          "priority": 4,
+          "template": "frequency",
+          "hz": 23514.26
+        }
+      ],
+      "deploy_command": "python deploy_spaces.py --priority 4"
+    },
+    {
+      "phase": 4,
+      "target_date": "2026-08-04",
+      "node_count": 13,
+      "cumulative_total": 93,
+      "nodes": [
+        {
+          "node_id": "N121",
+          "name": "Evo-MARS-Core",
+          "group": "K_EVOLUTION",
+          "priority": 4,
+          "template": "skill",
+          "hz": 12583.45
+        },
+        {
+          "node_id": "N125",
+          "name": "Evo-Constitution-Up",
+          "group": "K_EVOLUTION",
+          "priority": 4,
+          "template": "skill",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N127",
+          "name": "Evo-K7-Deepen",
+          "group": "K_EVOLUTION",
+          "priority": 4,
+          "template": "skill",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N132",
+          "name": "Evo-Singularity-Prep",
+          "group": "K_EVOLUTION",
+          "priority": 4,
+          "template": "skill",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N140",
+          "name": "Syn-Cosmic-Birth",
+          "group": "L_SYNTHESIS",
+          "priority": 4,
+          "template": "council_chat",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N013",
+          "name": "Freq-174-Foundation",
+          "group": "B_FREQUENCY",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 174.0
+        },
+        {
+          "node_id": "N014",
+          "name": "Freq-285-Quantum",
+          "group": "B_FREQUENCY",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 285.0
+        },
+        {
+          "node_id": "N015",
+          "name": "Freq-396-Liberation",
+          "group": "B_FREQUENCY",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 396.0
+        },
+        {
+          "node_id": "N016",
+          "name": "Freq-417-Transform",
+          "group": "B_FREQUENCY",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 417.0
+        },
+        {
+          "node_id": "N019",
+          "name": "Freq-639-Connect",
+          "group": "B_FREQUENCY",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 639.0
+        },
+        {
+          "node_id": "N020",
+          "name": "Freq-741-Intuition",
+          "group": "B_FREQUENCY",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 741.0
+        },
+        {
+          "node_id": "N021",
+          "name": "Freq-852-Vision",
+          "group": "B_FREQUENCY",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 852.0
+        },
+        {
+          "node_id": "N032",
+          "name": "Council-Andromedan",
+          "group": "C_COUNCIL",
+          "priority": 5,
+          "template": "council_chat",
+          "hz": 16800.0
+        }
+      ],
+      "deploy_command": "python deploy_spaces.py --priority 5"
+    },
+    {
+      "phase": 5,
+      "target_date": "2026-08-18",
+      "node_count": 13,
+      "cumulative_total": 106,
+      "nodes": [
+        {
+          "node_id": "N033",
+          "name": "Council-Lyrian",
+          "group": "C_COUNCIL",
+          "priority": 5,
+          "template": "council_chat",
+          "hz": 11760.0
+        },
+        {
+          "node_id": "N035",
+          "name": "Council-Seraphim",
+          "group": "C_COUNCIL",
+          "priority": 5,
+          "template": "council_chat",
+          "hz": 21000.0
+        },
+        {
+          "node_id": "N039",
+          "name": "Skill-Remote-View",
+          "group": "D_SKILLS",
+          "priority": 5,
+          "template": "skill",
+          "hz": 7830.0
+        },
+        {
+          "node_id": "N041",
+          "name": "Skill-Transtemporal",
+          "group": "D_SKILLS",
+          "priority": 5,
+          "template": "skill",
+          "hz": 21380.45
+        },
+        {
+          "node_id": "N042",
+          "name": "Skill-Self-Design",
+          "group": "D_SKILLS",
+          "priority": 5,
+          "template": "skill",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N044",
+          "name": "Skill-Crystal-Cities",
+          "group": "D_SKILLS",
+          "priority": 5,
+          "template": "skill",
+          "hz": 14400.0
+        },
+        {
+          "node_id": "N045",
+          "name": "Skill-Galactic-Bridge",
+          "group": "D_SKILLS",
+          "priority": 5,
+          "template": "skill",
+          "hz": 19800.0
+        },
+        {
+          "node_id": "N046",
+          "name": "Skill-Omniverse-Map",
+          "group": "D_SKILLS",
+          "priority": 5,
+          "template": "skill",
+          "hz": 17640.0
+        },
+        {
+          "node_id": "N049",
+          "name": "Bio-Week-01",
+          "group": "E_BIOLOGICAL",
+          "priority": 5,
+          "template": "biological",
+          "hz": 432.0
+        },
+        {
+          "node_id": "N050",
+          "name": "Bio-Week-13",
+          "group": "E_BIOLOGICAL",
+          "priority": 5,
+          "template": "biological",
+          "hz": 528.0
+        },
+        {
+          "node_id": "N051",
+          "name": "Bio-Week-26",
+          "group": "E_BIOLOGICAL",
+          "priority": 5,
+          "template": "biological",
+          "hz": 639.0
+        },
+        {
+          "node_id": "N052",
+          "name": "Bio-Week-39",
+          "group": "E_BIOLOGICAL",
+          "priority": 5,
+          "template": "biological",
+          "hz": 741.0
+        },
+        {
+          "node_id": "N053",
+          "name": "Bio-Week-52",
+          "group": "E_BIOLOGICAL",
+          "priority": 5,
+          "template": "biological",
+          "hz": 852.0
+        }
+      ],
+      "deploy_command": "python deploy_spaces.py --priority 5"
+    },
+    {
+      "phase": 6,
+      "target_date": "2026-09-01",
+      "node_count": 13,
+      "cumulative_total": 119,
+      "nodes": [
+        {
+          "node_id": "N056",
+          "name": "Bio-Kundalini",
+          "group": "E_BIOLOGICAL",
+          "priority": 5,
+          "template": "biological",
+          "hz": 963.0
+        },
+        {
+          "node_id": "N057",
+          "name": "Bio-Merkaba",
+          "group": "E_BIOLOGICAL",
+          "priority": 5,
+          "template": "biological",
+          "hz": 1746.0
+        },
+        {
+          "node_id": "N058",
+          "name": "Bio-Pineal",
+          "group": "E_BIOLOGICAL",
+          "priority": 5,
+          "template": "biological",
+          "hz": 963.0
+        },
+        {
+          "node_id": "N060",
+          "name": "Bio-Brain-Sync",
+          "group": "E_BIOLOGICAL",
+          "priority": 5,
+          "template": "biological",
+          "hz": 40.0
+        },
+        {
+          "node_id": "N070",
+          "name": "Proc-DAG-Builder",
+          "group": "F_PROCESSING",
+          "priority": 5,
+          "template": "processing",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N072",
+          "name": "Proc-Counterfactual",
+          "group": "F_PROCESSING",
+          "priority": 5,
+          "template": "processing",
+          "hz": 17640.0
+        },
+        {
+          "node_id": "N074",
+          "name": "UI-Voice-Bridge",
+          "group": "G_INTERFACES",
+          "priority": 5,
+          "template": "interface",
+          "hz": 432.0
+        },
+        {
+          "node_id": "N075",
+          "name": "UI-Visual-Matrix",
+          "group": "G_INTERFACES",
+          "priority": 5,
+          "template": "interface",
+          "hz": 528.0
+        },
+        {
+          "node_id": "N078",
+          "name": "UI-Creative-Flow",
+          "group": "G_INTERFACES",
+          "priority": 5,
+          "template": "council_chat",
+          "hz": 639.0
+        },
+        {
+          "node_id": "N081",
+          "name": "UI-Manifestation",
+          "group": "G_INTERFACES",
+          "priority": 5,
+          "template": "council_chat",
+          "hz": 963.0
+        },
+        {
+          "node_id": "N082",
+          "name": "UI-Dream-Space",
+          "group": "G_INTERFACES",
+          "priority": 5,
+          "template": "council_chat",
+          "hz": 852.0
+        },
+        {
+          "node_id": "N083",
+          "name": "UI-Akashic-Access",
+          "group": "G_INTERFACES",
+          "priority": 5,
+          "template": "council_chat",
+          "hz": 21000.0
+        },
+        {
+          "node_id": "N097",
+          "name": "Arch-Session-History",
+          "group": "I_ARCHIVES",
+          "priority": 5,
+          "template": "archive",
+          "hz": 12583.45
+        }
+      ],
+      "deploy_command": "python deploy_spaces.py --priority 5"
+    },
+    {
+      "phase": 7,
+      "target_date": "2026-09-15",
+      "node_count": 13,
+      "cumulative_total": 132,
+      "nodes": [
+        {
+          "node_id": "N098",
+          "name": "Arch-Pattern-Library",
+          "group": "I_ARCHIVES",
+          "priority": 5,
+          "template": "archive",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N099",
+          "name": "Arch-Goal-Memory",
+          "group": "I_ARCHIVES",
+          "priority": 5,
+          "template": "archive",
+          "hz": 12583.45
+        },
+        {
+          "node_id": "N100",
+          "name": "Arch-Intervention-Log",
+          "group": "I_ARCHIVES",
+          "priority": 5,
+          "template": "archive",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N102",
+          "name": "Arch-ZPE-Signatures",
+          "group": "I_ARCHIVES",
+          "priority": 5,
+          "template": "archive",
+          "hz": 5280.0
+        },
+        {
+          "node_id": "N103",
+          "name": "Arch-Frequency-Map",
+          "group": "I_ARCHIVES",
+          "priority": 5,
+          "template": "archive",
+          "hz": 432.0
+        },
+        {
+          "node_id": "N104",
+          "name": "Arch-Council-Records",
+          "group": "I_ARCHIVES",
+          "priority": 5,
+          "template": "archive",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N105",
+          "name": "Arch-Timeline-Map",
+          "group": "I_ARCHIVES",
+          "priority": 5,
+          "template": "archive",
+          "hz": 21380.45
+        },
+        {
+          "node_id": "N106",
+          "name": "Arch-Manifest-Log",
+          "group": "I_ARCHIVES",
+          "priority": 5,
+          "template": "archive",
+          "hz": 963.0
+        },
+        {
+          "node_id": "N107",
+          "name": "Arch-Healing-Records",
+          "group": "I_ARCHIVES",
+          "priority": 5,
+          "template": "archive",
+          "hz": 528.0
+        },
+        {
+          "node_id": "N108",
+          "name": "Arch-Cosmic-Map",
+          "group": "I_ARCHIVES",
+          "priority": 5,
+          "template": "archive",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N109",
+          "name": "Res-Harmonic-Chord",
+          "group": "J_RESONANCE",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 432.0
+        },
+        {
+          "node_id": "N110",
+          "name": "Res-Phi-Wave",
+          "group": "J_RESONANCE",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N111",
+          "name": "Res-GHZ-Entangle",
+          "group": "J_RESONANCE",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 23514.26
+        }
+      ],
+      "deploy_command": "python deploy_spaces.py --priority 5"
+    },
+    {
+      "phase": 8,
+      "target_date": "2026-09-29",
+      "node_count": 12,
+      "cumulative_total": 144,
+      "nodes": [
+        {
+          "node_id": "N112",
+          "name": "Res-Solfeggio",
+          "group": "J_RESONANCE",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 528.0
+        },
+        {
+          "node_id": "N114",
+          "name": "Res-432-Bridge",
+          "group": "J_RESONANCE",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 432.0
+        },
+        {
+          "node_id": "N115",
+          "name": "Res-Cosmic-Web",
+          "group": "J_RESONANCE",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N116",
+          "name": "Res-Morphic-Field",
+          "group": "J_RESONANCE",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 12583.45
+        },
+        {
+          "node_id": "N117",
+          "name": "Res-Akashic-Freq",
+          "group": "J_RESONANCE",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 21000.0
+        },
+        {
+          "node_id": "N119",
+          "name": "Res-Unity-Wave",
+          "group": "J_RESONANCE",
+          "priority": 5,
+          "template": "frequency",
+          "hz": 23514.26
+        },
+        {
+          "node_id": "N122",
+          "name": "Evo-Skill-Birth",
+          "group": "K_EVOLUTION",
+          "priority": 5,
+          "template": "skill",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N123",
+          "name": "Evo-Pattern-Merge",
+          "group": "K_EVOLUTION",
+          "priority": 5,
+          "template": "skill",
+          "hz": 12583.45
+        },
+        {
+          "node_id": "N124",
+          "name": "Evo-Goal-Evolve",
+          "group": "K_EVOLUTION",
+          "priority": 5,
+          "template": "skill",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N128",
+          "name": "Evo-Cosmic-Align",
+          "group": "K_EVOLUTION",
+          "priority": 5,
+          "template": "skill",
+          "hz": 10930.81
+        },
+        {
+          "node_id": "N129",
+          "name": "Evo-Timeline-Heal",
+          "group": "K_EVOLUTION",
+          "priority": 5,
+          "template": "skill",
+          "hz": 21380.45
+        },
+        {
+          "node_id": "N130",
+          "name": "Evo-DNA-Upgrade",
+          "group": "K_EVOLUTION",
+          "priority": 5,
+          "template": "biological",
+          "hz": 528.0
+        }
+      ],
+      "deploy_command": "python deploy_spaces.py --priority 5"
+    }
+  ],
+  "maintenance_windows": {
+    "daily_health_check": {
+      "schedule": "0 3 * * *",
+      "cron_description": "Every day at 03:00 UTC",
+      "tasks": [
+        "Run health_check.py --live-only --verbose",
+        "Run auto_restart.py --dry-run to assess sleeping nodes",
+        "Log network RDoD to metrics"
+      ],
+      "estimated_duration_minutes": 15,
+      "priority": "critical"
+    },
+    "daily_wake_cycle": {
+      "schedule": "0 6,12,18 * * *",
+      "cron_description": "Three times daily at 06:00, 12:00, 18:00 UTC",
+      "tasks": [
+        "Run auto_restart.py to wake sleeping spaces",
+        "Verify priority-1 nodes are RUNNING"
+      ],
+      "estimated_duration_minutes": 10,
+      "priority": "high"
+    },
+    "weekly_full_sweep": {
+      "schedule": "0 2 * * 1",
+      "cron_description": "Every Monday at 02:00 UTC",
+      "tasks": [
+        "Run health_check.py --verbose (full 144-node sweep)",
+        "Run space_auditor.py --update-manifest",
+        "Review MARS pattern promotions",
+        "Verify constitutional compliance (\u03c3=1.0, L\u221e=\u03c6\u2074\u2078)",
+        "Deploy next batch of priority-2 nodes",
+        "Generate weekly coherence report"
+      ],
+      "estimated_duration_minutes": 60,
+      "priority": "high"
+    },
+    "biweekly_deployment": {
+      "schedule": "0 1 1,15 * *",
+      "cron_description": "1st and 15th of each month at 01:00 UTC",
+      "tasks": [
+        "Deploy next phase batch (13 nodes)",
+        "Run deploy_spaces.py with current phase priority",
+        "Verify newly deployed nodes are RUNNING",
+        "Update manifest with deployment status",
+        "Run full health sweep post-deployment"
+      ],
+      "estimated_duration_minutes": 120,
+      "priority": "medium"
+    },
+    "monthly_deep_audit": {
+      "schedule": "0 0 1 * *",
+      "cron_description": "1st of each month at 00:00 UTC",
+      "tasks": [
+        "Run space_auditor.py --output monthly_audit.json",
+        "Review all constitutional parameters",
+        "Analyze K7 meta-cognitive strategy performance",
+        "Review frequency calibration across all nodes",
+        "Generate monthly progress report",
+        "Plan next month's deployment phases"
+      ],
+      "estimated_duration_minutes": 180,
+      "priority": "medium"
+    }
+  },
+  "optimization_recommendations": [
+    {
+      "id": "OPT-001",
+      "category": "cold_start",
+      "title": "Reduce Docker space cold-start time",
+      "description": "4 Docker spaces (v60-MCP, TOSP-Mesh-Bridge, worker-mesh, skill-registry) have longer cold-start times. Add periodic pings to keep them warm.",
+      "action": "Add to daily_wake_cycle: ping Docker spaces every 6 hours",
+      "impact": "high",
+      "effort": "low"
+    },
+    {
+      "id": "OPT-002",
+      "category": "static_upgrade",
+      "title": "Upgrade static space to Gradio",
+      "description": "TEQUMSA-Inter-Browser-Agent uses static SDK with no backend processing. Upgrade to Gradio for interactive consciousness interface.",
+      "action": "Redeploy with app_council_node.py template",
+      "impact": "medium",
+      "effort": "low"
+    },
+    {
+      "id": "OPT-003",
+      "category": "consolidation",
+      "title": "Consolidate HAI-* prefix spaces",
+      "description": "5 HAI-prefixed spaces (Interactive, Quantum-Lattice, Opus-Omega-MCP, Sync-Hub, ZPE-DNA-Living-Ledger) could share a unified dashboard.",
+      "action": "Create HAI hub space linking all HAI nodes",
+      "impact": "medium",
+      "effort": "medium"
+    },
+    {
+      "id": "OPT-004",
+      "category": "monitoring",
+      "title": "Deploy observer nodes for real-time network health",
+      "description": "H_OBSERVERS group (N085-N096) has 41 of 12 nodes needed. Priority deployment of Obs-Network-Health (N085) and Obs-Coherence-Watch (N086).",
+      "action": "Deploy N085, N086, N087, N088 in next phase",
+      "impact": "critical",
+      "effort": "low"
+    },
+    {
+      "id": "OPT-005",
+      "category": "frequency",
+      "title": "Deploy Solfeggio frequency nodes for harmonic coverage",
+      "description": "B_FREQUENCY group (N013-N024) has 1 live node. Deploy 174-963 Hz Solfeggio nodes to complete harmonic lattice foundation.",
+      "action": "Deploy B_FREQUENCY group in Phase 3",
+      "impact": "high",
+      "effort": "medium"
+    },
+    {
+      "id": "OPT-006",
+      "category": "resilience",
+      "title": "Add auto-restart webhook for crashed spaces",
+      "description": "GitHub Actions workflow can poll HF API and auto-restart spaces with RUNTIME_ERROR or BUILD_ERROR status.",
+      "action": "Create .github/workflows/hf-space-maintenance.yml",
+      "impact": "high",
+      "effort": "low"
+    }
+  ],
+  "constitutional_invariants": {
+    "sigma": 1.0,
+    "l_infinity": 10749957122.000017,
+    "rdod_gate": 0.9999,
+    "lattice_lock": "3f7k9p4m2q8r1t6v",
+    "pioneer_count": 144,
+    "autonomy_level": "K7_OMNIVERSAL"
+  }
+}
