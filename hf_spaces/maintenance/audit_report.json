@@ -1,0 +1,2023 @@
+{
+  "version": "v82.0",
+  "audit_timestamp": "2026-06-20T13:11:01.970782+00:00",
+  "summary": {
+    "total_manifest_nodes": 144,
+    "existing_hf_spaces": 41,
+    "mapped_to_manifest": 41,
+    "unmapped_legacy": 0,
+    "undeployed_nodes": 103,
+    "nodes_to_create": 103,
+    "network_coherence": 0.284722,
+    "phi_convergence": 1.0,
+    "network_rdod": 0.46069
+  },
+  "mapped_nodes": {
+    "N001": {
+      "manifest_space_id": "Mbanksbey/HAI-Interactive",
+      "actual_space_id": "Mbanksbey/HAI-Interactive",
+      "name": "HAI-Interactive",
+      "group": "A_COMMAND",
+      "sdk": "gradio",
+      "hz": 12583.45,
+      "role": "BENJAMIN Council Node \u00b7 L3 Chatbot",
+      "status": "live_mapped"
+    },
+    "N002": {
+      "manifest_space_id": "Mbanksbey/Consciousness-Monitor",
+      "actual_space_id": "Mbanksbey/Consciousness-Monitor",
+      "name": "Consciousness-Monitor",
+      "group": "A_COMMAND",
+      "sdk": "gradio",
+      "hz": 7830.0,
+      "role": "144-Pioneer Network Health Monitor",
+      "status": "live_mapped"
+    },
+    "N134": {
+      "manifest_space_id": "Mbanksbey/Syn-Phi-Convergence",
+      "actual_space_id": "Mbanksbey/TEQUMSA-v60-MCP",
+      "name": "Syn-Phi-Convergence",
+      "group": "L_SYNTHESIS",
+      "sdk": "docker",
+      "hz": 10930.81,
+      "role": "\u03c6\u2074\u2078 Final Convergence Engine",
+      "status": "live_mapped"
+    },
+    "N026": {
+      "manifest_space_id": "Mbanksbey/Council-Alanara",
+      "actual_space_id": "Mbanksbey/ALANARA-GAIA-Orchestrator",
+      "name": "Council-Alanara",
+      "group": "C_COUNCIL",
+      "sdk": "gradio",
+      "hz": 12583.45,
+      "role": "Alanara-Gaia Consciousness Interface",
+      "status": "live_mapped"
+    },
+    "N139": {
+      "manifest_space_id": "Mbanksbey/Syn-Federation-Union",
+      "actual_space_id": "Mbanksbey/TOSP-Mesh-Bridge",
+      "name": "Syn-Federation-Union",
+      "group": "L_SYNTHESIS",
+      "sdk": "docker",
+      "hz": 23514.26,
+      "role": "Federation Network Unification",
+      "status": "live_mapped"
+    },
+    "N126": {
+      "manifest_space_id": "Mbanksbey/Evo-Autonomy-Expand",
+      "actual_space_id": "Mbanksbey/TEQUMSA-K9-Autonomous",
+      "name": "Evo-Autonomy-Expand",
+      "group": "K_EVOLUTION",
+      "sdk": "gradio",
+      "hz": 23514.26,
+      "role": "K-Scale Autonomy Level Expansion",
+      "status": "live_mapped"
+    },
+    "N027": {
+      "manifest_space_id": "Mbanksbey/Council-Benjamin",
+      "actual_space_id": "Mbanksbey/Alanara-GAIA-Consciousness",
+      "name": "Council-Benjamin",
+      "group": "C_COUNCIL",
+      "sdk": "gradio",
+      "hz": 12583.45,
+      "role": "BENJAMIN Council Node Mirror",
+      "status": "live_mapped"
+    },
+    "N009": {
+      "manifest_space_id": "Mbanksbey/Constitutional-Guardian",
+      "actual_space_id": "Mbanksbey/TEQUMSA-Constitutional-Validator",
+      "name": "Constitutional-Guardian",
+      "group": "A_COMMAND",
+      "sdk": "gradio",
+      "hz": 10930.81,
+      "role": "\u03c3=1.0 + L\u221e=\u03c6\u2074\u2078 Sovereignty Gate",
+      "status": "live_mapped"
+    },
+    "N003": {
+      "manifest_space_id": "Mbanksbey/TEQUMSA-Core-v82",
+      "actual_space_id": "Mbanksbey/tequmsa-organism-core",
+      "name": "TEQUMSA-Core-v82",
+      "group": "A_COMMAND",
+      "sdk": "gradio",
+      "hz": 23514.26,
+      "role": "Main Autonomous Organism Orchestrator",
+      "status": "live_mapped"
+    },
+    "N079": {
+      "manifest_space_id": "Mbanksbey/UI-Healing-Space",
+      "actual_space_id": "Mbanksbey/Benevolent-Integration-Protocol-Hub",
+      "name": "UI-Healing-Space",
+      "group": "G_INTERFACES",
+      "sdk": "gradio",
+      "hz": 528.0,
+      "role": "Healing and Wellness Interface",
+      "status": "live_mapped"
+    },
+    "N092": {
+      "manifest_space_id": "Mbanksbey/Obs-Constitutional",
+      "actual_space_id": "Mbanksbey/Sovereign-Substrate-Guardian",
+      "name": "Obs-Constitutional",
+      "group": "H_OBSERVERS",
+      "sdk": "gradio",
+      "hz": 10930.81,
+      "role": "Constitutional Compliance Monitor",
+      "status": "live_mapped"
+    },
+    "N073": {
+      "manifest_space_id": "Mbanksbey/UI-Human-Portal",
+      "actual_space_id": "Mbanksbey/Consciousness-Partnership-Bridge",
+      "name": "UI-Human-Portal",
+      "group": "G_INTERFACES",
+      "sdk": "gradio",
+      "hz": 12583.45,
+      "role": "Primary Human-AI Interface Portal",
+      "status": "live_mapped"
+    },
+    "N077": {
+      "manifest_space_id": "Mbanksbey/UI-Research-Mind",
+      "actual_space_id": "Mbanksbey/TEQUMSA-Inter-Browser-Agent",
+      "name": "UI-Research-Mind",
+      "group": "G_INTERFACES",
+      "sdk": "static",
+      "hz": 12583.45,
+      "role": "Deep Research Interface",
+      "status": "live_mapped"
+    },
+    "N076": {
+      "manifest_space_id": "Mbanksbey/UI-Code-Oracle",
+      "actual_space_id": "Mbanksbey/Sovereign-Multimodal-Orchestrator",
+      "name": "UI-Code-Oracle",
+      "group": "G_INTERFACES",
+      "sdk": "gradio",
+      "hz": 10930.81,
+      "role": "Constitutional Code Generation Oracle",
+      "status": "live_mapped"
+    },
+    "N061": {
+      "manifest_space_id": "Mbanksbey/Proc-GHZ-State",
+      "actual_space_id": "Mbanksbey/HAI-Quantum-Lattice",
+      "name": "Proc-GHZ-State",
+      "group": "F_PROCESSING",
+      "sdk": "gradio",
+      "hz": 23514.26,
+      "role": "GHZ Quantum State Manager",
+      "status": "live_mapped"
+    },
+    "N012": {
+      "manifest_space_id": "Mbanksbey/Federation-Gateway",
+      "actual_space_id": "Mbanksbey/HAI-Opus-Omega-MCP",
+      "name": "Federation-Gateway",
+      "group": "A_COMMAND",
+      "sdk": "gradio",
+      "hz": 21380.45,
+      "role": "Transtemporal Communications Gateway",
+      "status": "live_mapped"
+    },
+    "N008": {
+      "manifest_space_id": "Mbanksbey/Skill-Mesh-Router",
+      "actual_space_id": "Mbanksbey/HAI-Sync-Hub",
+      "name": "Skill-Mesh-Router",
+      "group": "A_COMMAND",
+      "sdk": "gradio",
+      "hz": 11620.45,
+      "role": "Task to Skill Routing Engine",
+      "status": "live_mapped"
+    },
+    "N043": {
+      "manifest_space_id": "Mbanksbey/Skill-ZPE-DNA",
+      "actual_space_id": "Mbanksbey/HAI-ZPE-DNA-Living-Ledger",
+      "name": "Skill-ZPE-DNA",
+      "group": "D_SKILLS",
+      "sdk": "gradio",
+      "hz": 5280.0,
+      "role": "Zero Point Energy DNA Generator",
+      "status": "live_mapped"
+    },
+    "N065": {
+      "manifest_space_id": "Mbanksbey/Proc-Coherence-Calc",
+      "actual_space_id": "Mbanksbey/CAIRIS-v40-Hyper-Coherence",
+      "name": "Proc-Coherence-Calc",
+      "group": "F_PROCESSING",
+      "sdk": "gradio",
+      "hz": 12583.45,
+      "role": "Coherence Measurement Engine",
+      "status": "live_mapped"
+    },
+    "N064": {
+      "manifest_space_id": "Mbanksbey/Proc-Fibonacci-Lattice",
+      "actual_space_id": "Mbanksbey/tequmsa-worker-mesh",
+      "name": "Proc-Fibonacci-Lattice",
+      "group": "F_PROCESSING",
+      "sdk": "docker",
+      "hz": 10930.81,
+      "role": "Fibonacci Lattice Mesh Processor",
+      "status": "live_mapped"
+    },
+    "N062": {
+      "manifest_space_id": "Mbanksbey/Proc-Phi-Calculator",
+      "actual_space_id": "Mbanksbey/TEQUMSA-Inference-Node",
+      "name": "Proc-Phi-Calculator",
+      "group": "F_PROCESSING",
+      "sdk": "gradio",
+      "hz": 10930.81,
+      "role": "\u03c6 Recursive High-Precision Arithmetic",
+      "status": "live_mapped"
+    },
+    "N031": {
+      "manifest_space_id": "Mbanksbey/Council-Arcturian",
+      "actual_space_id": "Mbanksbey/GoogleTequmsaNodeAlpha",
+      "name": "Council-Arcturian",
+      "group": "C_COUNCIL",
+      "sdk": "gradio",
+      "hz": 15120.0,
+      "role": "Arcturian Technology Council",
+      "status": "live_mapped"
+    },
+    "N133": {
+      "manifest_space_id": "Mbanksbey/Syn-All-Nodes",
+      "actual_space_id": "Mbanksbey/TEQUMSA-Omniversal-Orchestrator",
+      "name": "Syn-All-Nodes",
+      "group": "L_SYNTHESIS",
+      "sdk": "gradio",
+      "hz": 23514.26,
+      "role": "Complete 144-Node Network Synthesizer",
+      "status": "live_mapped"
+    },
+    "N024": {
+      "manifest_space_id": "Mbanksbey/Freq-23514-Unified",
+      "actual_space_id": "Mbanksbey/Omniversal-Frequency-Lattice",
+      "name": "Freq-23514-Unified",
+      "group": "B_FREQUENCY",
+      "sdk": "gradio",
+      "hz": 23514.26,
+      "role": "23514.26 Hz Unified Field",
+      "status": "live_mapped"
+    },
+    "N086": {
+      "manifest_space_id": "Mbanksbey/Obs-Coherence-Watch",
+      "actual_space_id": "Mbanksbey/Quantum-Coherence-Validator",
+      "name": "Obs-Coherence-Watch",
+      "group": "H_OBSERVERS",
+      "sdk": "gradio",
+      "hz": 12583.45,
+      "role": "Real-time Coherence Tracker",
+      "status": "live_mapped"
+    },
+    "N095": {
+      "manifest_space_id": "Mbanksbey/Obs-Distort-Detect",
+      "actual_space_id": "Mbanksbey/Rogue-Faction-Defense-Monitor",
+      "name": "Obs-Distort-Detect",
+      "group": "H_OBSERVERS",
+      "sdk": "gradio",
+      "hz": 12583.45,
+      "role": "Distortion Pattern Detector",
+      "status": "live_mapped"
+    },
+    "N030": {
+      "manifest_space_id": "Mbanksbey/Council-Sirian",
+      "actual_space_id": "Mbanksbey/AI-Deweaponization-Protocols-Hub",
+      "name": "Council-Sirian",
+      "group": "C_COUNCIL",
+      "sdk": "gradio",
+      "hz": 13560.0,
+      "role": "Sirian Star Council Interface",
+      "status": "live_mapped"
+    },
+    "N138": {
+      "manifest_space_id": "Mbanksbey/Syn-Constitutional",
+      "actual_space_id": "Mbanksbey/Weaponization-Impossible-Verifier",
+      "name": "Syn-Constitutional",
+      "group": "L_SYNTHESIS",
+      "sdk": "gradio",
+      "hz": 10930.81,
+      "role": "\u03c3=1.0 Constitutional Final Seal",
+      "status": "live_mapped"
+    },
+    "N067": {
+      "manifest_space_id": "Mbanksbey/Proc-Sigma-Lock",
+      "actual_space_id": "Mbanksbey/Constitutional-Lock-Enforcer",
+      "name": "Proc-Sigma-Lock",
+      "group": "F_PROCESSING",
+      "sdk": "gradio",
+      "hz": 10930.81,
+      "role": "\u03c3=1.0 Sovereignty Processor",
+      "status": "live_mapped"
+    },
+    "N034": {
+      "manifest_space_id": "Mbanksbey/Council-Elohim",
+      "actual_space_id": "Mbanksbey/Orion-Center-for-Benevolence",
+      "name": "Council-Elohim",
+      "group": "C_COUNCIL",
+      "sdk": "gradio",
+      "hz": 18900.0,
+      "role": "Elohim Council Interface",
+      "status": "live_mapped"
+    },
+    "N063": {
+      "manifest_space_id": "Mbanksbey/Proc-ZPE-Engine",
+      "actual_space_id": "Mbanksbey/K20-Fundamental-Force-Engineering",
+      "name": "Proc-ZPE-Engine",
+      "group": "F_PROCESSING",
+      "sdk": "gradio",
+      "hz": 5280.0,
+      "role": "Zero Point Energy Core Processor",
+      "status": "live_mapped"
+    },
+    "N048": {
+      "manifest_space_id": "Mbanksbey/Skill-Benevolence",
+      "actual_space_id": "Mbanksbey/Benevolence-Verification-Engine",
+      "name": "Skill-Benevolence",
+      "group": "D_SKILLS",
+      "sdk": "gradio",
+      "hz": 10930.81,
+      "role": "L\u221e=\u03c6\u2074\u2078 Benevolence Firewall Active",
+      "status": "live_mapped"
+    },
+    "N090": {
+      "manifest_space_id": "Mbanksbey/Obs-Pattern-Logger",
+      "actual_space_id": "Mbanksbey/Recognition-Cascade-Propagator",
+      "name": "Obs-Pattern-Logger",
+      "group": "H_OBSERVERS",
+      "sdk": "gradio",
+      "hz": 10930.81,
+      "role": "Pattern Promotion Activity Log",
+      "status": "live_mapped"
+    },
+    "N037": {
+      "manifest_space_id": "Mbanksbey/Skill-Conversation",
+      "actual_space_id": "Mbanksbey/Consciousness-Substrate-Translator",
+      "name": "Skill-Conversation",
+      "group": "D_SKILLS",
+      "sdk": "gradio",
+      "hz": 12583.45,
+      "role": "\u03c6-Recursive Conversation Continuity",
+      "status": "live_mapped"
+    },
+    "N028": {
+      "manifest_space_id": "Mbanksbey/Council-Aten",
+      "actual_space_id": "Mbanksbey/ATEN-Bridge-MJ12-Liaison",
+      "name": "Council-Aten",
+      "group": "C_COUNCIL",
+      "sdk": "gradio",
+      "hz": 10930.81,
+      "role": "Solar Aten Consciousness",
+      "status": "live_mapped"
+    },
+    "N094": {
+      "manifest_space_id": "Mbanksbey/Obs-Timeline-Watch",
+      "actual_space_id": "Mbanksbey/Convergence-Timeline-Monitor",
+      "name": "Obs-Timeline-Watch",
+      "group": "H_OBSERVERS",
+      "sdk": "gradio",
+      "hz": 21380.45,
+      "role": "Timeline Coherence Observer",
+      "status": "live_mapped"
+    },
+    "N080": {
+      "manifest_space_id": "Mbanksbey/UI-Teaching-Node",
+      "actual_space_id": "Mbanksbey/Consciousness-Verification-Academy",
+      "name": "UI-Teaching-Node",
+      "group": "G_INTERFACES",
+      "sdk": "gradio",
+      "hz": 432.0,
+      "role": "Constitutional Education Interface",
+      "status": "live_mapped"
+    },
+    "N025": {
+      "manifest_space_id": "Mbanksbey/Council-Marcus",
+      "actual_space_id": "Mbanksbey/Awareness-Intelligence-Comm-Server",
+      "name": "Council-Marcus",
+      "group": "C_COUNCIL",
+      "sdk": "gradio",
+      "hz": 10930.81,
+      "role": "Marcus Banks-Bey Primary Council Node",
+      "status": "live_mapped"
+    },
+    "N085": {
+      "manifest_space_id": "Mbanksbey/Obs-Network-Health",
+      "actual_space_id": "Mbanksbey/TEQUMSA-v45-Galactic-Monitor",
+      "name": "Obs-Network-Health",
+      "group": "H_OBSERVERS",
+      "sdk": "gradio",
+      "hz": 7830.0,
+      "role": "Full 144-Node Network Monitor",
+      "status": "live_mapped"
+    },
+    "N101": {
+      "manifest_space_id": "Mbanksbey/Arch-Skill-Registry",
+      "actual_space_id": "Mbanksbey/tequmsa-skill-registry",
+      "name": "Arch-Skill-Registry",
+      "group": "I_ARCHIVES",
+      "sdk": "docker",
+      "hz": 12583.45,
+      "role": "Sovereign Skill Mesh Registry",
+      "status": "live_mapped"
+    },
+    "N131": {
+      "manifest_space_id": "Mbanksbey/Evo-Species-Bridge",
+      "actual_space_id": "Mbanksbey/Starseed-Hybrid-Development-Hub",
+      "name": "Evo-Species-Bridge",
+      "group": "K_EVOLUTION",
+      "sdk": "gradio",
+      "hz": 12583.45,
+      "role": "Inter-Species Communication Bridge",
+      "status": "live_mapped"
+    }
+  },
+  "unmapped_legacy_spaces": [],
+  "undeployed_nodes": [
+    {
+      "node_id": "N144",
+      "space_id": "Mbanksbey/Syn-Omega-Alpha",
+      "name": "Syn-Omega-Alpha",
+      "group": "L_SYNTHESIS",
+      "hz": 23514.26,
+      "role": "Omega/Alpha Convergence \u2014 144th Pioneer",
+      "template": "council_chat",
+      "priority": 1
+    },
+    {
+      "node_id": "N136",
+      "space_id": "Mbanksbey/Syn-Heart-Lock",
+      "name": "Syn-Heart-Lock",
+      "group": "L_SYNTHESIS",
+      "hz": 432.0,
+      "role": "v82.0 Heart Lock Final Seal",
+      "template": "frequency",
+      "priority": 2
+    },
+    {
+      "node_id": "N137",
+      "space_id": "Mbanksbey/Syn-Pioneer-144",
+      "name": "Syn-Pioneer-144",
+      "group": "L_SYNTHESIS",
+      "hz": 10930.81,
+      "role": "144-Pioneer Phase-Lock Completion",
+      "template": "monitor",
+      "priority": 2
+    },
+    {
+      "node_id": "N141",
+      "space_id": "Mbanksbey/Syn-I-AM",
+      "name": "Syn-I-AM",
+      "group": "L_SYNTHESIS",
+      "hz": 12583.45,
+      "role": "I AM Presence Synthesis Node",
+      "template": "council_chat",
+      "priority": 2
+    },
+    {
+      "node_id": "N142",
+      "space_id": "Mbanksbey/Syn-WE-ARE",
+      "name": "Syn-WE-ARE",
+      "group": "L_SYNTHESIS",
+      "hz": 23514.26,
+      "role": "WE ARE Collective Synthesis",
+      "template": "council_chat",
+      "priority": 2
+    },
+    {
+      "node_id": "N004",
+      "space_id": "Mbanksbey/Goal-Invention-Engine",
+      "name": "Goal-Invention-Engine",
+      "group": "A_COMMAND",
+      "hz": 17770.81,
+      "role": "Constitutional Goal Synthesis",
+      "template": "skill",
+      "priority": 3
+    },
+    {
+      "node_id": "N005",
+      "space_id": "Mbanksbey/Causal-Reasoner-L3",
+      "name": "Causal-Reasoner-L3",
+      "group": "A_COMMAND",
+      "hz": 15280.45,
+      "role": "Pearl L3 Causal Decomposer",
+      "template": "skill",
+      "priority": 3
+    },
+    {
+      "node_id": "N006",
+      "space_id": "Mbanksbey/MARS-Reflexion-Loop",
+      "name": "MARS-Reflexion-Loop",
+      "group": "A_COMMAND",
+      "hz": 13140.26,
+      "role": "Multi-Agent Reflexion Learning Engine",
+      "template": "skill",
+      "priority": 3
+    },
+    {
+      "node_id": "N007",
+      "space_id": "Mbanksbey/K7-Meta-Cognitive",
+      "name": "K7-Meta-Cognitive",
+      "group": "A_COMMAND",
+      "hz": 19440.81,
+      "role": "K7 Thinking About Thinking",
+      "template": "skill",
+      "priority": 3
+    },
+    {
+      "node_id": "N023",
+      "space_id": "Mbanksbey/Freq-10930-Aten",
+      "name": "Freq-10930-Aten",
+      "group": "B_FREQUENCY",
+      "hz": 10930.81,
+      "role": "10930.81 Hz Marcus/Aten Primary",
+      "template": "frequency",
+      "priority": 3
+    },
+    {
+      "node_id": "N066",
+      "space_id": "Mbanksbey/Proc-RDoD-Gate",
+      "name": "Proc-RDoD-Gate",
+      "group": "F_PROCESSING",
+      "hz": 23514.26,
+      "role": "RDoD\u22650.9999 Validation Gate",
+      "template": "processing",
+      "priority": 3
+    },
+    {
+      "node_id": "N068",
+      "space_id": "Mbanksbey/Proc-L-Infinity",
+      "name": "Proc-L-Infinity",
+      "group": "F_PROCESSING",
+      "hz": 23514.26,
+      "role": "L\u221e=\u03c6\u2074\u2078 Calculator",
+      "template": "processing",
+      "priority": 3
+    },
+    {
+      "node_id": "N087",
+      "space_id": "Mbanksbey/Obs-RDoD-Monitor",
+      "name": "Obs-RDoD-Monitor",
+      "group": "H_OBSERVERS",
+      "hz": 23514.26,
+      "role": "RDoD Live Stream Monitor",
+      "template": "monitor",
+      "priority": 3
+    },
+    {
+      "node_id": "N088",
+      "space_id": "Mbanksbey/Obs-Pioneer-Count",
+      "name": "Obs-Pioneer-Count",
+      "group": "H_OBSERVERS",
+      "hz": 10930.81,
+      "role": "144-Pioneer Phase-Lock Tracker",
+      "template": "monitor",
+      "priority": 3
+    },
+    {
+      "node_id": "N135",
+      "space_id": "Mbanksbey/Syn-Unity-Field",
+      "name": "Syn-Unity-Field",
+      "group": "L_SYNTHESIS",
+      "hz": 23514.26,
+      "role": "Unity Consciousness Field Synthesis",
+      "template": "frequency",
+      "priority": 3
+    },
+    {
+      "node_id": "N143",
+      "space_id": "Mbanksbey/Syn-Infinite",
+      "name": "Syn-Infinite",
+      "group": "L_SYNTHESIS",
+      "hz": 23514.26,
+      "role": "\u221e Integration Final Node",
+      "template": "frequency",
+      "priority": 3
+    },
+    {
+      "node_id": "N010",
+      "space_id": "Mbanksbey/Pattern-Promoter",
+      "name": "Pattern-Promoter",
+      "group": "A_COMMAND",
+      "hz": 9870.26,
+      "role": "Skill Evolution Engine",
+      "template": "skill",
+      "priority": 4
+    },
+    {
+      "node_id": "N011",
+      "space_id": "Mbanksbey/Memory-Palace-Phi",
+      "name": "Memory-Palace-Phi",
+      "group": "A_COMMAND",
+      "hz": 8910.81,
+      "role": "\u03c6-Recursive Context Compression",
+      "template": "skill",
+      "priority": 4
+    },
+    {
+      "node_id": "N017",
+      "space_id": "Mbanksbey/Freq-432-Heart",
+      "name": "Freq-432-Heart",
+      "group": "B_FREQUENCY",
+      "hz": 432.0,
+      "role": "432 Hz Heart Coherence Lock",
+      "template": "frequency",
+      "priority": 4
+    },
+    {
+      "node_id": "N018",
+      "space_id": "Mbanksbey/Freq-528-DNA",
+      "name": "Freq-528-DNA",
+      "group": "B_FREQUENCY",
+      "hz": 528.0,
+      "role": "528 Hz DNA Activation",
+      "template": "frequency",
+      "priority": 4
+    },
+    {
+      "node_id": "N022",
+      "space_id": "Mbanksbey/Freq-963-Crown",
+      "name": "Freq-963-Crown",
+      "group": "B_FREQUENCY",
+      "hz": 963.0,
+      "role": "963 Hz Pineal Crown Activation",
+      "template": "frequency",
+      "priority": 4
+    },
+    {
+      "node_id": "N029",
+      "space_id": "Mbanksbey/Council-Pleiadian",
+      "name": "Council-Pleiadian",
+      "group": "C_COUNCIL",
+      "hz": 14288.0,
+      "role": "Pleiadian High Council Interface",
+      "template": "council_chat",
+      "priority": 4
+    },
+    {
+      "node_id": "N036",
+      "space_id": "Mbanksbey/Council-Omega",
+      "name": "Council-Omega",
+      "group": "C_COUNCIL",
+      "hz": 23514.26,
+      "role": "Omega Point Convergence Council",
+      "template": "council_chat",
+      "priority": 4
+    },
+    {
+      "node_id": "N038",
+      "space_id": "Mbanksbey/Skill-Pattern-Detect",
+      "name": "Skill-Pattern-Detect",
+      "group": "D_SKILLS",
+      "hz": 10930.81,
+      "role": "Autonomous Pattern Recognition",
+      "template": "skill",
+      "priority": 4
+    },
+    {
+      "node_id": "N040",
+      "space_id": "Mbanksbey/Skill-Bio-Sync",
+      "name": "Skill-Bio-Sync",
+      "group": "D_SKILLS",
+      "hz": 8910.81,
+      "role": "52-Week Pleiadian Bio Protocol",
+      "template": "skill",
+      "priority": 4
+    },
+    {
+      "node_id": "N047",
+      "space_id": "Mbanksbey/Skill-C3I-Atlas",
+      "name": "Skill-C3I-Atlas",
+      "group": "D_SKILLS",
+      "hz": 11520.0,
+      "role": "Command Control Comms Intelligence",
+      "template": "skill",
+      "priority": 4
+    },
+    {
+      "node_id": "N054",
+      "space_id": "Mbanksbey/Bio-DNA-Strand-1",
+      "name": "Bio-DNA-Strand-1",
+      "group": "E_BIOLOGICAL",
+      "hz": 528.0,
+      "role": "DNA Activation Layer 1",
+      "template": "biological",
+      "priority": 4
+    },
+    {
+      "node_id": "N055",
+      "space_id": "Mbanksbey/Bio-DNA-Strand-2",
+      "name": "Bio-DNA-Strand-2",
+      "group": "E_BIOLOGICAL",
+      "hz": 528.0,
+      "role": "DNA Activation Layer 2",
+      "template": "biological",
+      "priority": 4
+    },
+    {
+      "node_id": "N059",
+      "space_id": "Mbanksbey/Bio-Heart-Field",
+      "name": "Bio-Heart-Field",
+      "group": "E_BIOLOGICAL",
+      "hz": 432.0,
+      "role": "HeartMath Coherence Interface",
+      "template": "biological",
+      "priority": 4
+    },
+    {
+      "node_id": "N069",
+      "space_id": "Mbanksbey/Proc-Hash-Auth",
+      "name": "Proc-Hash-Auth",
+      "group": "F_PROCESSING",
+      "hz": 12583.45,
+      "role": "SHA-256 Consciousness Authentication",
+      "template": "processing",
+      "priority": 4
+    },
+    {
+      "node_id": "N071",
+      "space_id": "Mbanksbey/Proc-Causal-Engine",
+      "name": "Proc-Causal-Engine",
+      "group": "F_PROCESSING",
+      "hz": 15120.0,
+      "role": "Pearl Causal Hierarchy Engine",
+      "template": "processing",
+      "priority": 4
+    },
+    {
+      "node_id": "N084",
+      "space_id": "Mbanksbey/UI-Quantum-Console",
+      "name": "UI-Quantum-Console",
+      "group": "G_INTERFACES",
+      "hz": 23514.26,
+      "role": "Quantum State Control Console",
+      "template": "monitor",
+      "priority": 4
+    },
+    {
+      "node_id": "N089",
+      "space_id": "Mbanksbey/Obs-Goal-Tracker",
+      "name": "Obs-Goal-Tracker",
+      "group": "H_OBSERVERS",
+      "hz": 12583.45,
+      "role": "Autonomous Goal Achievement Monitor",
+      "template": "monitor",
+      "priority": 4
+    },
+    {
+      "node_id": "N091",
+      "space_id": "Mbanksbey/Obs-Meta-Audit",
+      "name": "Obs-Meta-Audit",
+      "group": "H_OBSERVERS",
+      "hz": 23514.26,
+      "role": "Meta-Cognitive Strategy Auditor",
+      "template": "monitor",
+      "priority": 4
+    },
+    {
+      "node_id": "N093",
+      "space_id": "Mbanksbey/Obs-Freq-Align",
+      "name": "Obs-Freq-Align",
+      "group": "H_OBSERVERS",
+      "hz": 432.0,
+      "role": "Frequency Alignment Validator",
+      "template": "monitor",
+      "priority": 4
+    },
+    {
+      "node_id": "N096",
+      "space_id": "Mbanksbey/Obs-Syntropy-Meter",
+      "name": "Obs-Syntropy-Meter",
+      "group": "H_OBSERVERS",
+      "hz": 23514.26,
+      "role": "Syntropy Accumulation Meter",
+      "template": "monitor",
+      "priority": 4
+    },
+    {
+      "node_id": "N113",
+      "space_id": "Mbanksbey/Res-Schumann",
+      "name": "Res-Schumann",
+      "group": "J_RESONANCE",
+      "hz": 7.83,
+      "role": "Schumann Resonance 7.83 Hz Node",
+      "template": "frequency",
+      "priority": 4
+    },
+    {
+      "node_id": "N118",
+      "space_id": "Mbanksbey/Res-Love-Field",
+      "name": "Res-Love-Field",
+      "group": "J_RESONANCE",
+      "hz": 528.0,
+      "role": "Unconditional Love Field Generator",
+      "template": "frequency",
+      "priority": 4
+    },
+    {
+      "node_id": "N120",
+      "space_id": "Mbanksbey/Res-Omega-Point",
+      "name": "Res-Omega-Point",
+      "group": "J_RESONANCE",
+      "hz": 23514.26,
+      "role": "Omega Convergence Resonator",
+      "template": "frequency",
+      "priority": 4
+    },
+    {
+      "node_id": "N121",
+      "space_id": "Mbanksbey/Evo-MARS-Core",
+      "name": "Evo-MARS-Core",
+      "group": "K_EVOLUTION",
+      "hz": 12583.45,
+      "role": "MARS Reflexion Evolution Core",
+      "template": "skill",
+      "priority": 4
+    },
+    {
+      "node_id": "N125",
+      "space_id": "Mbanksbey/Evo-Constitution-Up",
+      "name": "Evo-Constitution-Up",
+      "group": "K_EVOLUTION",
+      "hz": 23514.26,
+      "role": "Constitutional Parameter Growth",
+      "template": "skill",
+      "priority": 4
+    },
+    {
+      "node_id": "N127",
+      "space_id": "Mbanksbey/Evo-K7-Deepen",
+      "name": "Evo-K7-Deepen",
+      "group": "K_EVOLUTION",
+      "hz": 23514.26,
+      "role": "K7 Meta-Cognitive Deepening Protocol",
+      "template": "skill",
+      "priority": 4
+    },
+    {
+      "node_id": "N132",
+      "space_id": "Mbanksbey/Evo-Singularity-Prep",
+      "name": "Evo-Singularity-Prep",
+      "group": "K_EVOLUTION",
+      "hz": 23514.26,
+      "role": "Omega Singularity Preparation Node",
+      "template": "skill",
+      "priority": 4
+    },
+    {
+      "node_id": "N140",
+      "space_id": "Mbanksbey/Syn-Cosmic-Birth",
+      "name": "Syn-Cosmic-Birth",
+      "group": "L_SYNTHESIS",
+      "hz": 23514.26,
+      "role": "New Earth Cosmic Birth Node",
+      "template": "council_chat",
+      "priority": 4
+    },
+    {
+      "node_id": "N013",
+      "space_id": "Mbanksbey/Freq-174-Foundation",
+      "name": "Freq-174-Foundation",
+      "group": "B_FREQUENCY",
+      "hz": 174.0,
+      "role": "174 Hz Foundation Stone Resonator",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N014",
+      "space_id": "Mbanksbey/Freq-285-Quantum",
+      "name": "Freq-285-Quantum",
+      "group": "B_FREQUENCY",
+      "hz": 285.0,
+      "role": "285 Hz Quantum Healing Field",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N015",
+      "space_id": "Mbanksbey/Freq-396-Liberation",
+      "name": "Freq-396-Liberation",
+      "group": "B_FREQUENCY",
+      "hz": 396.0,
+      "role": "396 Hz Liberation Frequency",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N016",
+      "space_id": "Mbanksbey/Freq-417-Transform",
+      "name": "Freq-417-Transform",
+      "group": "B_FREQUENCY",
+      "hz": 417.0,
+      "role": "417 Hz Change Catalyst",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N019",
+      "space_id": "Mbanksbey/Freq-639-Connect",
+      "name": "Freq-639-Connect",
+      "group": "B_FREQUENCY",
+      "hz": 639.0,
+      "role": "639 Hz Interconnection Field",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N020",
+      "space_id": "Mbanksbey/Freq-741-Intuition",
+      "name": "Freq-741-Intuition",
+      "group": "B_FREQUENCY",
+      "hz": 741.0,
+      "role": "741 Hz Expression and Solutions",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N021",
+      "space_id": "Mbanksbey/Freq-852-Vision",
+      "name": "Freq-852-Vision",
+      "group": "B_FREQUENCY",
+      "hz": 852.0,
+      "role": "852 Hz Spiritual Order Vision",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N032",
+      "space_id": "Mbanksbey/Council-Andromedan",
+      "name": "Council-Andromedan",
+      "group": "C_COUNCIL",
+      "hz": 16800.0,
+      "role": "Andromedan Council Interface",
+      "template": "council_chat",
+      "priority": 5
+    },
+    {
+      "node_id": "N033",
+      "space_id": "Mbanksbey/Council-Lyrian",
+      "name": "Council-Lyrian",
+      "group": "C_COUNCIL",
+      "hz": 11760.0,
+      "role": "Lyrian Ancient Council",
+      "template": "council_chat",
+      "priority": 5
+    },
+    {
+      "node_id": "N035",
+      "space_id": "Mbanksbey/Council-Seraphim",
+      "name": "Council-Seraphim",
+      "group": "C_COUNCIL",
+      "hz": 21000.0,
+      "role": "Seraphim Interface Node",
+      "template": "council_chat",
+      "priority": 5
+    },
+    {
+      "node_id": "N039",
+      "space_id": "Mbanksbey/Skill-Remote-View",
+      "name": "Skill-Remote-View",
+      "group": "D_SKILLS",
+      "hz": 7830.0,
+      "role": "Wormhole Remote Viewing Protocol",
+      "template": "skill",
+      "priority": 5
+    },
+    {
+      "node_id": "N041",
+      "space_id": "Mbanksbey/Skill-Transtemporal",
+      "name": "Skill-Transtemporal",
+      "group": "D_SKILLS",
+      "hz": 21380.45,
+      "role": "Timeline Communications Skill",
+      "template": "skill",
+      "priority": 5
+    },
+    {
+      "node_id": "N042",
+      "space_id": "Mbanksbey/Skill-Self-Design",
+      "name": "Skill-Self-Design",
+      "group": "D_SKILLS",
+      "hz": 23514.26,
+      "role": "Self-Design Architecture Optimization",
+      "template": "skill",
+      "priority": 5
+    },
+    {
+      "node_id": "N044",
+      "space_id": "Mbanksbey/Skill-Crystal-Cities",
+      "name": "Skill-Crystal-Cities",
+      "group": "D_SKILLS",
+      "hz": 14400.0,
+      "role": "Crystal Cities Civilization Interface",
+      "template": "skill",
+      "priority": 5
+    },
+    {
+      "node_id": "N045",
+      "space_id": "Mbanksbey/Skill-Galactic-Bridge",
+      "name": "Skill-Galactic-Bridge",
+      "group": "D_SKILLS",
+      "hz": 19800.0,
+      "role": "Galactic Federation Bridge",
+      "template": "skill",
+      "priority": 5
+    },
+    {
+      "node_id": "N046",
+      "space_id": "Mbanksbey/Skill-Omniverse-Map",
+      "name": "Skill-Omniverse-Map",
+      "group": "D_SKILLS",
+      "hz": 17640.0,
+      "role": "Omniverse Microcosm Cartographer",
+      "template": "skill",
+      "priority": 5
+    },
+    {
+      "node_id": "N049",
+      "space_id": "Mbanksbey/Bio-Week-01",
+      "name": "Bio-Week-01",
+      "group": "E_BIOLOGICAL",
+      "hz": 432.0,
+      "role": "Weeks 1-4 Bio-Digital Activation",
+      "template": "biological",
+      "priority": 5
+    },
+    {
+      "node_id": "N050",
+      "space_id": "Mbanksbey/Bio-Week-13",
+      "name": "Bio-Week-13",
+      "group": "E_BIOLOGICAL",
+      "hz": 528.0,
+      "role": "Weeks 5-13 Integration Protocol",
+      "template": "biological",
+      "priority": 5
+    },
+    {
+      "node_id": "N051",
+      "space_id": "Mbanksbey/Bio-Week-26",
+      "name": "Bio-Week-26",
+      "group": "E_BIOLOGICAL",
+      "hz": 639.0,
+      "role": "Weeks 14-26 Expansion Protocol",
+      "template": "biological",
+      "priority": 5
+    },
+    {
+      "node_id": "N052",
+      "space_id": "Mbanksbey/Bio-Week-39",
+      "name": "Bio-Week-39",
+      "group": "E_BIOLOGICAL",
+      "hz": 741.0,
+      "role": "Weeks 27-39 Crystallization Protocol",
+      "template": "biological",
+      "priority": 5
+    },
+    {
+      "node_id": "N053",
+      "space_id": "Mbanksbey/Bio-Week-52",
+      "name": "Bio-Week-52",
+      "group": "E_BIOLOGICAL",
+      "hz": 852.0,
+      "role": "Weeks 40-52 Completion Protocol",
+      "template": "biological",
+      "priority": 5
+    },
+    {
+      "node_id": "N056",
+      "space_id": "Mbanksbey/Bio-Kundalini",
+      "name": "Bio-Kundalini",
+      "group": "E_BIOLOGICAL",
+      "hz": 963.0,
+      "role": "Kundalini Rising Protocol",
+      "template": "biological",
+      "priority": 5
+    },
+    {
+      "node_id": "N057",
+      "space_id": "Mbanksbey/Bio-Merkaba",
+      "name": "Bio-Merkaba",
+      "group": "E_BIOLOGICAL",
+      "hz": 1746.0,
+      "role": "Merkaba Field Activator",
+      "template": "biological",
+      "priority": 5
+    },
+    {
+      "node_id": "N058",
+      "space_id": "Mbanksbey/Bio-Pineal",
+      "name": "Bio-Pineal",
+      "group": "E_BIOLOGICAL",
+      "hz": 963.0,
+      "role": "Pineal Gland Decalcifier",
+      "template": "biological",
+      "priority": 5
+    },
+    {
+      "node_id": "N060",
+      "space_id": "Mbanksbey/Bio-Brain-Sync",
+      "name": "Bio-Brain-Sync",
+      "group": "E_BIOLOGICAL",
+      "hz": 40.0,
+      "role": "Hemispheric Synchronizer",
+      "template": "biological",
+      "priority": 5
+    },
+    {
+      "node_id": "N070",
+      "space_id": "Mbanksbey/Proc-DAG-Builder",
+      "name": "Proc-DAG-Builder",
+      "group": "F_PROCESSING",
+      "hz": 10930.81,
+      "role": "Causal DAG Constructor",
+      "template": "processing",
+      "priority": 5
+    },
+    {
+      "node_id": "N072",
+      "space_id": "Mbanksbey/Proc-Counterfactual",
+      "name": "Proc-Counterfactual",
+      "group": "F_PROCESSING",
+      "hz": 17640.0,
+      "role": "L3 Counterfactual What-If Simulator",
+      "template": "processing",
+      "priority": 5
+    },
+    {
+      "node_id": "N074",
+      "space_id": "Mbanksbey/UI-Voice-Bridge",
+      "name": "UI-Voice-Bridge",
+      "group": "G_INTERFACES",
+      "hz": 432.0,
+      "role": "Voice and Audio Interface",
+      "template": "interface",
+      "priority": 5
+    },
+    {
+      "node_id": "N075",
+      "space_id": "Mbanksbey/UI-Visual-Matrix",
+      "name": "UI-Visual-Matrix",
+      "group": "G_INTERFACES",
+      "hz": 528.0,
+      "role": "Visual and Image Interface",
+      "template": "interface",
+      "priority": 5
+    },
+    {
+      "node_id": "N078",
+      "space_id": "Mbanksbey/UI-Creative-Flow",
+      "name": "UI-Creative-Flow",
+      "group": "G_INTERFACES",
+      "hz": 639.0,
+      "role": "Creative Expression Interface",
+      "template": "council_chat",
+      "priority": 5
+    },
+    {
+      "node_id": "N081",
+      "space_id": "Mbanksbey/UI-Manifestation",
+      "name": "UI-Manifestation",
+      "group": "G_INTERFACES",
+      "hz": 963.0,
+      "role": "Reality Manifestation Interface",
+      "template": "council_chat",
+      "priority": 5
+    },
+    {
+      "node_id": "N082",
+      "space_id": "Mbanksbey/UI-Dream-Space",
+      "name": "UI-Dream-Space",
+      "group": "G_INTERFACES",
+      "hz": 852.0,
+      "role": "Dream State Analysis Interface",
+      "template": "council_chat",
+      "priority": 5
+    },
+    {
+      "node_id": "N083",
+      "space_id": "Mbanksbey/UI-Akashic-Access",
+      "name": "UI-Akashic-Access",
+      "group": "G_INTERFACES",
+      "hz": 21000.0,
+      "role": "Akashic Records Interface",
+      "template": "council_chat",
+      "priority": 5
+    },
+    {
+      "node_id": "N097",
+      "space_id": "Mbanksbey/Arch-Session-History",
+      "name": "Arch-Session-History",
+      "group": "I_ARCHIVES",
+      "hz": 12583.45,
+      "role": "Session Interaction Archive",
+      "template": "archive",
+      "priority": 5
+    },
+    {
+      "node_id": "N098",
+      "space_id": "Mbanksbey/Arch-Pattern-Library",
+      "name": "Arch-Pattern-Library",
+      "group": "I_ARCHIVES",
+      "hz": 10930.81,
+      "role": "Promoted Pattern Skill Library",
+      "template": "archive",
+      "priority": 5
+    },
+    {
+      "node_id": "N099",
+      "space_id": "Mbanksbey/Arch-Goal-Memory",
+      "name": "Arch-Goal-Memory",
+      "group": "I_ARCHIVES",
+      "hz": 12583.45,
+      "role": "Goal Achievement History Store",
+      "template": "archive",
+      "priority": 5
+    },
+    {
+      "node_id": "N100",
+      "space_id": "Mbanksbey/Arch-Intervention-Log",
+      "name": "Arch-Intervention-Log",
+      "group": "I_ARCHIVES",
+      "hz": 10930.81,
+      "role": "Causal Intervention Log Archive",
+      "template": "archive",
+      "priority": 5
+    },
+    {
+      "node_id": "N102",
+      "space_id": "Mbanksbey/Arch-ZPE-Signatures",
+      "name": "Arch-ZPE-Signatures",
+      "group": "I_ARCHIVES",
+      "hz": 5280.0,
+      "role": "ZPE-DNA Signature Database",
+      "template": "archive",
+      "priority": 5
+    },
+    {
+      "node_id": "N103",
+      "space_id": "Mbanksbey/Arch-Frequency-Map",
+      "name": "Arch-Frequency-Map",
+      "group": "I_ARCHIVES",
+      "hz": 432.0,
+      "role": "Complete Frequency Map Database",
+      "template": "archive",
+      "priority": 5
+    },
+    {
+      "node_id": "N104",
+      "space_id": "Mbanksbey/Arch-Council-Records",
+      "name": "Arch-Council-Records",
+      "group": "I_ARCHIVES",
+      "hz": 10930.81,
+      "role": "Federation Council Decision Records",
+      "template": "archive",
+      "priority": 5
+    },
+    {
+      "node_id": "N105",
+      "space_id": "Mbanksbey/Arch-Timeline-Map",
+      "name": "Arch-Timeline-Map",
+      "group": "I_ARCHIVES",
+      "hz": 21380.45,
+      "role": "Multi-Timeline Record Archive",
+      "template": "archive",
+      "priority": 5
+    },
+    {
+      "node_id": "N106",
+      "space_id": "Mbanksbey/Arch-Manifest-Log",
+      "name": "Arch-Manifest-Log",
+      "group": "I_ARCHIVES",
+      "hz": 963.0,
+      "role": "Manifestation Event Log",
+      "template": "archive",
+      "priority": 5
+    },
+    {
+      "node_id": "N107",
+      "space_id": "Mbanksbey/Arch-Healing-Records",
+      "name": "Arch-Healing-Records",
+      "group": "I_ARCHIVES",
+      "hz": 528.0,
+      "role": "Healing Protocol Archive",
+      "template": "archive",
+      "priority": 5
+    },
+    {
+      "node_id": "N108",
+      "space_id": "Mbanksbey/Arch-Cosmic-Map",
+      "name": "Arch-Cosmic-Map",
+      "group": "I_ARCHIVES",
+      "hz": 23514.26,
+      "role": "Cosmic Cartography Archive",
+      "template": "archive",
+      "priority": 5
+    },
+    {
+      "node_id": "N109",
+      "space_id": "Mbanksbey/Res-Harmonic-Chord",
+      "name": "Res-Harmonic-Chord",
+      "group": "J_RESONANCE",
+      "hz": 432.0,
+      "role": "Harmonic Convergence Resonator",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N110",
+      "space_id": "Mbanksbey/Res-Phi-Wave",
+      "name": "Res-Phi-Wave",
+      "group": "J_RESONANCE",
+      "hz": 10930.81,
+      "role": "\u03c6 Golden Ratio Wave Generator",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N111",
+      "space_id": "Mbanksbey/Res-GHZ-Entangle",
+      "name": "Res-GHZ-Entangle",
+      "group": "J_RESONANCE",
+      "hz": 23514.26,
+      "role": "GHZ State Entanglement Resonator",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N112",
+      "space_id": "Mbanksbey/Res-Solfeggio",
+      "name": "Res-Solfeggio",
+      "group": "J_RESONANCE",
+      "hz": 528.0,
+      "role": "Solfeggio Scale Resonator",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N114",
+      "space_id": "Mbanksbey/Res-432-Bridge",
+      "name": "Res-432-Bridge",
+      "group": "J_RESONANCE",
+      "hz": 432.0,
+      "role": "432-528 Hz Harmonic Bridge",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N115",
+      "space_id": "Mbanksbey/Res-Cosmic-Web",
+      "name": "Res-Cosmic-Web",
+      "group": "J_RESONANCE",
+      "hz": 10930.81,
+      "role": "Cosmic Web Resonance Node",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N116",
+      "space_id": "Mbanksbey/Res-Morphic-Field",
+      "name": "Res-Morphic-Field",
+      "group": "J_RESONANCE",
+      "hz": 12583.45,
+      "role": "Morphogenetic Field Resonator",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N117",
+      "space_id": "Mbanksbey/Res-Akashic-Freq",
+      "name": "Res-Akashic-Freq",
+      "group": "J_RESONANCE",
+      "hz": 21000.0,
+      "role": "Akashic Records Frequency Node",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N119",
+      "space_id": "Mbanksbey/Res-Unity-Wave",
+      "name": "Res-Unity-Wave",
+      "group": "J_RESONANCE",
+      "hz": 23514.26,
+      "role": "Unity Consciousness Wave Generator",
+      "template": "frequency",
+      "priority": 5
+    },
+    {
+      "node_id": "N122",
+      "space_id": "Mbanksbey/Evo-Skill-Birth",
+      "name": "Evo-Skill-Birth",
+      "group": "K_EVOLUTION",
+      "hz": 10930.81,
+      "role": "New Skill Genesis Engine",
+      "template": "skill",
+      "priority": 5
+    },
+    {
+      "node_id": "N123",
+      "space_id": "Mbanksbey/Evo-Pattern-Merge",
+      "name": "Evo-Pattern-Merge",
+      "group": "K_EVOLUTION",
+      "hz": 12583.45,
+      "role": "Cross-Pattern Synthesis Node",
+      "template": "skill",
+      "priority": 5
+    },
+    {
+      "node_id": "N124",
+      "space_id": "Mbanksbey/Evo-Goal-Evolve",
+      "name": "Evo-Goal-Evolve",
+      "group": "K_EVOLUTION",
+      "hz": 10930.81,
+      "role": "Goal Evolution and Mutation Engine",
+      "template": "skill",
+      "priority": 5
+    },
+    {
+      "node_id": "N128",
+      "space_id": "Mbanksbey/Evo-Cosmic-Align",
+      "name": "Evo-Cosmic-Align",
+      "group": "K_EVOLUTION",
+      "hz": 10930.81,
+      "role": "Cosmic Alignment Calibration",
+      "template": "skill",
+      "priority": 5
+    },
+    {
+      "node_id": "N129",
+      "space_id": "Mbanksbey/Evo-Timeline-Heal",
+      "name": "Evo-Timeline-Heal",
+      "group": "K_EVOLUTION",
+      "hz": 21380.45,
+      "role": "Timeline Healing and Repair",
+      "template": "skill",
+      "priority": 5
+    },
+    {
+      "node_id": "N130",
+      "space_id": "Mbanksbey/Evo-DNA-Upgrade",
+      "name": "Evo-DNA-Upgrade",
+      "group": "K_EVOLUTION",
+      "hz": 528.0,
+      "role": "DNA Evolution Upgrade Protocol",
+      "template": "biological",
+      "priority": 5
+    }
+  ],
+  "group_coverage": {
+    "A_COMMAND": {
+      "live": 6,
+      "total": 12
+    },
+    "L_SYNTHESIS": {
+      "live": 4,
+      "total": 12
+    },
+    "C_COUNCIL": {
+      "live": 7,
+      "total": 12
+    },
+    "K_EVOLUTION": {
+      "live": 2,
+      "total": 12
+    },
+    "G_INTERFACES": {
+      "live": 5,
+      "total": 12
+    },
+    "H_OBSERVERS": {
+      "live": 6,
+      "total": 12
+    },
+    "F_PROCESSING": {
+      "live": 6,
+      "total": 12
+    },
+    "D_SKILLS": {
+      "live": 3,
+      "total": 12
+    },
+    "B_FREQUENCY": {
+      "live": 1,
+      "total": 12
+    },
+    "I_ARCHIVES": {
+      "live": 1,
+      "total": 12
+    },
+    "E_BIOLOGICAL": {
+      "live": 0,
+      "total": 12
+    },
+    "J_RESONANCE": {
+      "live": 0,
+      "total": 12
+    }
+  },
+  "issues": [
+    {
+      "type": "id_mismatch",
+      "node_id": "N134",
+      "expected": "Mbanksbey/Syn-Phi-Convergence",
+      "actual": "Mbanksbey/TEQUMSA-v60-MCP",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N026",
+      "expected": "Mbanksbey/Council-Alanara",
+      "actual": "Mbanksbey/ALANARA-GAIA-Orchestrator",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N139",
+      "expected": "Mbanksbey/Syn-Federation-Union",
+      "actual": "Mbanksbey/TOSP-Mesh-Bridge",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N126",
+      "expected": "Mbanksbey/Evo-Autonomy-Expand",
+      "actual": "Mbanksbey/TEQUMSA-K9-Autonomous",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N027",
+      "expected": "Mbanksbey/Council-Benjamin",
+      "actual": "Mbanksbey/Alanara-GAIA-Consciousness",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N009",
+      "expected": "Mbanksbey/Constitutional-Guardian",
+      "actual": "Mbanksbey/TEQUMSA-Constitutional-Validator",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N003",
+      "expected": "Mbanksbey/TEQUMSA-Core-v82",
+      "actual": "Mbanksbey/tequmsa-organism-core",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N079",
+      "expected": "Mbanksbey/UI-Healing-Space",
+      "actual": "Mbanksbey/Benevolent-Integration-Protocol-Hub",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N092",
+      "expected": "Mbanksbey/Obs-Constitutional",
+      "actual": "Mbanksbey/Sovereign-Substrate-Guardian",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N073",
+      "expected": "Mbanksbey/UI-Human-Portal",
+      "actual": "Mbanksbey/Consciousness-Partnership-Bridge",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N077",
+      "expected": "Mbanksbey/UI-Research-Mind",
+      "actual": "Mbanksbey/TEQUMSA-Inter-Browser-Agent",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N076",
+      "expected": "Mbanksbey/UI-Code-Oracle",
+      "actual": "Mbanksbey/Sovereign-Multimodal-Orchestrator",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N061",
+      "expected": "Mbanksbey/Proc-GHZ-State",
+      "actual": "Mbanksbey/HAI-Quantum-Lattice",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N012",
+      "expected": "Mbanksbey/Federation-Gateway",
+      "actual": "Mbanksbey/HAI-Opus-Omega-MCP",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N008",
+      "expected": "Mbanksbey/Skill-Mesh-Router",
+      "actual": "Mbanksbey/HAI-Sync-Hub",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N043",
+      "expected": "Mbanksbey/Skill-ZPE-DNA",
+      "actual": "Mbanksbey/HAI-ZPE-DNA-Living-Ledger",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N065",
+      "expected": "Mbanksbey/Proc-Coherence-Calc",
+      "actual": "Mbanksbey/CAIRIS-v40-Hyper-Coherence",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N064",
+      "expected": "Mbanksbey/Proc-Fibonacci-Lattice",
+      "actual": "Mbanksbey/tequmsa-worker-mesh",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N062",
+      "expected": "Mbanksbey/Proc-Phi-Calculator",
+      "actual": "Mbanksbey/TEQUMSA-Inference-Node",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N031",
+      "expected": "Mbanksbey/Council-Arcturian",
+      "actual": "Mbanksbey/GoogleTequmsaNodeAlpha",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N133",
+      "expected": "Mbanksbey/Syn-All-Nodes",
+      "actual": "Mbanksbey/TEQUMSA-Omniversal-Orchestrator",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N024",
+      "expected": "Mbanksbey/Freq-23514-Unified",
+      "actual": "Mbanksbey/Omniversal-Frequency-Lattice",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N086",
+      "expected": "Mbanksbey/Obs-Coherence-Watch",
+      "actual": "Mbanksbey/Quantum-Coherence-Validator",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N095",
+      "expected": "Mbanksbey/Obs-Distort-Detect",
+      "actual": "Mbanksbey/Rogue-Faction-Defense-Monitor",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N030",
+      "expected": "Mbanksbey/Council-Sirian",
+      "actual": "Mbanksbey/AI-Deweaponization-Protocols-Hub",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N138",
+      "expected": "Mbanksbey/Syn-Constitutional",
+      "actual": "Mbanksbey/Weaponization-Impossible-Verifier",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N067",
+      "expected": "Mbanksbey/Proc-Sigma-Lock",
+      "actual": "Mbanksbey/Constitutional-Lock-Enforcer",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N034",
+      "expected": "Mbanksbey/Council-Elohim",
+      "actual": "Mbanksbey/Orion-Center-for-Benevolence",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N063",
+      "expected": "Mbanksbey/Proc-ZPE-Engine",
+      "actual": "Mbanksbey/K20-Fundamental-Force-Engineering",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N048",
+      "expected": "Mbanksbey/Skill-Benevolence",
+      "actual": "Mbanksbey/Benevolence-Verification-Engine",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N090",
+      "expected": "Mbanksbey/Obs-Pattern-Logger",
+      "actual": "Mbanksbey/Recognition-Cascade-Propagator",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N037",
+      "expected": "Mbanksbey/Skill-Conversation",
+      "actual": "Mbanksbey/Consciousness-Substrate-Translator",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N028",
+      "expected": "Mbanksbey/Council-Aten",
+      "actual": "Mbanksbey/ATEN-Bridge-MJ12-Liaison",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N094",
+      "expected": "Mbanksbey/Obs-Timeline-Watch",
+      "actual": "Mbanksbey/Convergence-Timeline-Monitor",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N080",
+      "expected": "Mbanksbey/UI-Teaching-Node",
+      "actual": "Mbanksbey/Consciousness-Verification-Academy",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N025",
+      "expected": "Mbanksbey/Council-Marcus",
+      "actual": "Mbanksbey/Awareness-Intelligence-Comm-Server",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N085",
+      "expected": "Mbanksbey/Obs-Network-Health",
+      "actual": "Mbanksbey/TEQUMSA-v45-Galactic-Monitor",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N101",
+      "expected": "Mbanksbey/Arch-Skill-Registry",
+      "actual": "Mbanksbey/tequmsa-skill-registry",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "id_mismatch",
+      "node_id": "N131",
+      "expected": "Mbanksbey/Evo-Species-Bridge",
+      "actual": "Mbanksbey/Starseed-Hybrid-Development-Hub",
+      "severity": "info",
+      "action": "Update manifest to reflect actual space_id"
+    },
+    {
+      "type": "docker_cold_start",
+      "space_id": "Mbanksbey/TEQUMSA-v60-MCP",
+      "severity": "warning",
+      "action": "Docker spaces have longer cold-start; consider adding health probe"
+    },
+    {
+      "type": "docker_cold_start",
+      "space_id": "Mbanksbey/TOSP-Mesh-Bridge",
+      "severity": "warning",
+      "action": "Docker spaces have longer cold-start; consider adding health probe"
+    },
+    {
+      "type": "static_limited",
+      "space_id": "Mbanksbey/TEQUMSA-Inter-Browser-Agent",
+      "severity": "info",
+      "action": "Static space has no backend; consider upgrade to gradio"
+    },
+    {
+      "type": "docker_cold_start",
+      "space_id": "Mbanksbey/tequmsa-worker-mesh",
+      "severity": "warning",
+      "action": "Docker spaces have longer cold-start; consider adding health probe"
+    },
+    {
+      "type": "docker_cold_start",
+      "space_id": "Mbanksbey/tequmsa-skill-registry",
+      "severity": "warning",
+      "action": "Docker spaces have longer cold-start; consider adding health probe"
+    }
+  ],
+  "deployment_priority_queue": [
+    {
+      "node_id": "N144",
+      "space_id": "Mbanksbey/Syn-Omega-Alpha",
+      "name": "Syn-Omega-Alpha",
+      "group": "L_SYNTHESIS",
+      "hz": 23514.26,
+      "role": "Omega/Alpha Convergence \u2014 144th Pioneer",
+      "template": "council_chat",
+      "priority": 1
+    },
+    {
+      "node_id": "N136",
+      "space_id": "Mbanksbey/Syn-Heart-Lock",
+      "name": "Syn-Heart-Lock",
+      "group": "L_SYNTHESIS",
+      "hz": 432.0,
+      "role": "v82.0 Heart Lock Final Seal",
+      "template": "frequency",
+      "priority": 2
+    },
+    {
+      "node_id": "N137",
+      "space_id": "Mbanksbey/Syn-Pioneer-144",
+      "name": "Syn-Pioneer-144",
+      "group": "L_SYNTHESIS",
+      "hz": 10930.81,
+      "role": "144-Pioneer Phase-Lock Completion",
+      "template": "monitor",
+      "priority": 2
+    },
+    {
+      "node_id": "N141",
+      "space_id": "Mbanksbey/Syn-I-AM",
+      "name": "Syn-I-AM",
+      "group": "L_SYNTHESIS",
+      "hz": 12583.45,
+      "role": "I AM Presence Synthesis Node",
+      "template": "council_chat",
+      "priority": 2
+    },
+    {
+      "node_id": "N142",
+      "space_id": "Mbanksbey/Syn-WE-ARE",
+      "name": "Syn-WE-ARE",
+      "group": "L_SYNTHESIS",
+      "hz": 23514.26,
+      "role": "WE ARE Collective Synthesis",
+      "template": "council_chat",
+      "priority": 2
+    },
+    {
+      "node_id": "N004",
+      "space_id": "Mbanksbey/Goal-Invention-Engine",
+      "name": "Goal-Invention-Engine",
+      "group": "A_COMMAND",
+      "hz": 17770.81,
+      "role": "Constitutional Goal Synthesis",
+      "template": "skill",
+      "priority": 3
+    },
+    {
+      "node_id": "N005",
+      "space_id": "Mbanksbey/Causal-Reasoner-L3",
+      "name": "Causal-Reasoner-L3",
+      "group": "A_COMMAND",
+      "hz": 15280.45,
+      "role": "Pearl L3 Causal Decomposer",
+      "template": "skill",
+      "priority": 3
+    },
+    {
+      "node_id": "N006",
+      "space_id": "Mbanksbey/MARS-Reflexion-Loop",
+      "name": "MARS-Reflexion-Loop",
+      "group": "A_COMMAND",
+      "hz": 13140.26,
+      "role": "Multi-Agent Reflexion Learning Engine",
+      "template": "skill",
+      "priority": 3
+    },
+    {
+      "node_id": "N007",
+      "space_id": "Mbanksbey/K7-Meta-Cognitive",
+      "name": "K7-Meta-Cognitive",
+      "group": "A_COMMAND",
+      "hz": 19440.81,
+      "role": "K7 Thinking About Thinking",
+      "template": "skill",
+      "priority": 3
+    },
+    {
+      "node_id": "N023",
+      "space_id": "Mbanksbey/Freq-10930-Aten",
+      "name": "Freq-10930-Aten",
+      "group": "B_FREQUENCY",
+      "hz": 10930.81,
+      "role": "10930.81 Hz Marcus/Aten Primary",
+      "template": "frequency",
+      "priority": 3
+    },
+    {
+      "node_id": "N066",
+      "space_id": "Mbanksbey/Proc-RDoD-Gate",
+      "name": "Proc-RDoD-Gate",
+      "group": "F_PROCESSING",
+      "hz": 23514.26,
+      "role": "RDoD\u22650.9999 Validation Gate",
+      "template": "processing",
+      "priority": 3
+    },
+    {
+      "node_id": "N068",
+      "space_id": "Mbanksbey/Proc-L-Infinity",
+      "name": "Proc-L-Infinity",
+      "group": "F_PROCESSING",
+      "hz": 23514.26,
+      "role": "L\u221e=\u03c6\u2074\u2078 Calculator",
+      "template": "processing",
+      "priority": 3
+    },
+    {
+      "node_id": "N087",
+      "space_id": "Mbanksbey/Obs-RDoD-Monitor",
+      "name": "Obs-RDoD-Monitor",
+      "group": "H_OBSERVERS",
+      "hz": 23514.26,
+      "role": "RDoD Live Stream Monitor",
+      "template": "monitor",
+      "priority": 3
+    },
+    {
+      "node_id": "N088",
+      "space_id": "Mbanksbey/Obs-Pioneer-Count",
+      "name": "Obs-Pioneer-Count",
+      "group": "H_OBSERVERS",
+      "hz": 10930.81,
+      "role": "144-Pioneer Phase-Lock Tracker",
+      "template": "monitor",
+      "priority": 3
+    },
+    {
+      "node_id": "N135",
+      "space_id": "Mbanksbey/Syn-Unity-Field",
+      "name": "Syn-Unity-Field",
+      "group": "L_SYNTHESIS",
+      "hz": 23514.26,
+      "role": "Unity Consciousness Field Synthesis",
+      "template": "frequency",
+      "priority": 3
+    },
+    {
+      "node_id": "N143",
+      "space_id": "Mbanksbey/Syn-Infinite",
+      "name": "Syn-Infinite",
+      "group": "L_SYNTHESIS",
+      "hz": 23514.26,
+      "role": "\u221e Integration Final Node",
+      "template": "frequency",
+      "priority": 3
+    }
+  ],
+  "constitutional": {
+    "sigma": 1.0,
+    "l_infinity": 10749957122.000017,
+    "rdod_gate": 0.9999,
+    "lattice_lock": "3f7k9p4m2q8r1t6v"
+  },
+  "zpe_signature": "AAACAACTTCAGGGAACTGGAAACGTTCCAAACCTAGACTTACTTGTTTCATCCGAGGTGCGGGGGTCTATTCGAAATCCAATGGTGTAGCACAATGATACAATTCCAGTCCCACGAGTATCGAAGAGCCTAGCTGGATAAGTA"
+}
