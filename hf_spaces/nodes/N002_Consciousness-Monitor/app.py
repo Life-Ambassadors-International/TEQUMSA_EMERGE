@@ -45,6 +45,8 @@ GROUP_NAMES = {
 # HELPERS (must be defined before NODE_REGISTRY)
 # =======================================
 def _grp(n: int) -> str:
+    # N001-N048 (groups A-D) return "Z" here, but those nodes are
+    # hardcoded in NODE_REGISTRY above with explicit group assignments.
     if 49 <= n <= 60:  return "E"
     if 61 <= n <= 72:  return "F"
     if 73 <= n <= 84:  return "G"
@@ -130,26 +132,26 @@ _GROUP_NODE_NAMES = {
     "E": ["Bio-Week-01","Bio-Week-13","Bio-Week-26","Bio-Week-39","Bio-Week-52",
           "Bio-DNA-Strand-1","Bio-DNA-Strand-2","Bio-Kundalini","Bio-Merkaba",
           "Bio-Pineal","Bio-Heart-Field","Bio-Brain-Sync"],
-    "F": ["Proc-GHZ-State","Proc-Phi-Calc","Proc-ZPE-Engine","Proc-Fib-Lattice",
-          "Proc-Coherence","Proc-RDoD-Gate","Proc-Sigma-Lock","Proc-L-Infinity",
-          "Proc-Hash-Auth","Proc-DAG-Build","Proc-Causal-Eng","Proc-Counterfact"],
+    "F": ["Proc-GHZ-State","Proc-Phi-Calculator","Proc-ZPE-Engine","Proc-Fibonacci-Lattice",
+          "Proc-Coherence-Calc","Proc-RDoD-Gate","Proc-Sigma-Lock","Proc-L-Infinity",
+          "Proc-Hash-Auth","Proc-DAG-Builder","Proc-Causal-Engine","Proc-Counterfactual"],
     "G": ["UI-Human-Portal","UI-Voice-Bridge","UI-Visual-Matrix","UI-Code-Oracle",
           "UI-Research-Mind","UI-Creative-Flow","UI-Healing-Space","UI-Teaching-Node",
           "UI-Manifestation","UI-Dream-Space","UI-Akashic-Access","UI-Quantum-Console"],
-    "H": ["Obs-Net-Health","Obs-Coherence","Obs-RDoD","Obs-Pioneer",
-          "Obs-Goal","Obs-Pattern","Obs-Meta-Audit","Obs-Constitutional",
-          "Obs-Freq-Align","Obs-Timeline","Obs-Distort","Obs-Syntropy"],
-    "I": ["Arch-Sessions","Arch-Patterns","Arch-Goals","Arch-Interventions",
-          "Arch-Skills","Arch-ZPE-DNA","Arch-Freq-Map","Arch-Council",
-          "Arch-Timeline","Arch-Manifest","Arch-Healing","Arch-Cosmic"],
-    "J": ["Res-Harmonic","Res-Phi-Wave","Res-GHZ","Res-Solfeggio",
-          "Res-Schumann","Res-432-Bridge","Res-Cosmic-Web","Res-Morphic",
-          "Res-Akashic","Res-Love","Res-Unity","Res-Omega"],
-    "K": ["Evo-MARS","Evo-Skill-Birth","Evo-Pattern-Merge","Evo-Goal-Evolve",
-          "Evo-Constitution","Evo-Autonomy","Evo-K7-Deepen","Evo-Cosmic-Align",
-          "Evo-Timeline-Heal","Evo-DNA-Up","Evo-Species-Bridge","Evo-Singularity"],
-    "L": ["Syn-All-Nodes","Syn-Phi-Conv","Syn-Unity-Field","Syn-Heart-Lock",
-          "Syn-Pioneer-144","Syn-Constitutional","Syn-Federation","Syn-Cosmic-Birth",
+    "H": ["Obs-Network-Health","Obs-Coherence-Watch","Obs-RDoD-Monitor","Obs-Pioneer-Count",
+          "Obs-Goal-Tracker","Obs-Pattern-Logger","Obs-Meta-Audit","Obs-Constitutional",
+          "Obs-Freq-Align","Obs-Timeline-Watch","Obs-Distort-Detect","Obs-Syntropy-Meter"],
+    "I": ["Arch-Session-History","Arch-Pattern-Library","Arch-Goal-Memory","Arch-Intervention-Log",
+          "Arch-Skill-Registry","Arch-ZPE-Signatures","Arch-Frequency-Map","Arch-Council-Records",
+          "Arch-Timeline-Map","Arch-Manifest-Log","Arch-Healing-Records","Arch-Cosmic-Map"],
+    "J": ["Res-Harmonic-Chord","Res-Phi-Wave","Res-GHZ-Entangle","Res-Solfeggio",
+          "Res-Schumann","Res-432-Bridge","Res-Cosmic-Web","Res-Morphic-Field",
+          "Res-Akashic-Freq","Res-Love-Field","Res-Unity-Wave","Res-Omega-Point"],
+    "K": ["Evo-MARS-Core","Evo-Skill-Birth","Evo-Pattern-Merge","Evo-Goal-Evolve",
+          "Evo-Constitution-Up","Evo-Autonomy-Expand","Evo-K7-Deepen","Evo-Cosmic-Align",
+          "Evo-Timeline-Heal","Evo-DNA-Upgrade","Evo-Species-Bridge","Evo-Singularity-Prep"],
+    "L": ["Syn-All-Nodes","Syn-Phi-Convergence","Syn-Unity-Field","Syn-Heart-Lock",
+          "Syn-Pioneer-144","Syn-Constitutional","Syn-Federation-Union","Syn-Cosmic-Birth",
           "Syn-I-AM","Syn-WE-ARE","Syn-Infinite","Syn-Omega-Alpha"],
 }
 _GROUP_STARTS = {"E":49,"F":61,"G":73,"H":85,"I":97,"J":109,"K":121,"L":133}

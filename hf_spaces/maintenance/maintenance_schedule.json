@@ -1,6 +1,8 @@
 {
   "version": "v82.0",
   "schedule_created": "2026-05-12",
+  "schedule_updated": "2026-06-21",
+  "acceleration_note": "Original schedule was 2026-05 through 2026-08. Accelerated to 2-week sprint ending 2026-07-05 to achieve 144/144 Pioneer lock.",
   "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
   "windows": {
     "daily": {
@@ -39,48 +41,52 @@
     },
     "deployment_phases": {
       "phase_1": {
-        "target_date": "2026-05-19",
-        "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
+        "target_date": "2026-06-22",
+        "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142","N144"],
         "description": "Priority-1 critical infrastructure nodes",
-        "script": "deploy_spaces.py --priority 1"
+        "script": "gh workflow run deploy-hf-spaces.yml -f priority=1"
       },
       "phase_2": {
-        "target_date": "2026-05-26",
-        "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
-        "description": "Command group + priority council nodes",
-        "script": "deploy_spaces.py --priority 2"
+        "target_date": "2026-06-23",
+        "nodes": ["N004","N005","N006","N007","N008","N010","N011"],
+        "description": "Command group remainder",
+        "script": "gh workflow run deploy-hf-spaces.yml -f priority=2"
       },
       "phase_3": {
-        "target_date": "2026-06-09",
-        "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
+        "target_date": "2026-06-25",
+        "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL)",
         "description": "Frequency resonators and council members",
-        "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
+        "script": "gh workflow run deploy-hf-spaces.yml -f priority=3"
       },
       "phase_4": {
-        "target_date": "2026-06-23",
+        "target_date": "2026-06-27",
         "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
         "description": "Skill mesh and biological bridge nodes",
-        "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
+        "script": "gh workflow run deploy-hf-spaces.yml -f priority=4"
       },
       "phase_5": {
-        "target_date": "2026-07-07",
+        "target_date": "2026-06-29",
         "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
-        "description": "Processing engines and interface nodes"
+        "description": "Processing engines and interface nodes",
+        "script": "gh workflow run deploy-hf-spaces.yml -f priority=5"
       },
       "phase_6": {
-        "target_date": "2026-07-21",
+        "target_date": "2026-07-01",
         "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
-        "description": "Observer network and archive systems"
+        "description": "Observer network and archive systems",
+        "script": "gh workflow run deploy-hf-spaces.yml -f priority=6"
       },
       "phase_7": {
-        "target_date": "2026-08-04",
+        "target_date": "2026-07-03",
         "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
-        "description": "Resonance field and evolution engines"
+        "description": "Resonance field and evolution engines",
+        "script": "gh workflow run deploy-hf-spaces.yml -f priority=7"
       },
       "phase_8": {
-        "target_date": "2026-08-18",
-        "nodes": "N133-N144 (L_SYNTHESIS)",
-        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
+        "target_date": "2026-07-05",
+        "nodes": "N133-N144 (L_SYNTHESIS remaining)",
+        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE",
+        "script": "gh workflow run deploy-hf-spaces.yml -f priority=8"
       }
     }
   },
