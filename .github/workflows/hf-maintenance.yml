@@ -1,0 +1,175 @@
+name: HuggingFace Spaces Maintenance
+
+# ☉💖🔥✨∞✨🔥💖☉
+# TEQUMSA Level 100 Civilization
+# Ongoing Maintenance for 144 HuggingFace Spaces Nodes
+# Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞
+# ☉💖🔥✨∞✨🔥💖☉
+
+on:
+  # Daily maintenance at 03:00 UTC
+  schedule:
+    - cron: '0 3 * * *'
+
+  # Manual dispatch with action selection
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Maintenance action to perform'
+        required: true
+        default: 'health_check'
+        type: choice
+        options:
+          - 'health_check'
+          - 'auto_restart'
+          - 'full_sweep'
+
+env:
+  HF_TOKEN: ${{ secrets.HF_TOKEN }}
+
+permissions:
+  contents: write
+
+jobs:
+  health-sweep:
+    name: Health Sweep
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install huggingface-hub numpy requests
+
+      - name: Run Health Check
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "Running HuggingFace Spaces health sweep"
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
+          echo "☉💖🔥✨∞✨🔥💖☉"
+
+          python hf_spaces/maintenance/health_check.py \
+            --live-only \
+            --verbose
+
+          echo "Health sweep completed"
+
+      - name: Upload Health Sweep Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hf-health-sweep-${{ github.run_id }}
+          path: |
+            health_report.json
+            hf_spaces/maintenance/*.log
+          retention-days: 30
+
+  auto-restart:
+    name: Auto Restart Unhealthy Spaces
+    needs: health-sweep
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: >-
+      github.event.inputs.action == 'auto_restart' ||
+      github.event.inputs.action == 'full_sweep'
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install huggingface-hub numpy requests
+
+      - name: Auto Restart Unhealthy Spaces
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "Running auto-restart for unhealthy spaces"
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
+          echo "☉💖🔥✨∞✨🔥💖☉"
+
+          python hf_spaces/maintenance/auto_restart.py \
+            --verbose
+
+          echo "Auto restart completed"
+
+      - name: Upload Auto Restart Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hf-auto-restart-${{ github.run_id }}
+          path: |
+            hf_spaces/maintenance/*.log
+            hf_spaces/maintenance/*.json
+          retention-days: 30
+
+  report:
+    name: Commit Health Report
+    needs: [health-sweep, auto-restart]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install huggingface-hub numpy requests
+
+      - name: Generate Final Health Report
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "Generating final health report"
+          echo "☉💖🔥✨∞✨🔥💖☉"
+
+          python hf_spaces/maintenance/health_check.py \
+            --live-only \
+            --verbose \
+            --output health_report.json
+
+      - name: Commit Health Report
+        run: |
+          mkdir -p data
+          if [ -f health_report.json ]; then
+            cp health_report.json data/health_report.json
+          fi
+
+          git config user.name "TEQUMSA HF Maintenance Bot"
+          git config user.email "hf-maintenance@lai-tequmsa.org"
+          git add data/health_report.json
+          git diff --staged --quiet || git commit -m "📊 HF Spaces Health Report: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push || echo "No changes to push"
+
+      - name: Maintenance Summary
+        if: always()
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "HuggingFace Spaces maintenance cycle completed"
+          echo "Action: ${{ inputs.action || 'health_check (scheduled)' }}"
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
+          echo "☉💖🔥✨∞✨🔥💖☉"

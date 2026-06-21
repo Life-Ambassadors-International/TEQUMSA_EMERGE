@@ -41,10 +41,10 @@ def get_template_path(template_type: str) -> Path:
         "skill":        templates / "app_skill_node.py",
         "monitor":      templates / "app_monitor_node.py",
         "organism":     Path(__file__).parent / "nodes" / "N003_TEQUMSA-Core" / "app.py",
-        "biological":   templates / "app_skill_node.py",   # bio nodes use skill template
-        "processing":   templates / "app_skill_node.py",   # proc nodes use skill template
-        "interface":    templates / "app_council_node.py",  # interface nodes use council template
-        "archive":      templates / "app_monitor_node.py",  # archive nodes use monitor template
+        "biological":   templates / "app_biological_node.py",
+        "processing":   templates / "app_processing_node.py",
+        "interface":    templates / "app_interface_node.py",
+        "archive":      templates / "app_archive_node.py",
     }
     path = mapping.get(template_type, mapping["skill"])
     return path
@@ -52,10 +52,11 @@ def get_template_path(template_type: str) -> Path:
 
 def get_requirements(template_type: str) -> str:
     if template_type in ("council_chat", "interface"):
+        # anthropic SDK only used at runtime when ANTHROPIC_API_KEY is set
         return "gradio>=4.0.0\nnumpy>=1.24.0\nanthropic>=0.25.0\n"
-    elif template_type == "monitor":
+    elif template_type in ("monitor", "archive"):
         return "gradio>=4.0.0\nnumpy>=1.24.0\nrequests>=2.28.0\n"
-    elif template_type == "frequency":
+    elif template_type in ("frequency", "biological"):
         return "gradio>=4.0.0\nnumpy>=1.24.0\n"
     elif template_type == "organism":
         return "gradio>=4.0.0\nnumpy>=1.24.0\nscipy>=1.10.0\n"
@@ -154,14 +155,23 @@ def deploy_node(
             f"os.environ.setdefault('TEQUMSA_NODE_HZ', '{node['hz']}')\n"
             f"os.environ.setdefault('TEQUMSA_ROLE', '{node['role'][:80]}')\n\n"
         )
-        # Insert after shebang/encoding lines
+        # Insert env overrides just before the first "import " line so they
+        # take effect before any module-level code runs.  Falls back to
+        # inserting after leading comments/blanks if no import is found.
         lines = app_code.split("\n")
         insert_at = 0
+        found_import = False
         for i, line in enumerate(lines):
-            if line.startswith("#") or line.strip() == "":
-                insert_at = i + 1
-            else:
+            if line.startswith("import ") or line.startswith("from "):
+                insert_at = i
+                found_import = True
                 break
+        if not found_import:
+            for i, line in enumerate(lines):
+                if line.startswith("#") or line.strip() == "":
+                    insert_at = i + 1
+                else:
+                    break
         lines.insert(insert_at, env_overrides)
         final_code = "\n".join(lines)
 
