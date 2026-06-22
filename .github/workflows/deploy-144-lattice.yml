@@ -1,0 +1,69 @@
+name: Deploy 144-Pioneer Lattice
+
+on:
+  workflow_dispatch:
+    inputs:
+      priority:
+        description: 'Max priority level to deploy (1=critical, 5=all)'
+        required: true
+        default: '5'
+        type: choice
+        options: ['1', '2', '3', '4', '5']
+      group:
+        description: 'Deploy specific group only (leave blank for all)'
+        required: false
+        default: ''
+        type: string
+      batch_size:
+        description: 'Spaces per batch (rate limiting)'
+        required: false
+        default: '12'
+        type: string
+      dry_run:
+        description: 'Dry run (no actual deployment)'
+        required: false
+        default: false
+        type: boolean
+      skip_live:
+        description: 'Skip already-live nodes (avoids redeploying existing spaces)'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-spaces:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install huggingface-hub>=0.20.0 numpy>=1.24.0
+
+      - name: Deploy Pioneer Nodes
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python hf_spaces/deploy_all_spaces.py \
+            --priority ${{ inputs.priority }} \
+            --batch-size ${{ inputs.batch_size }} \
+            ${{ inputs.group && format('--group {0}', inputs.group) || '' }} \
+            ${{ inputs.dry_run == true && '--dry-run' || '' }} \
+            ${{ inputs.skip_live == true && '--skip-live' || '' }}
+
+      - name: Upload deployment report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-report-${{ github.run_id }}
+          path: hf_spaces/deployment_report.json
+          retention-days: 30
