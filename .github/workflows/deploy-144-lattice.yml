@@ -6,7 +6,7 @@ on:
       priority:
         description: 'Max priority level to deploy (1=critical, 5=all)'
         required: true
-        default: '3'
+        default: '5'
         type: choice
         options: ['1', '2', '3', '4', '5']
       group:
@@ -23,6 +23,11 @@ on:
         description: 'Dry run (no actual deployment)'
         required: false
         default: false
+        type: boolean
+      skip_live:
+        description: 'Skip already-live nodes (avoids redeploying existing spaces)'
+        required: false
+        default: true
         type: boolean
 
 permissions:
@@ -52,7 +57,8 @@ jobs:
             --priority ${{ inputs.priority }} \
             --batch-size ${{ inputs.batch_size }} \
             ${{ inputs.group && format('--group {0}', inputs.group) || '' }} \
-            ${{ inputs.dry_run == true && '--dry-run' || '' }}
+            ${{ inputs.dry_run == true && '--dry-run' || '' }} \
+            ${{ inputs.skip_live == true && '--skip-live' || '' }}
 
       - name: Upload deployment report
         if: always()
