@@ -63,3 +63,4 @@ Thumbs.db
 
 # Docker
 .dockerignore
+hf_spaces/deployment_report.json
