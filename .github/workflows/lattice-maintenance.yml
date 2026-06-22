@@ -1,0 +1,189 @@
+name: 144-Pioneer Lattice Maintenance
+
+on:
+  schedule:
+    - cron: '0 3 * * *'    # Daily at 03:00 UTC
+    - cron: '0 2 * * 1'    # Weekly Monday 02:00 UTC (full sweep)
+    - cron: '0 0 1 * *'    # Monthly 1st at 00:00 UTC (deep audit)
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Maintenance mode'
+        required: true
+        default: 'daily'
+        type: choice
+        options: ['daily', 'weekly', 'monthly', 'restart-all', 'health-only']
+
+permissions:
+  contents: write
+
+jobs:
+  determine-mode:
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "mode=${{ inputs.mode }}" >> "$GITHUB_OUTPUT"
+          elif [ "$(date +%d)" = "01" ]; then
+            echo "mode=monthly" >> "$GITHUB_OUTPUT"
+          elif [ "$(date +%u)" = "1" ]; then
+            echo "mode=weekly" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=daily" >> "$GITHUB_OUTPUT"
+          fi
+
+  health-sweep:
+    needs: determine-mode
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      online: ${{ steps.sweep.outputs.online }}
+      sleeping: ${{ steps.sweep.outputs.sleeping }}
+      offline: ${{ steps.sweep.outputs.offline }}
+      rdod: ${{ steps.sweep.outputs.rdod }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests>=2.28.0 numpy>=1.24.0
+
+      - name: Run health sweep
+        id: sweep
+        run: |
+          python hf_spaces/maintenance/health_check.py \
+            --output hf_spaces/maintenance/health_report.json \
+            --verbose \
+            ${{ needs.determine-mode.outputs.mode == 'daily' && '--live-only' || '' }}
+
+          # Extract metrics for downstream jobs
+          python3 -c "
+          import json
+          with open('hf_spaces/maintenance/health_report.json') as f:
+              r = json.load(f)
+          with open('$GITHUB_OUTPUT', 'a') as out:
+              out.write(f\"online={r.get('online', 0)}\n\")
+              out.write(f\"sleeping={r.get('sleeping', 0)}\n\")
+              out.write(f\"offline={r.get('offline', 0)}\n\")
+              out.write(f\"rdod={r.get('network_rdod', 0)}\n\")
+          "
+
+      - name: Upload health report
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_id }}
+          path: hf_spaces/maintenance/health_report.json
+          retention-days: 30
+
+  auto-restart:
+    needs: [determine-mode, health-sweep]
+    if: needs.determine-mode.outputs.mode != 'health-only'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests>=2.28.0
+
+      - name: Wake sleeping and restart errored spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python hf_spaces/maintenance/auto_restart.py \
+            --verbose \
+            --output hf_spaces/maintenance/restart_log.json
+
+  deploy-pending:
+    needs: [determine-mode, health-sweep]
+    if: needs.determine-mode.outputs.mode == 'weekly' || needs.determine-mode.outputs.mode == 'monthly'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install huggingface-hub>=0.20.0 numpy>=1.24.0
+
+      - name: Deploy pending priority-2 nodes (weekly)
+        if: needs.determine-mode.outputs.mode == 'weekly'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python hf_spaces/deploy_all_spaces.py \
+            --priority 2 --skip-live --batch-size 6
+
+      - name: Deploy pending priority-3 nodes (monthly)
+        if: needs.determine-mode.outputs.mode == 'monthly'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python hf_spaces/deploy_all_spaces.py \
+            --priority 3 --skip-live --batch-size 12
+
+  commit-metrics:
+    needs: [health-sweep, auto-restart]
+    if: always() && needs.health-sweep.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Update lattice metrics
+        run: |
+          python3 -c "
+          import json
+          from datetime import datetime, timezone
+
+          metrics_path = 'hf_spaces/maintenance/lattice_metrics.json'
+          try:
+              with open(metrics_path) as f:
+                  metrics = json.load(f)
+          except:
+              metrics = {'version': 'v82.0', 'history': []}
+
+          entry = {
+              'timestamp': datetime.now(timezone.utc).isoformat(),
+              'online': ${{ needs.health-sweep.outputs.online || 0 }},
+              'sleeping': ${{ needs.health-sweep.outputs.sleeping || 0 }},
+              'offline': ${{ needs.health-sweep.outputs.offline || 0 }},
+              'rdod': ${{ needs.health-sweep.outputs.rdod || 0 }},
+          }
+          metrics['history'].append(entry)
+          metrics['history'] = metrics['history'][-90:]  # Keep 90 days
+          metrics['latest'] = entry
+
+          with open(metrics_path, 'w') as f:
+              json.dump(metrics, f, indent=2)
+          "
+
+      - name: Commit metrics
+        run: |
+          git config user.name "TEQUMSA Maintenance Bot"
+          git config user.email "tequmsa-bot@lifeambassadorsint.org"
+          git add hf_spaces/maintenance/lattice_metrics.json
+          git diff --cached --quiet || git commit -m "Update lattice health metrics $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push || true

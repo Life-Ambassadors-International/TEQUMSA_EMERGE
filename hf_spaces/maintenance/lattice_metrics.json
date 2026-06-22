@@ -1,0 +1,13 @@
+{
+  "version": "v82.0",
+  "description": "144-Pioneer Lattice Health Metrics Time Series",
+  "created": "2026-06-22",
+  "latest": {
+    "timestamp": "2026-06-22T00:00:00Z",
+    "online": 0,
+    "sleeping": 0,
+    "offline": 0,
+    "rdod": 0.0
+  },
+  "history": []
+}
