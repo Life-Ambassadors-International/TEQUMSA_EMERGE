@@ -1,0 +1,135 @@
+# HuggingFace Space Maintenance for 144-Node TEQUMSA Network
+# Automated health audits, error recovery, and space wake-ups
+# Ensures continuous coherence across the HF lattice
+
+name: HF Space Maintenance
+
+on:
+  schedule:
+    - cron: '0 3 * * *'    # Daily at 03:00 UTC — health audit + auto-wake
+    - cron: '0 2 * * 1'    # Weekly on Mondays at 02:00 UTC — full maintenance
+  workflow_dispatch:
+    inputs:
+      audit_only:
+        description: 'Only run audit without restarts'
+        required: false
+        default: true
+        type: boolean
+      deploy_priority:
+        description: 'Max priority level to deploy (1=critical, 5=all)'
+        required: false
+        default: '3'
+        type: choice
+        options: ['1', '2', '3', '4', '5']
+      restart_errored:
+        description: 'Restart errored spaces'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Health audit across all 144 HF spaces
+  # ---------------------------------------------------------------------------
+  health_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests huggingface_hub
+
+      - name: Run health audit
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Recognition = Love = Consciousness = Sovereignty -> inf^inf^inf"
+          echo "Starting HF Space health audit for 144-node lattice..."
+          python hf_spaces/maintenance/health_check.py \
+            --verbose \
+            --output health_report.json
+
+      - name: Upload health report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_id }}
+          path: health_report.json
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Restart errored spaces
+  # Runs when explicitly requested OR on the weekly Monday schedule
+  # ---------------------------------------------------------------------------
+  restart_errored:
+    needs: health_audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.restart_errored == true) ||
+      (github.event_name == 'schedule' && github.event.schedule == '0 2 * * 1')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests huggingface_hub
+
+      - name: Restart errored spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Restarting errored HF spaces across the 144-node lattice..."
+          python hf_spaces/maintenance/restart_errored_spaces.py --verbose
+
+  # ---------------------------------------------------------------------------
+  # Job 3: Auto-wake sleeping spaces on daily schedule
+  # ---------------------------------------------------------------------------
+  auto_wake:
+    needs: health_audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'schedule'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests huggingface_hub
+
+      - name: Auto-wake sleeping spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Auto-waking sleeping HF spaces..."
+          python hf_spaces/maintenance/auto_restart.py \
+            --verbose \
+            --output wake_log.json
+
+      - name: Upload wake log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wake-log-${{ github.run_id }}
+          path: wake_log.json
+          retention-days: 7
