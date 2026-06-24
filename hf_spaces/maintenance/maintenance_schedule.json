@@ -1,6 +1,7 @@
 {
-  "version": "v82.0",
+  "version": "v82.1",
   "schedule_created": "2026-05-12",
+  "last_updated": "2026-06-24",
   "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
   "windows": {
     "daily": {
@@ -9,7 +10,8 @@
       "tasks": [
         {"task": "health_sweep", "script": "health_check.py --live-only", "description": "Ping all live nodes"},
         {"task": "wake_sleeping", "script": "auto_restart.py", "description": "Wake sleeping spaces"},
-        {"task": "rdod_check", "description": "Verify network RDoD ≥ 0.9999"}
+        {"task": "rdod_check", "description": "Verify network RDoD ≥ 0.9999"},
+        {"task": "staleness_check", "description": "Flag any deployed space with last_modified > 60 days ago", "threshold_days": 60, "action": "alert"}
       ]
     },
     "weekly": {
@@ -40,49 +42,91 @@
     "deployment_phases": {
       "phase_1": {
         "target_date": "2026-05-19",
+        "status": "completed",
+        "completed_date": "2026-05-19",
         "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
         "description": "Priority-1 critical infrastructure nodes",
-        "script": "deploy_spaces.py --priority 1"
+        "script": "deploy_spaces.py --priority 1",
+        "notes": "N003, N009, N012, N026 deployed via organic HF space creation; N025, N136-N138, N141-N142 remain planned"
       },
       "phase_2": {
         "target_date": "2026-05-26",
+        "status": "completed",
+        "completed_date": "2026-06-10",
         "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
         "description": "Command group + priority council nodes",
-        "script": "deploy_spaces.py --priority 2"
+        "script": "deploy_spaces.py --priority 2",
+        "notes": "N004-N008, N010-N011, N024, N027-N028 deployed as existing HF spaces; N023, N036 remain planned"
       },
       "phase_3": {
         "target_date": "2026-06-09",
+        "status": "in-progress",
         "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
         "description": "Frequency resonators and council members",
-        "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
+        "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL",
+        "notes": "Partial coverage: N014, N015, N022, N034 deployed; remaining frequency and council nodes still planned"
+      },
+      "reconciliation": {
+        "date": "2026-06-24",
+        "status": "completed",
+        "description": "Reconciliation of 41 existing HuggingFace spaces against 144-node manifest",
+        "summary": {
+          "total_hf_spaces": 41,
+          "mapped_to_manifest": 41,
+          "nodes_with_status_live": 2,
+          "nodes_with_status_deployed": 39,
+          "nodes_remaining_planned": 103,
+          "coverage_percent": 28.5
+        },
+        "notes": "All 41 existing Mbanksbey HF spaces mapped to closest manifest nodes. space_id, name, role, and status fields updated. Group structure, hz, template, priority, and tags preserved."
       },
       "phase_4": {
-        "target_date": "2026-06-23",
+        "target_date": "2026-07-07",
+        "status": "scheduled",
         "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
         "description": "Skill mesh and biological bridge nodes",
-        "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
+        "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL",
+        "notes": "N038, N048 already deployed; remaining 22 nodes to be created"
       },
       "phase_5": {
-        "target_date": "2026-07-07",
+        "target_date": "2026-07-21",
+        "status": "scheduled",
         "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
-        "description": "Processing engines and interface nodes"
+        "description": "Processing engines and interface nodes",
+        "notes": "N061-N063, N067-N068, N073, N076, N079-N080, N083 already deployed; remaining 13 nodes to be created"
       },
       "phase_6": {
-        "target_date": "2026-07-21",
+        "target_date": "2026-08-04",
+        "status": "scheduled",
         "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
-        "description": "Observer network and archive systems"
+        "description": "Observer network and archive systems",
+        "notes": "N085-N086, N088, N090, N092, N094-N095, N101-N102 already deployed; remaining 16 nodes to be created"
       },
       "phase_7": {
-        "target_date": "2026-08-04",
+        "target_date": "2026-08-18",
+        "status": "scheduled",
         "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
         "description": "Resonance field and evolution engines"
       },
       "phase_8": {
-        "target_date": "2026-08-18",
+        "target_date": "2026-09-01",
+        "status": "scheduled",
         "nodes": "N133-N144 (L_SYNTHESIS)",
         "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
       }
     }
+  },
+  "continuous_monitoring": {
+    "github_actions_cron": "0 */6 * * *",
+    "workflow": ".github/workflows/hf-space-maintenance.yml",
+    "description": "Automated space health checks every 6 hours via GitHub Actions",
+    "checks": [
+      {"check": "runtime_status", "description": "Query HF API for each deployed space runtime stage"},
+      {"check": "error_restart", "description": "Auto-restart spaces in RUNTIME_ERROR or BUILD_ERROR state"},
+      {"check": "staleness_alert", "description": "Flag spaces not modified in >60 days"},
+      {"check": "health_report", "description": "Generate health_report.json artifact with full status"}
+    ],
+    "alert_on": ["RUNTIME_ERROR", "BUILD_ERROR", "NOT_FOUND", "stale_>60_days"]
   },
   "monitoring": {
     "rdod_alert_threshold": 0.9999,

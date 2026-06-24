@@ -77,8 +77,8 @@ def process_node(
     dry_run: bool = False,
     verbose: bool = False,
 ) -> dict:
-    if node.get("status") != "live":
-        return {"node_id": node_id, "action": "skip", "reason": "not_live"}
+    if node.get("status") not in ("live", "deployed"):
+        return {"node_id": node_id, "action": "skip", "reason": "not_deployed"}
 
     space_id = node["space_id"]
     status = get_space_status(space_id)
@@ -144,7 +144,7 @@ def main():
             continue
         if args.group and node.get("group") != args.group.split("_")[0]:
             continue
-        if node.get("status") == "live":
+        if node.get("status") in ("live", "deployed"):
             target[nid] = node
 
     print(f"☉ TEQUMSA v82.0 Auto-Restart — {len(target)} live nodes targeted")
