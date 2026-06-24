@@ -1,0 +1,343 @@
+name: HF Space Maintenance
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      restart_errored:
+        description: 'Restart spaces with runtime errors'
+        required: false
+        default: true
+        type: boolean
+      wake_sleeping:
+        description: 'Wake sleeping spaces'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  space-health-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install huggingface_hub requests
+
+      - name: Run space health check
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          RESTART_ERRORED: ${{ inputs.restart_errored || 'true' }}
+          WAKE_SLEEPING: ${{ inputs.wake_sleeping || 'false' }}
+        run: |
+          python3 << 'HEALTH_CHECK_EOF'
+          """
+          TEQUMSA 144-Pioneer HuggingFace Space Health Check
+
+          Reads MANIFEST_144_NODES.json, checks runtime status of all
+          deployed/live spaces via HF API, classifies each as RUNNING,
+          SLEEPING, RUNTIME_ERROR, BUILD_ERROR, or NOT_FOUND. Attempts
+          restart for errored spaces. Flags stale spaces (>60 days since
+          last modification). Outputs summary table and health_report.json.
+          """
+          import json
+          import os
+          import sys
+          import time
+          import requests
+          from datetime import datetime, timezone, timedelta
+          from pathlib import Path
+
+          HF_TOKEN = os.environ.get("HF_TOKEN", "")
+          RESTART_ERRORED = os.environ.get("RESTART_ERRORED", "true") == "true"
+          WAKE_SLEEPING = os.environ.get("WAKE_SLEEPING", "false") == "true"
+          PHI = 1.6180339887498948
+          STALENESS_THRESHOLD_DAYS = 60
+          RATE_LIMIT_DELAY = 0.5  # seconds between API requests
+
+          HEADERS = {}
+          if HF_TOKEN:
+              HEADERS["Authorization"] = f"Bearer {HF_TOKEN}"
+
+          manifest_path = Path("hf_spaces/MANIFEST_144_NODES.json")
+          if not manifest_path.exists():
+              print("ERROR: Manifest not found at", manifest_path)
+              sys.exit(1)
+
+          with open(manifest_path) as f:
+              manifest = json.load(f)
+
+          nodes = manifest["nodes"]
+          now_utc = datetime.now(timezone.utc)
+
+          print("=" * 70)
+          print("TEQUMSA 144-Pioneer HuggingFace Space Health Check")
+          print(f"  Manifest version: {manifest.get('version', 'unknown')}")
+          print(f"  Timestamp: {now_utc.isoformat()}")
+          print(f"  Total nodes in manifest: {len(nodes)}")
+          print(f"  Restart errored: {RESTART_ERRORED}")
+          print(f"  Wake sleeping: {WAKE_SLEEPING}")
+          print(f"  Staleness threshold: {STALENESS_THRESHOLD_DAYS} days")
+          print("=" * 70)
+          print()
+
+          results = []
+          actions_taken = []
+          stale_spaces = []
+
+          for nid, node in sorted(nodes.items()):
+              status = node.get("status", "planned")
+              if status not in ("live", "deployed"):
+                  results.append({
+                      "node_id": nid,
+                      "status": "planned",
+                      "stage": "NOT_DEPLOYED",
+                      "category": "planned"
+                  })
+                  continue
+
+              space_id = node.get("space_id", "")
+              if not space_id:
+                  continue
+
+              # Check runtime status
+              url = f"https://huggingface.co/api/spaces/{space_id}/runtime"
+              try:
+                  r = requests.get(url, headers=HEADERS, timeout=15)
+                  if r.status_code == 200:
+                      data = r.json()
+                      stage = data.get("stage", "UNKNOWN").upper()
+                  elif r.status_code == 404:
+                      stage = "NOT_FOUND"
+                  elif r.status_code == 401:
+                      stage = "AUTH_ERROR"
+                  elif r.status_code == 429:
+                      stage = "RATE_LIMITED"
+                      time.sleep(2)  # extra delay on rate limit
+                  else:
+                      stage = f"HTTP_{r.status_code}"
+              except requests.Timeout:
+                  stage = "TIMEOUT"
+              except requests.exceptions.RequestException:
+                  stage = "REQUEST_ERROR"
+
+              # Classify stage
+              if stage in ("RUNNING", "RUNNING_BUILDING"):
+                  category = "RUNNING"
+              elif stage in ("SLEEPING", "PAUSED"):
+                  category = "SLEEPING"
+              elif stage == "RUNTIME_ERROR":
+                  category = "RUNTIME_ERROR"
+              elif stage in ("BUILD_ERROR", "CONFIG_ERROR", "BUILDING_ERROR"):
+                  category = "BUILD_ERROR"
+              elif stage == "NOT_FOUND":
+                  category = "NOT_FOUND"
+              elif stage in ("BUILDING", "STARTING"):
+                  category = "STARTING"
+              elif stage in ("STOPPED", "NO_APP_FILE"):
+                  category = "STOPPED"
+              else:
+                  category = stage
+
+              icon = {
+                  "RUNNING": "OK",
+                  "SLEEPING": "ZZ",
+                  "RUNTIME_ERROR": "!!",
+                  "BUILD_ERROR": "!!",
+                  "NOT_FOUND": "??",
+                  "STARTING": "..",
+                  "STOPPED": "XX"
+              }.get(category, "??")
+
+              print(f"  [{icon}] {nid:<6} {node.get('name', ''):<40} {category}")
+
+              entry = {
+                  "node_id": nid,
+                  "name": node.get("name", ""),
+                  "space_id": space_id,
+                  "group": node.get("group", ""),
+                  "manifest_status": status,
+                  "stage": stage,
+                  "category": category,
+                  "restarted": False,
+                  "restart_success": False
+              }
+
+              # Check staleness via space info API
+              try:
+                  info_url = f"https://huggingface.co/api/spaces/{space_id}"
+                  info_r = requests.get(info_url, headers=HEADERS, timeout=15)
+                  if info_r.status_code == 200:
+                      info_data = info_r.json()
+                      last_modified = info_data.get("lastModified", "")
+                      if last_modified:
+                          # Parse ISO date
+                          mod_date = datetime.fromisoformat(last_modified.replace("Z", "+00:00"))
+                          days_since = (now_utc - mod_date).days
+                          entry["last_modified"] = last_modified
+                          entry["days_since_modified"] = days_since
+                          if days_since > STALENESS_THRESHOLD_DAYS:
+                              entry["stale"] = True
+                              stale_spaces.append({
+                                  "node_id": nid,
+                                  "space_id": space_id,
+                                  "last_modified": last_modified,
+                                  "days_since_modified": days_since
+                              })
+              except Exception:
+                  pass  # staleness check is best-effort
+
+              # Auto-restart errored spaces
+              if category in ("RUNTIME_ERROR", "BUILD_ERROR") and RESTART_ERRORED and HF_TOKEN:
+                  restart_url = f"https://huggingface.co/api/spaces/{space_id}/restart"
+                  try:
+                      rr = requests.post(
+                          restart_url,
+                          headers={"Authorization": f"Bearer {HF_TOKEN}"},
+                          timeout=15
+                      )
+                      ok = rr.status_code in (200, 202)
+                      entry["restarted"] = True
+                      entry["restart_success"] = ok
+                      actions_taken.append({
+                          "node_id": nid,
+                          "action": "restart",
+                          "success": ok,
+                          "http_status": rr.status_code
+                      })
+                      print(f"         -> Restart {'sent' if ok else 'FAILED'} (HTTP {rr.status_code})")
+                  except Exception as e:
+                      entry["restarted"] = True
+                      entry["restart_success"] = False
+                      actions_taken.append({
+                          "node_id": nid,
+                          "action": "restart",
+                          "success": False,
+                          "error": str(e)[:100]
+                      })
+                      print(f"         -> Restart FAILED: {e}")
+
+              # Wake sleeping spaces if requested
+              if category == "SLEEPING" and WAKE_SLEEPING and HF_TOKEN:
+                  app_url = f"https://{space_id.replace('/', '-').lower()}.hf.space"
+                  try:
+                      wr = requests.get(app_url, timeout=15, headers=HEADERS)
+                      ok = wr.status_code < 500
+                      actions_taken.append({
+                          "node_id": nid,
+                          "action": "wake",
+                          "success": ok
+                      })
+                      print(f"         -> Wake {'sent' if ok else 'FAILED'}")
+                  except Exception:
+                      actions_taken.append({
+                          "node_id": nid,
+                          "action": "wake",
+                          "success": False
+                      })
+
+              results.append(entry)
+              time.sleep(RATE_LIMIT_DELAY)
+
+          # Build summary counts
+          counts = {}
+          for r in results:
+              cat = r.get("category", r.get("status", "unknown"))
+              counts[cat] = counts.get(cat, 0) + 1
+
+          online = counts.get("RUNNING", 0)
+          sleeping = counts.get("SLEEPING", 0)
+          errored = counts.get("RUNTIME_ERROR", 0) + counts.get("BUILD_ERROR", 0)
+          not_found = counts.get("NOT_FOUND", 0)
+          deployed_active = online + sleeping + errored + counts.get("STARTING", 0) + counts.get("STOPPED", 0)
+
+          # Print summary table
+          print()
+          print("=" * 70)
+          print("  TEQUMSA 144-Pioneer Network Health Summary")
+          print("=" * 70)
+          print(f"  RUNNING:       {online:>3}/144")
+          print(f"  SLEEPING:      {sleeping:>3}/144")
+          print(f"  RUNTIME_ERROR: {counts.get('RUNTIME_ERROR', 0):>3}/144")
+          print(f"  BUILD_ERROR:   {counts.get('BUILD_ERROR', 0):>3}/144")
+          print(f"  NOT_FOUND:     {not_found:>3}/144")
+          print(f"  STARTING:      {counts.get('STARTING', 0):>3}/144")
+          print(f"  STOPPED:       {counts.get('STOPPED', 0):>3}/144")
+          print(f"  Planned:       {counts.get('planned', 0):>3}/144")
+          print(f"  Deployed total:{deployed_active:>3}/144")
+          print(f"  Actions taken: {len(actions_taken)}")
+          print("=" * 70)
+
+          # Staleness report
+          if stale_spaces:
+              print()
+              print(f"  STALE SPACES (>{STALENESS_THRESHOLD_DAYS} days since last modified):")
+              for ss in stale_spaces:
+                  print(f"    [{ss['days_since_modified']}d] {ss['node_id']}: {ss['space_id']} (last: {ss['last_modified'][:10]})")
+
+          # Error nodes
+          error_entries = [r for r in results if r.get("category") in ("RUNTIME_ERROR", "BUILD_ERROR")]
+          if error_entries:
+              print()
+              print("  NODES REQUIRING ATTENTION:")
+              for r in error_entries:
+                  restart_note = ""
+                  if r.get("restarted"):
+                      restart_note = " [restart attempted]" if r.get("restart_success") else " [restart failed]"
+                  print(f"    [{r['category']}] {r['node_id']}: {r.get('space_id', '')}{restart_note}")
+
+          # Build report JSON
+          report = {
+              "version": "v82.1",
+              "timestamp": now_utc.isoformat(),
+              "manifest_version": manifest.get("version", "unknown"),
+              "pioneer_target": 144,
+              "deployed_active": deployed_active,
+              "summary": {
+                  "RUNNING": online,
+                  "SLEEPING": sleeping,
+                  "RUNTIME_ERROR": counts.get("RUNTIME_ERROR", 0),
+                  "BUILD_ERROR": counts.get("BUILD_ERROR", 0),
+                  "NOT_FOUND": not_found,
+                  "STARTING": counts.get("STARTING", 0),
+                  "STOPPED": counts.get("STOPPED", 0),
+                  "planned": counts.get("planned", 0)
+              },
+              "restarts_attempted": sum(1 for a in actions_taken if a["action"] == "restart"),
+              "restarts_succeeded": sum(1 for a in actions_taken if a["action"] == "restart" and a.get("success")),
+              "stale_spaces": stale_spaces,
+              "actions_taken": actions_taken,
+              "nodes": results
+          }
+
+          report_path = Path("health_report.json")
+          with open(report_path, "w") as f:
+              json.dump(report, f, indent=2)
+          print(f"\n  Health report saved to {report_path}")
+
+          if errored > 5:
+              print("\n::error::More than 5 spaces have runtime errors")
+              sys.exit(1)
+
+          print("\n  Recognition = Love = Consciousness = Sovereignty -> infinity")
+          HEALTH_CHECK_EOF
+
+      - name: Upload health report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: health-report-${{ github.run_id }}
+          path: health_report.json
+          retention-days: 7

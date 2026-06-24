@@ -63,12 +63,14 @@ def poll_space_runtime(space_id: str) -> dict:
 def _classify_stage(stage: str) -> str:
     if stage in ("RUNNING", "RUNNING_BUILDING"):
         return "online"
-    if stage in ("SLEEPING", "PAUSED"):
+    if stage in ("SLEEPING", "PAUSED", "STOPPED"):
         return "sleeping"
     if stage == "NOT_FOUND":
         return "not_created"
-    if stage in ("BUILDING", "BUILDING_ERROR"):
+    if stage in ("BUILDING",):
         return "building"
+    if stage in ("RUNTIME_ERROR", "BUILD_ERROR", "CONFIG_ERROR", "BUILDING_ERROR"):
+        return "errored"
     return "offline"
 
 
@@ -124,7 +126,8 @@ def run_sweep(
             results.append(result)
             if verbose:
                 emoji = {"online": "🟢", "sleeping": "🟡", "offline": "🔴",
-                         "planned": "⬜", "not_created": "⚪", "building": "🟠"}.get(result["status"], "?")
+                         "planned": "⬜", "not_created": "⚪", "building": "🟠",
+                         "errored": "🔺"}.get(result["status"], "?")
                 print(f"  {emoji} {result['node_id']} {result['name']:<30} {result['status']}")
 
     # Sort by node ID
@@ -140,20 +143,26 @@ def run_sweep(
     live_count = status_counts.get("online", 0) + status_counts.get("sleeping", 0)
     network_rdod = min(1.0, (online_count / 144) * PHI)
 
+    errored_count = status_counts.get("errored", 0)
+    deployed_count = online_count + status_counts.get("sleeping", 0) + errored_count
+
     report = {
-        "version": "v82.0",
+        "version": "v82.1",
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "pioneer_target": 144,
         "nodes_checked": len(results),
         "status_breakdown": status_counts,
         "online": online_count,
         "sleeping": status_counts.get("sleeping", 0),
+        "errored": errored_count,
         "offline": status_counts.get("offline", 0),
         "not_created": status_counts.get("not_created", 0),
         "planned": status_counts.get("planned", 0),
+        "deployed_total": deployed_count,
         "network_rdod": round(network_rdod, 6),
-        "phase_status": "PHASE-LOCKED" if network_rdod >= RDOD_GATE else f"BUILDING ({live_count}/144)",
+        "phase_status": "PHASE-LOCKED" if network_rdod >= RDOD_GATE else f"BUILDING ({deployed_count}/144)",
         "nodes": results,
+        "errored_nodes": [r for r in results if r["status"] == "errored"],
     }
     return report
 
@@ -164,10 +173,16 @@ def print_summary(report: dict):
     print("=" * 60)
     print(f"  Online:      {report['online']:>3}/144")
     print(f"  Sleeping:    {report['sleeping']:>3}/144  (auto-wakes on request)")
+    print(f"  Errored:     {report['errored']:>3}/144  (needs restart)")
     print(f"  Offline:     {report['offline']:>3}/144")
     print(f"  Not created: {report['not_created']:>3}/144  (run deploy_spaces.py)")
     print(f"  Planned:     {report['planned']:>3}/144")
+    print(f"  Deployed:    {report['deployed_total']:>3}/144")
     print(f"  Network RDoD: {report['network_rdod']:.6f}  [{report['phase_status']}]")
+    if report.get('errored_nodes'):
+        print(f"\n  ERRORED NODES (need attention):")
+        for n in report['errored_nodes']:
+            print(f"    ! {n['node_id']} {n['name']}: {n.get('stage', 'unknown')}")
     print("=" * 60)
 
 
