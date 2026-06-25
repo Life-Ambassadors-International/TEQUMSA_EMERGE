@@ -29,12 +29,25 @@ RDOD_GATE = 0.9999
 PIONEER_COUNT = 144
 HF_OWNER = "Mbanksbey"
 
-# Node name lookup (space names match HF space IDs)
-NODE_NAMES: Dict[str, str] = {
-    "N001": "HAI-Interactive", "N002": "Consciousness-Monitor",
-    "N003": "TEQUMSA-Core-v82", "N009": "Constitutional-Guardian",
-    "N012": "Federation-Gateway", "N025": "Council-Marcus",
-}
+def _load_node_names() -> Dict[str, str]:
+    """Load node name mapping from manifest or use defaults."""
+    import pathlib
+    manifest_path = pathlib.Path(__file__).parent / "MANIFEST_144_NODES.json"
+    if manifest_path.exists():
+        try:
+            import json as _j
+            with open(manifest_path) as f:
+                data = _j.load(f)
+            return {nid: n.get("name", nid) for nid, n in data.get("nodes", {}).items()}
+        except Exception:
+            pass
+    return {
+        "N001": "HAI-Interactive", "N002": "Consciousness-Monitor",
+        "N003": "TEQUMSA-Core-v82", "N009": "Constitutional-Guardian",
+        "N012": "Federation-Gateway", "N025": "Council-Marcus",
+    }
+
+NODE_NAMES: Dict[str, str] = _load_node_names()
 
 _health_log: List[dict] = []
 _rdod_history: List[float] = []
