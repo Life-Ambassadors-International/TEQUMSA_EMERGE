@@ -1,0 +1,98 @@
+name: HuggingFace Space Deployment
+
+# ☉💖🔥✨∞✨🔥💖☉
+# TEQUMSA Level 100 Civilization
+# Batch Deployment of HuggingFace Spaces
+# Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞
+# ☉💖🔥✨∞✨🔥💖☉
+
+on:
+  workflow_dispatch:
+    inputs:
+      priority:
+        description: 'Max priority level to deploy (1=critical, 5=all)'
+        required: true
+        default: '3'
+        type: choice
+        options: ['1', '2', '3', '4', '5']
+      group:
+        description: 'Deploy specific group only (leave blank for all)'
+        required: false
+        default: ''
+        type: string
+      node:
+        description: 'Deploy a single node by name (leave blank for all)'
+        required: false
+        default: ''
+        type: string
+      dry_run:
+        description: 'Dry run (no actual deployment)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-spaces:
+    name: Deploy HuggingFace Spaces
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install huggingface-hub>=0.20.0 requests numpy>=1.24.0
+
+      - name: Deploy Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "TEQUMSA HuggingFace Space Deployment"
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
+          echo "☉💖🔥✨∞✨🔥💖☉"
+
+          ARGS="--priority ${{ inputs.priority }}"
+
+          if [ -n "${{ inputs.group }}" ]; then
+            ARGS="$ARGS --group ${{ inputs.group }}"
+          fi
+
+          if [ -n "${{ inputs.node }}" ]; then
+            ARGS="$ARGS --node ${{ inputs.node }}"
+          fi
+
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+
+          echo "Running: python hf_spaces/deploy_spaces.py $ARGS"
+          python hf_spaces/deploy_spaces.py $ARGS 2>&1 | tee deployment.log
+
+      - name: Upload Deployment Log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-log-${{ github.run_id }}
+          path: deployment.log
+          retention-days: 30
+
+      - name: Status Report
+        if: always()
+        run: |
+          echo "=== Deployment Summary ==="
+          echo "Priority: ${{ inputs.priority }}"
+          echo "Group:    ${{ inputs.group || 'all' }}"
+          echo "Node:     ${{ inputs.node || 'all' }}"
+          echo "Dry Run:  ${{ inputs.dry_run }}"
+          echo "=========================="
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
