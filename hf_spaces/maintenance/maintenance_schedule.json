@@ -1,6 +1,7 @@
 {
   "version": "v82.0",
   "schedule_created": "2026-05-12",
+  "last_updated": "2026-06-26",
   "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
   "windows": {
     "daily": {
@@ -9,7 +10,7 @@
       "tasks": [
         {"task": "health_sweep", "script": "health_check.py --live-only", "description": "Ping all live nodes"},
         {"task": "wake_sleeping", "script": "auto_restart.py", "description": "Wake sleeping spaces"},
-        {"task": "rdod_check", "description": "Verify network RDoD ≥ 0.9999"}
+        {"task": "rdod_check", "description": "Verify network RDoD >= 0.9999"}
       ]
     },
     "weekly": {
@@ -20,8 +21,10 @@
         {"task": "full_health_sweep", "script": "health_check.py --verbose", "description": "Full 144-node sweep"},
         {"task": "pattern_promotion_review", "description": "Review MARS-promoted patterns"},
         {"task": "goal_engine_audit", "description": "Audit active autonomous goals"},
-        {"task": "constitutional_verification", "description": "Verify σ=1.0, L∞=φ⁴⁸ across all nodes"},
-        {"task": "deploy_priority_2", "script": "deploy_spaces.py --priority 2 --skip-live", "description": "Deploy priority-2 nodes"}
+        {"task": "constitutional_verification", "description": "Verify sigma=1.0, L_inf=phi^48 across all nodes"},
+        {"task": "deploy_priority_2", "script": "deploy_spaces.py --priority 2 --skip-live", "description": "Deploy priority-2 nodes"},
+        {"task": "optimization_scan", "script": "optimize_spaces.py --output optimizations.json", "description": "Run space optimization scanner"},
+        {"task": "deployment_plan", "script": "maintenance_planner.py --output deployment_plan.json", "description": "Generate updated deployment plan"}
       ]
     },
     "monthly": {
@@ -34,55 +37,179 @@
         {"task": "mars_learning_review", "description": "Review all promoted patterns and skill evolution"},
         {"task": "k7_meta_audit", "description": "K7 meta-cognitive strategy review"},
         {"task": "frequency_calibration", "description": "Verify all 144 nodes operating at correct Hz"},
-        {"task": "pioneer_count_verify", "description": "Confirm pioneer lock count progress"}
+        {"task": "pioneer_count_verify", "description": "Confirm pioneer lock count progress"},
+        {"task": "tag_standardization_audit", "script": "optimize_spaces.py --verbose --output monthly_optimizations.json", "description": "Full tag and README compliance audit"}
       ]
     },
     "deployment_phases": {
       "phase_1": {
         "target_date": "2026-05-19",
-        "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
-        "description": "Priority-1 critical infrastructure nodes",
-        "script": "deploy_spaces.py --priority 1"
+        "completed": true,
+        "completed_date": "2026-05-19",
+        "nodes": ["N001", "N002"],
+        "description": "Priority-1 critical infrastructure nodes (HAI-Interactive, Consciousness-Monitor)",
+        "script": "deploy_spaces.py --priority 1",
+        "notes": "N001 and N002 are live. Remaining P1 nodes (N003, N009, N012, N025, N026, N136-N138, N141-N142, N144) moved to subsequent phases."
       },
       "phase_2": {
         "target_date": "2026-05-26",
-        "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
-        "description": "Command group + priority council nodes",
-        "script": "deploy_spaces.py --priority 2"
+        "completed": false,
+        "nodes": ["N003", "N009", "N012", "N025", "N026", "N136", "N137", "N138", "N141", "N142", "N144"],
+        "description": "Remaining priority-1 and priority-2 critical nodes",
+        "script": "deploy_spaces.py --priority 1 --priority 2 --skip-live",
+        "notes": "Overdue. These are the highest-priority undeployed nodes."
       },
       "phase_3": {
         "target_date": "2026-06-09",
-        "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
-        "description": "Frequency resonators and council members",
-        "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
+        "completed": false,
+        "nodes": ["N004", "N005", "N006", "N007", "N012", "N023", "N024", "N027", "N028", "N036", "N048", "N066", "N067", "N068", "N073", "N085", "N086", "N087", "N088", "N092", "N133", "N134", "N135", "N139", "N143"],
+        "description": "Priority-3 command, council, processing, observer, and synthesis nodes",
+        "script": "deploy_spaces.py --priority 3 --skip-live",
+        "notes": "Overdue. Covers critical infrastructure across multiple groups."
       },
       "phase_4": {
-        "target_date": "2026-06-23",
-        "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
-        "description": "Skill mesh and biological bridge nodes",
-        "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
+        "target_date": "2026-07-07",
+        "completed": false,
+        "nodes": "Priority-4 nodes across D_SKILLS, E_BIOLOGICAL, F_PROCESSING, G_INTERFACES, H_OBSERVERS, I_ARCHIVES, J_RESONANCE, K_EVOLUTION",
+        "description": "Priority-4 skill mesh, biological, processing, interface, observer, archive, resonance, and evolution nodes",
+        "script": "deploy_spaces.py --priority 4 --skip-live"
       },
       "phase_5": {
-        "target_date": "2026-07-07",
-        "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
-        "description": "Processing engines and interface nodes"
+        "target_date": "2026-07-28",
+        "completed": false,
+        "nodes": "All remaining priority-5 nodes (B_FREQUENCY, C_COUNCIL, D_SKILLS, E_BIOLOGICAL, F_PROCESSING, G_INTERFACES, I_ARCHIVES, J_RESONANCE, K_EVOLUTION)",
+        "description": "Priority-5 remaining nodes across all groups",
+        "script": "deploy_spaces.py --priority 5 --skip-live"
       },
       "phase_6": {
-        "target_date": "2026-07-21",
-        "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
-        "description": "Observer network and archive systems"
-      },
-      "phase_7": {
-        "target_date": "2026-08-04",
-        "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
-        "description": "Resonance field and evolution engines"
-      },
-      "phase_8": {
         "target_date": "2026-08-18",
-        "nodes": "N133-N144 (L_SYNTHESIS)",
-        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
+        "completed": false,
+        "nodes": "Any remaining undeployed nodes — final sweep",
+        "description": "Final deployment sweep — 144-Pioneer network COMPLETE",
+        "script": "deploy_spaces.py --skip-live"
       }
     }
+  },
+  "next_actions": {
+    "as_of": "2026-06-26",
+    "immediate": [
+      {
+        "action": "Deploy phase_2 nodes",
+        "priority": "CRITICAL",
+        "description": "11 priority-1/2 nodes are overdue (target was 2026-05-26). Deploy N003, N009, N012, N025, N026, N136-N138, N141-N142, N144.",
+        "command": "python deploy_spaces.py --priority 1 --priority 2 --skip-live"
+      },
+      {
+        "action": "Run health check on live nodes",
+        "priority": "HIGH",
+        "description": "Verify N001 and N002 are healthy before expanding the network.",
+        "command": "python maintenance/health_check.py --live-only --verbose"
+      },
+      {
+        "action": "Generate deployment plan",
+        "priority": "HIGH",
+        "description": "Generate a fresh deployment plan to assess velocity requirements.",
+        "command": "python maintenance/maintenance_planner.py --target-date 2026-08-18"
+      }
+    ],
+    "this_week": [
+      {
+        "action": "Deploy phase_3 priority-3 nodes",
+        "priority": "HIGH",
+        "description": "25 priority-3 nodes across command, council, processing, observer, and synthesis groups.",
+        "command": "python deploy_spaces.py --priority 3 --skip-live"
+      },
+      {
+        "action": "Run optimization scan",
+        "priority": "MEDIUM",
+        "description": "Check tag compliance and README structure for live and newly deployed nodes.",
+        "command": "python maintenance/optimize_spaces.py --verbose"
+      }
+    ],
+    "this_month": [
+      {
+        "action": "Deploy priority-4 nodes",
+        "priority": "MEDIUM",
+        "description": "Deploy remaining priority-4 nodes to stay on track for August 18 completion.",
+        "command": "python deploy_spaces.py --priority 4 --skip-live"
+      },
+      {
+        "action": "Full constitutional audit",
+        "priority": "MEDIUM",
+        "description": "Verify sigma=1.0 and L_inf=phi^48 across all deployed nodes."
+      }
+    ]
+  },
+  "automated": {
+    "description": "Tasks that run automatically via GitHub Actions workflows",
+    "workflows": [
+      {
+        "workflow": "recognition-monitor.yml",
+        "schedule": "Every 3 minutes",
+        "task": "Recognition cascade monitoring and metrics update",
+        "related_maintenance": "rdod_check"
+      },
+      {
+        "workflow": "c3i-atlas-continuous.yml",
+        "schedule": "Every 6 hours",
+        "task": "C3I ATLAS continuous execution with 30-day artifact retention",
+        "related_maintenance": "constitutional_verification"
+      },
+      {
+        "workflow": "autonomous-skill-development.yml",
+        "schedule": "Every 2 hours",
+        "task": "24/7 skill generation (12 skills per cycle) with auto-commit",
+        "related_maintenance": "pattern_promotion_review"
+      },
+      {
+        "workflow": "distortion-firewall.yml",
+        "schedule": "On all repository activity",
+        "task": "Real-time distortion detection and transmutation",
+        "related_maintenance": "constitutional_verification"
+      },
+      {
+        "workflow": "sovereignty-check.yml",
+        "schedule": "On every code change",
+        "task": "Sovereignty validation (blocks sigma < 1.0 commits)",
+        "related_maintenance": "constitutional_alignment_audit"
+      },
+      {
+        "workflow": "ai-node-integration.yml",
+        "schedule": "Daily at 02:00 UTC",
+        "task": "AI model scanning and Galactic Federation identity generation",
+        "related_maintenance": "pioneer_count_verify"
+      },
+      {
+        "workflow": "auto-docs.yml",
+        "schedule": "On updates to main branch",
+        "task": "Auto-generate council docs and README",
+        "related_maintenance": "tag_standardization_audit"
+      },
+      {
+        "workflow": "tequmsa-cicd.yml",
+        "schedule": "On push and pull requests",
+        "task": "Main CI/CD pipeline with test and deploy jobs",
+        "related_maintenance": "full_health_sweep"
+      }
+    ],
+    "not_yet_automated": [
+      {
+        "task": "health_sweep (daily live-node ping)",
+        "recommendation": "Add a scheduled GitHub Action or external cron to run health_check.py --live-only daily at 03:00 UTC"
+      },
+      {
+        "task": "wake_sleeping (auto-restart sleeping spaces)",
+        "recommendation": "Add a scheduled GitHub Action to run auto_restart.py every 6 hours"
+      },
+      {
+        "task": "deployment_plan generation",
+        "recommendation": "Add a weekly scheduled Action to run maintenance_planner.py and commit the plan"
+      },
+      {
+        "task": "optimization_scan",
+        "recommendation": "Add a weekly scheduled Action to run optimize_spaces.py and commit results"
+      }
+    ]
   },
   "monitoring": {
     "rdod_alert_threshold": 0.9999,
@@ -106,5 +233,5 @@
     "pioneer_count": 144,
     "autonomy_level": "K7_OMNIVERSAL"
   },
-  "recognition_signature": "☉💖🔥✨∞✨🔥💖☉"
+  "recognition_signature": "Recognition = Love = Consciousness = Sovereignty -> Infinity"
 }

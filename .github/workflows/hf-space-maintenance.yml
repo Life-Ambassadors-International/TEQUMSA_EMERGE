@@ -1,0 +1,174 @@
+name: HuggingFace Space Maintenance
+
+# ☉💖🔥✨∞✨🔥💖☉
+# TEQUMSA Level 100 Civilization
+# Automated HuggingFace Space Health Monitoring & Maintenance
+# Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞
+# ☉💖🔥✨∞✨🔥💖☉
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Maintenance action to perform'
+        required: true
+        default: 'health_check'
+        type: choice
+        options:
+          - health_check
+          - restart_sleeping
+          - deploy_batch
+
+permissions:
+  contents: read
+
+jobs:
+  health-check:
+    name: Space Health Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      has_unhealthy: ${{ steps.parse.outputs.has_unhealthy }}
+      total_spaces: ${{ steps.parse.outputs.total_spaces }}
+      healthy_count: ${{ steps.parse.outputs.healthy_count }}
+      sleeping_count: ${{ steps.parse.outputs.sleeping_count }}
+      offline_count: ${{ steps.parse.outputs.offline_count }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install requests
+
+      - name: Run Health Check
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "TEQUMSA HuggingFace Space Health Check"
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          python hf_spaces/maintenance/health_check.py --live-only --verbose --output health_report.json
+
+      - name: Upload Health Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_id }}
+          path: health_report.json
+          retention-days: 7
+
+      - name: Parse Health Results
+        id: parse
+        if: always()
+        run: |
+          if [ -f health_report.json ]; then
+            TOTAL=$(jq -r '.nodes_checked // 0' health_report.json)
+            HEALTHY=$(jq -r '.online // 0' health_report.json)
+            SLEEPING=$(jq -r '.sleeping // 0' health_report.json)
+            OFFLINE=$(jq -r '.offline // 0' health_report.json)
+
+            echo "total_spaces=$TOTAL" >> $GITHUB_OUTPUT
+            echo "healthy_count=$HEALTHY" >> $GITHUB_OUTPUT
+            echo "sleeping_count=$SLEEPING" >> $GITHUB_OUTPUT
+            echo "offline_count=$OFFLINE" >> $GITHUB_OUTPUT
+
+            if [ "$SLEEPING" -gt 0 ] || [ "$OFFLINE" -gt 0 ]; then
+              echo "has_unhealthy=true" >> $GITHUB_OUTPUT
+            else
+              echo "has_unhealthy=false" >> $GITHUB_OUTPUT
+            fi
+
+            echo "=== Health Check Summary ==="
+            echo "Total spaces:   $TOTAL"
+            echo "Healthy:        $HEALTHY"
+            echo "Sleeping:       $SLEEPING"
+            echo "Offline:        $OFFLINE"
+            echo "============================"
+          else
+            echo "has_unhealthy=false" >> $GITHUB_OUTPUT
+            echo "total_spaces=0" >> $GITHUB_OUTPUT
+            echo "healthy_count=0" >> $GITHUB_OUTPUT
+            echo "sleeping_count=0" >> $GITHUB_OUTPUT
+            echo "offline_count=0" >> $GITHUB_OUTPUT
+            echo "No health report generated"
+          fi
+
+  auto-restart:
+    name: Auto-Restart Sleeping/Offline Spaces
+    needs: health-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: needs.health-check.outputs.has_unhealthy == 'true'
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install requests
+
+      - name: Restart Unhealthy Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "Auto-Restarting Sleeping/Offline Spaces"
+          echo "Sleeping: ${{ needs.health-check.outputs.sleeping_count }}"
+          echo "Offline:  ${{ needs.health-check.outputs.offline_count }}"
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          python hf_spaces/maintenance/auto_restart.py --verbose
+
+      - name: Status Report
+        if: always()
+        run: |
+          echo "Auto-restart cycle complete"
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
+
+  deploy-batch:
+    name: Batch Deploy Spaces
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy_batch'
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install huggingface-hub>=0.20.0 requests
+
+      - name: Deploy Batch
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          echo "Batch Deploying HuggingFace Spaces"
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
+          echo "☉💖🔥✨∞✨🔥💖☉"
+          python hf_spaces/deploy_spaces.py --priority 3 --skip-live
+
+      - name: Status Report
+        if: always()
+        run: |
+          echo "Batch deployment complete"
+          echo "Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞"
