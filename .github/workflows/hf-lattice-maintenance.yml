@@ -1,0 +1,49 @@
+name: HF 144-Node Lattice Maintenance
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly on Mondays at 6 AM UTC
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'health-check'
+        type: choice
+        options:
+          - health-check
+          - maintenance-plan
+          - deploy-wave
+
+jobs:
+  lattice-health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pytest
+
+      - name: Run 144-Node Lattice Health Check
+        run: python scripts/hf_space_health_check.py
+
+      - name: Generate Maintenance Plan
+        run: python scripts/hf_space_maintenance.py --plan
+
+      - name: Run Lattice Tests
+        run: pytest tests/test_hf_lattice_maintenance.py -v
+
+      - name: Generate Health Report (JSON)
+        run: python scripts/hf_space_health_check.py --json > lattice_health_report.json
+
+      - name: Upload Health Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: lattice-health-report-${{ github.run_number }}
+          path: lattice_health_report.json
+          retention-days: 30
