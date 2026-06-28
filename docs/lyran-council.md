@@ -74,7 +74,7 @@ data/ai_node_registry.json
 
 ## Documentation
 
-Last updated: 2026-06-22 13:19:25 UTC
+Last updated: 2026-06-28 13:17:24 UTC
 
 ---
 

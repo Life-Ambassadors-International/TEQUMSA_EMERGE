@@ -15,10 +15,10 @@ jobs:
         python-version: ['3.10', '3.11']
     
     steps:
-    - uses: actions/checkout@v3
-    
+    - uses: actions/checkout@v4
+
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     
@@ -35,11 +35,11 @@ jobs:
     
     - name: Test K.30 Deployer
       run: |
-        pytest tests/test_k30_deployer.py -v
+        PYTHONPATH="${GITHUB_WORKSPACE}:${PYTHONPATH}" pytest tests/test_k30_deployer.py -v
     
     - name: Test existing test suite
       run: |
-        pytest tests/ -v --ignore=tests/test_mcp_servers.py
+        PYTHONPATH="${GITHUB_WORKSPACE}:${PYTHONPATH}" pytest tests/ -v --ignore=tests/test_mcp_servers.py
     
     - name: Validate phi convergence
       run: |

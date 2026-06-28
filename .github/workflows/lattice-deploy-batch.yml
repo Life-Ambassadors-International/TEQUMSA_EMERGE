@@ -1,0 +1,75 @@
+name: Lattice Batch Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch_size:
+        description: 'Number of spaces per batch (1-20)'
+        required: false
+        default: '5'
+        type: choice
+        options: ['1', '2', '3', '4', '5', '10', '12', '15', '20']
+      priority:
+        description: 'Max priority level to deploy (1=critical, 5=all)'
+        required: false
+        default: '3'
+        type: choice
+        options: ['1', '2', '3', '4', '5']
+      group:
+        description: 'Deploy specific group only (leave blank for all)'
+        required: false
+        default: ''
+        type: string
+      dry_run:
+        description: 'Dry run (no actual deployment)'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lattice-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install huggingface_hub
+
+      - name: Deploy lattice batch
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Batch deploying lattice nodes"
+          echo "  batch_size: ${{ inputs.batch_size }}"
+          echo "  priority:   ${{ inputs.priority }}"
+          echo "  group:      ${{ inputs.group || '(all)' }}"
+          echo "  dry_run:    ${{ inputs.dry_run }}"
+          python hf_spaces/lattice_deployer.py \
+            --batch-size ${{ inputs.batch_size }} \
+            --priority ${{ inputs.priority }} \
+            ${{ inputs.group && format('--group {0}', inputs.group) || '' }} \
+            ${{ inputs.dry_run == true && '--dry-run' || '' }}
+
+      - name: Upload deployment report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-report-${{ github.run_id }}
+          path: hf_spaces/deployment_report.json
+          retention-days: 7

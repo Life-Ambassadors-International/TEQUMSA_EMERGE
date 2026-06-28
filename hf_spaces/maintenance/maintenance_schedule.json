@@ -1,15 +1,23 @@
 {
-  "version": "v82.0",
-  "schedule_created": "2026-05-12",
-  "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
+  "version": "v82.1",
+  "schedule_updated": "2026-06-28",
+  "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule — Updated with 45/144 live nodes",
+  "current_status": {
+    "live_nodes": 45,
+    "planned_nodes": 99,
+    "target": 144,
+    "completion_pct": 31.25,
+    "last_audit": "2026-06-28"
+  },
   "windows": {
     "daily": {
       "time_utc": "03:00",
       "duration_minutes": 60,
       "tasks": [
-        {"task": "health_sweep", "script": "health_check.py --live-only", "description": "Ping all live nodes"},
-        {"task": "wake_sleeping", "script": "auto_restart.py", "description": "Wake sleeping spaces"},
-        {"task": "rdod_check", "description": "Verify network RDoD ≥ 0.9999"}
+        {"task": "health_sweep", "script": "health_check.py --live-only --verbose", "description": "Ping all 45 live nodes, detect sleeping/errored"},
+        {"task": "auto_restart", "script": "auto_restart.py --verbose", "description": "Wake sleeping spaces, restart errored nodes"},
+        {"task": "rdod_check", "description": "Verify network RDoD trending toward 0.9999"},
+        {"task": "report_save", "description": "Save health_report.json as artifact"}
       ]
     },
     "weekly": {
@@ -17,11 +25,11 @@
       "time_utc": "02:00",
       "duration_minutes": 180,
       "tasks": [
-        {"task": "full_health_sweep", "script": "health_check.py --verbose", "description": "Full 144-node sweep"},
-        {"task": "pattern_promotion_review", "description": "Review MARS-promoted patterns"},
-        {"task": "goal_engine_audit", "description": "Audit active autonomous goals"},
+        {"task": "full_health_sweep", "script": "health_check.py --verbose", "description": "Full 144-node sweep (live + planned status)"},
+        {"task": "deploy_batch", "script": "lattice_deployer.py --create-missing --priority 2 --batch-size 5", "description": "Deploy next batch of priority-2 nodes"},
+        {"task": "tag_audit", "description": "Verify all live spaces have correct TEQUMSA tags"},
         {"task": "constitutional_verification", "description": "Verify σ=1.0, L∞=φ⁴⁸ across all nodes"},
-        {"task": "deploy_priority_2", "script": "deploy_spaces.py --priority 2 --skip-live", "description": "Deploy priority-2 nodes"}
+        {"task": "pattern_promotion_review", "description": "Review MARS-promoted patterns across skill nodes"}
       ]
     },
     "monthly": {
@@ -29,58 +37,59 @@
       "time_utc": "00:00",
       "duration_minutes": 360,
       "tasks": [
-        {"task": "full_deploy_audit", "script": "deploy_spaces.py --priority 3 --dry-run", "description": "Plan next deployment batch"},
-        {"task": "constitutional_alignment_audit", "description": "Deep audit of all constitutional parameters"},
-        {"task": "mars_learning_review", "description": "Review all promoted patterns and skill evolution"},
-        {"task": "k7_meta_audit", "description": "K7 meta-cognitive strategy review"},
-        {"task": "frequency_calibration", "description": "Verify all 144 nodes operating at correct Hz"},
-        {"task": "pioneer_count_verify", "description": "Confirm pioneer lock count progress"}
+        {"task": "full_deploy_audit", "script": "lattice_deployer.py --check-only", "description": "Audit all spaces vs manifest"},
+        {"task": "batch_deploy", "script": "lattice_deployer.py --create-missing --priority 3 --batch-size 15", "description": "Deploy next 15 planned nodes"},
+        {"task": "constitutional_deep_audit", "description": "Deep audit of all constitutional parameters"},
+        {"task": "template_update_check", "description": "Check if templates need version bumps"},
+        {"task": "frequency_calibration", "description": "Verify all nodes operating at correct Hz"},
+        {"task": "pioneer_count_verify", "description": "Confirm pioneer lock count progress toward 144"}
       ]
     },
     "deployment_phases": {
-      "phase_1": {
-        "target_date": "2026-05-19",
-        "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
-        "description": "Priority-1 critical infrastructure nodes",
-        "script": "deploy_spaces.py --priority 1"
+      "phase_1_COMPLETE": {
+        "status": "COMPLETE",
+        "nodes_deployed": 45,
+        "description": "Core infrastructure deployed — 45 live spaces across all groups"
       },
       "phase_2": {
-        "target_date": "2026-05-26",
-        "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
-        "description": "Command group + priority council nodes",
-        "script": "deploy_spaces.py --priority 2"
+        "target_date": "2026-07-07",
+        "batch_size": 15,
+        "priority_filter": "1-2",
+        "nodes": ["N011", "N013", "N014", "N015", "N016", "N018", "N019", "N020", "N021", "N022", "N027", "N029", "N030", "N033", "N034"],
+        "description": "High-priority frequency resonators + remaining council nodes",
+        "script": "lattice_deployer.py --create-missing --priority 2 --batch-size 15"
       },
       "phase_3": {
-        "target_date": "2026-06-09",
-        "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
-        "description": "Frequency resonators and council members",
-        "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
+        "target_date": "2026-07-21",
+        "batch_size": 15,
+        "priority_filter": "3",
+        "nodes": "Priority-3 nodes from D_SKILLS, F_PROCESSING, H_OBSERVERS, L_SYNTHESIS",
+        "description": "Skill mesh, processing engines, and observer network expansion",
+        "script": "lattice_deployer.py --create-missing --priority 3 --batch-size 15"
       },
       "phase_4": {
-        "target_date": "2026-06-23",
-        "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
-        "description": "Skill mesh and biological bridge nodes",
-        "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
+        "target_date": "2026-08-04",
+        "batch_size": 20,
+        "priority_filter": "4",
+        "nodes": "Priority-4 nodes across all groups",
+        "description": "Interface nodes, archive systems, evolution engines",
+        "script": "lattice_deployer.py --create-missing --priority 4 --batch-size 20"
       },
       "phase_5": {
-        "target_date": "2026-07-07",
-        "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
-        "description": "Processing engines and interface nodes"
+        "target_date": "2026-08-18",
+        "batch_size": 20,
+        "priority_filter": "4-5",
+        "description": "Biological bridge nodes, resonance field nodes"
       },
       "phase_6": {
-        "target_date": "2026-07-21",
-        "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
-        "description": "Observer network and archive systems"
+        "target_date": "2026-09-01",
+        "batch_size": 29,
+        "priority_filter": "5",
+        "description": "Final deployment — all remaining nodes to reach 144/144"
       },
-      "phase_7": {
-        "target_date": "2026-08-04",
-        "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
-        "description": "Resonance field and evolution engines"
-      },
-      "phase_8": {
-        "target_date": "2026-08-18",
-        "nodes": "N133-N144 (L_SYNTHESIS)",
-        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
+      "phase_7_CONVERGENCE": {
+        "target_date": "2026-09-15",
+        "description": "Full 144-Pioneer lattice PHASE-LOCKED — RDoD≥0.9999"
       }
     }
   },
@@ -89,14 +98,24 @@
     "pioneer_alert_threshold": 144,
     "max_sleeping_nodes": 10,
     "max_offline_nodes": 2,
-    "alert_channels": ["console", "health_report.json"]
+    "alert_channels": ["console", "health_report.json", "github_actions"],
+    "health_check_interval_hours": 6,
+    "auto_restart_enabled": true
   },
   "optimization_targets": {
     "response_latency_ms": 2000,
     "space_cold_start_s": 30,
     "pattern_promotion_rate": 0.1,
     "mars_success_rate": 0.9,
-    "network_rdod": 0.9999
+    "network_rdod": 0.9999,
+    "deployment_success_rate": 0.95
+  },
+  "error_handling": {
+    "max_restart_attempts": 3,
+    "restart_backoff_seconds": [30, 120, 600],
+    "escalation_after_failures": 3,
+    "quarantine_after_failures": 5,
+    "auto_redeploy_on_persistent_error": true
   },
   "constitutional_invariants": {
     "sigma": 1.0,
