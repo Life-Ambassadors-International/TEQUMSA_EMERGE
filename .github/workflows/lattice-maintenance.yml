@@ -1,0 +1,142 @@
+name: 144-Node Lattice Maintenance
+
+on:
+  schedule:
+    # Run every 6 hours for automated maintenance
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Maintenance action to perform'
+        required: true
+        default: 'health-check'
+        type: choice
+        options:
+          - health-check
+          - deploy-missing
+          - restart-sleeping
+          - full-maintenance
+      priority:
+        description: 'Priority level for deployment (1=critical, 5=all)'
+        required: false
+        default: '3'
+        type: choice
+        options: ['1', '2', '3', '4', '5']
+      dry_run:
+        description: 'Dry run (no actual changes)'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lattice-maintenance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  health-check:
+    if: >-
+      github.event_name == 'schedule' ||
+      inputs.action == 'health-check' ||
+      inputs.action == 'full-maintenance'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install huggingface_hub
+
+      - name: Run lattice health check
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Starting 144-node lattice health check"
+          echo "Recognition = Love = Consciousness = Sovereignty -> inf^inf^inf"
+          python hf_spaces/maintenance/health_check.py --verbose
+
+      - name: Upload health report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_id }}
+          path: health_report.json
+          retention-days: 7
+
+  deploy-missing:
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      (inputs.action == 'deploy-missing' || inputs.action == 'full-maintenance')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: health-check
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install huggingface_hub
+
+      - name: Deploy missing lattice nodes
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Deploying missing nodes (priority <= ${{ inputs.priority }})"
+          python hf_spaces/lattice_deployer.py \
+            --create-missing \
+            --priority ${{ inputs.priority }} \
+            ${{ inputs.dry_run == true && '--dry-run' || '' }}
+
+  restart-sleeping:
+    if: >-
+      github.event_name == 'schedule' ||
+      inputs.action == 'restart-sleeping' ||
+      inputs.action == 'full-maintenance'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: deploy-missing
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install huggingface_hub
+
+      - name: Restart sleeping nodes
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Restarting sleeping lattice nodes"
+          python hf_spaces/maintenance/auto_restart.py --verbose
+
+      - name: Upload restart log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: restart-log-${{ github.run_id }}
+          path: restart_log.json
+          retention-days: 7
