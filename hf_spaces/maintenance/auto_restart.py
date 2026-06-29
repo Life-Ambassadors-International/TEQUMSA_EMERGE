@@ -82,27 +82,40 @@ def process_node(
 
     space_id = node["space_id"]
     status = get_space_status(space_id)
-    
+
     action = "none"
     success = True
 
-    if status in ("SLEEPING", "PAUSED"):
+    if status == "SLEEPING":
         action = "wake"
         if not dry_run:
             success = wake_space(space_id, hf_token)
             if verbose:
                 print(f"  🟡 {node_id} {node['name']}: sleeping → {'waking' if success else 'FAILED'}")
 
-    elif status in ("RUNTIME_ERROR", "CONFIG_ERROR", "BUILD_ERROR"):
+    elif status == "PAUSED":
         action = "restart"
         if not dry_run:
             success = restart_space(space_id, hf_token)
             if verbose:
-                print(f"  🔴 {node_id} {node['name']}: error → {'restarting' if success else 'FAILED'}")
+                print(f"  ⏸️  {node_id} {node['name']}: paused → {'restarting' if success else 'FAILED'}")
+
+    elif status in ("RUNTIME_ERROR", "CONFIG_ERROR", "BUILD_ERROR", "BUILDING_ERROR"):
+        action = "restart"
+        if not dry_run:
+            success = restart_space(space_id, hf_token)
+            if verbose:
+                emoji = "🔴" if "RUNTIME" in status else "🟠"
+                print(f"  {emoji} {node_id} {node['name']}: {status} → {'restarting' if success else 'FAILED'}")
 
     elif status == "RUNNING":
         if verbose:
             print(f"  🟢 {node_id} {node['name']}: online")
+
+    elif "NOT_FOUND" in status or "404" in status:
+        action = "not_deployed"
+        if verbose:
+            print(f"  ⚪ {node_id} {node['name']}: not deployed yet")
 
     result = {
         "node_id": node_id,

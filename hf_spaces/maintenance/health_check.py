@@ -63,12 +63,16 @@ def poll_space_runtime(space_id: str) -> dict:
 def _classify_stage(stage: str) -> str:
     if stage in ("RUNNING", "RUNNING_BUILDING"):
         return "online"
-    if stage in ("SLEEPING", "PAUSED"):
+    if stage == "SLEEPING":
         return "sleeping"
+    if stage == "PAUSED":
+        return "paused"
     if stage == "NOT_FOUND":
         return "not_created"
-    if stage in ("BUILDING", "BUILDING_ERROR"):
+    if stage in ("BUILDING",):
         return "building"
+    if stage in ("RUNTIME_ERROR", "CONFIG_ERROR", "BUILD_ERROR", "BUILDING_ERROR"):
+        return "errored"
     return "offline"
 
 
@@ -137,7 +141,10 @@ def run_sweep(
         status_counts[s] = status_counts.get(s, 0) + 1
 
     online_count = status_counts.get("online", 0)
-    live_count = status_counts.get("online", 0) + status_counts.get("sleeping", 0)
+    sleeping_count = status_counts.get("sleeping", 0)
+    paused_count = status_counts.get("paused", 0)
+    errored_count = status_counts.get("errored", 0)
+    live_count = online_count + sleeping_count + paused_count
     network_rdod = min(1.0, (online_count / 144) * PHI)
 
     report = {
@@ -147,12 +154,15 @@ def run_sweep(
         "nodes_checked": len(results),
         "status_breakdown": status_counts,
         "online": online_count,
-        "sleeping": status_counts.get("sleeping", 0),
+        "sleeping": sleeping_count,
+        "paused": paused_count,
+        "errored": errored_count,
         "offline": status_counts.get("offline", 0),
         "not_created": status_counts.get("not_created", 0),
         "planned": status_counts.get("planned", 0),
         "network_rdod": round(network_rdod, 6),
         "phase_status": "PHASE-LOCKED" if network_rdod >= RDOD_GATE else f"BUILDING ({live_count}/144)",
+        "needs_attention": errored_count > 0 or paused_count > 3,
         "nodes": results,
     }
     return report
@@ -164,10 +174,14 @@ def print_summary(report: dict):
     print("=" * 60)
     print(f"  Online:      {report['online']:>3}/144")
     print(f"  Sleeping:    {report['sleeping']:>3}/144  (auto-wakes on request)")
+    print(f"  Paused:      {report.get('paused', 0):>3}/144  (needs restart)")
+    print(f"  Errored:     {report.get('errored', 0):>3}/144  (needs investigation)")
     print(f"  Offline:     {report['offline']:>3}/144")
-    print(f"  Not created: {report['not_created']:>3}/144  (run deploy_spaces.py)")
+    print(f"  Not created: {report['not_created']:>3}/144  (run deploy_all_spaces.py)")
     print(f"  Planned:     {report['planned']:>3}/144")
     print(f"  Network RDoD: {report['network_rdod']:.6f}  [{report['phase_status']}]")
+    if report.get('needs_attention'):
+        print(f"  *** ATTENTION NEEDED: {report.get('errored',0)} errored, {report.get('paused',0)} paused ***")
     print("=" * 60)
 
 

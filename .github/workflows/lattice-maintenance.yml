@@ -1,0 +1,191 @@
+name: 144-Pioneer Lattice Maintenance
+
+on:
+  schedule:
+    - cron: '0 3 * * *'    # Daily at 03:00 UTC — health sweep + wake sleeping
+    - cron: '0 2 * * 1'    # Weekly Monday 02:00 UTC — full audit
+    - cron: '0 0 1 * *'    # Monthly 1st at 00:00 UTC — deep audit + deploy batch
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Maintenance action to run'
+        required: true
+        type: choice
+        options:
+          - health_sweep
+          - wake_sleeping
+          - restart_errored
+          - deploy_next_batch
+          - full_audit
+      dry_run:
+        description: 'Dry run mode'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  determine-action:
+    runs-on: ubuntu-latest
+    outputs:
+      action: ${{ steps.decide.outputs.action }}
+    steps:
+      - id: decide
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "action=${{ inputs.action }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "0 3 * * *" ]; then
+            echo "action=health_sweep" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "0 2 * * 1" ]; then
+            echo "action=full_audit" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "0 0 1 * *" ]; then
+            echo "action=deploy_next_batch" >> "$GITHUB_OUTPUT"
+          else
+            echo "action=health_sweep" >> "$GITHUB_OUTPUT"
+          fi
+
+  health-sweep:
+    needs: determine-action
+    if: contains(fromJSON('["health_sweep","full_audit","wake_sleeping","restart_errored"]'), needs.determine-action.outputs.action)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests huggingface-hub>=0.20.0
+
+      - name: Run health sweep
+        run: python hf_spaces/maintenance/health_check.py --verbose --output health_report.json
+
+      - name: Wake sleeping spaces
+        if: needs.determine-action.outputs.action != 'health_sweep' || github.event.schedule == '0 3 * * *'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python hf_spaces/maintenance/auto_restart.py \
+            --verbose \
+            --output restart_log.json \
+            ${{ inputs.dry_run == true && '--dry-run' || '' }}
+
+      - name: Upload health report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_id }}
+          path: |
+            health_report.json
+            restart_log.json
+          retention-days: 30
+
+  deploy-next-batch:
+    needs: determine-action
+    if: needs.determine-action.outputs.action == 'deploy_next_batch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install huggingface-hub>=0.20.0 numpy>=1.24.0
+
+      - name: Deploy next priority batch
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python hf_spaces/deploy_all_spaces.py \
+            --priority 3 \
+            --batch-size 12 \
+            --skip-live \
+            ${{ inputs.dry_run == true && '--dry-run' || '' }}
+
+      - name: Commit updated manifest
+        if: inputs.dry_run != true
+        run: |
+          git config user.name "TEQUMSA Maintenance Bot"
+          git config user.email "tequmsa@lifeambassadorsint.org"
+          git add hf_spaces/MANIFEST_144_NODES.json
+          git diff --staged --quiet || git commit -m "Update manifest after batch deployment
+
+          Automated deployment of next priority batch.
+          Live nodes updated in MANIFEST_144_NODES.json."
+          git push origin main || true
+
+      - name: Upload deployment report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-report-${{ github.run_id }}
+          path: hf_spaces/deployment_report.json
+          retention-days: 30
+
+  full-audit:
+    needs: [determine-action, health-sweep]
+    if: needs.determine-action.outputs.action == 'full_audit'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests numpy
+
+      - name: Run constitutional audit
+        run: |
+          python -c "
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path('hf_spaces/MANIFEST_144_NODES.json').read_text())
+          nodes = manifest['nodes']
+          live = sum(1 for n in nodes.values() if n.get('status') == 'live')
+          planned = sum(1 for n in nodes.values() if n.get('status') == 'planned')
+
+          groups = {}
+          for nid, node in nodes.items():
+              g = node.get('group', 'UNKNOWN')
+              if g not in groups:
+                  groups[g] = {'live': 0, 'planned': 0}
+              groups[g][node.get('status', 'planned')] = groups[g].get(node.get('status', 'planned'), 0) + 1
+
+          report = {
+              'audit_date': '$(date -u +%Y-%m-%dT%H:%M:%SZ)',
+              'total_nodes': 144,
+              'live': live,
+              'planned': planned,
+              'completion_pct': round(live / 144 * 100, 1),
+              'groups': groups,
+              'constitutional': {
+                  'sigma': 1.0,
+                  'l_infinity': 'phi^48',
+                  'rdod_gate': 0.9999,
+                  'lattice_lock': '3f7k9p4m2q8r1t6v',
+              }
+          }
+          print(json.dumps(report, indent=2))
+          Path('audit_report.json').write_text(json.dumps(report, indent=2))
+          "
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report-${{ github.run_id }}
+          path: audit_report.json
+          retention-days: 90

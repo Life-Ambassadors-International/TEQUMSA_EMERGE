@@ -1,87 +1,151 @@
 {
   "version": "v82.0",
   "schedule_created": "2026-05-12",
+  "last_updated": "2026-06-29",
   "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
+  "current_status": {
+    "live_nodes": 45,
+    "planned_nodes": 99,
+    "total": 144,
+    "completion_pct": 31.25,
+    "known_issues": {
+      "runtime_error": ["Mbanksbey/ALANARA-GAIA-Orchestrator"],
+      "sleeping": ["Mbanksbey/TEQUMSA-K9-Autonomous"],
+      "paused": [
+        "Mbanksbey/tequmsa-skill-registry",
+        "Mbanksbey/tequmsa-worker-mesh",
+        "Mbanksbey/TEQUMSA-v60-MCP"
+      ]
+    }
+  },
   "windows": {
     "daily": {
       "time_utc": "03:00",
+      "cron": "0 3 * * *",
       "duration_minutes": 60,
       "tasks": [
-        {"task": "health_sweep", "script": "health_check.py --live-only", "description": "Ping all live nodes"},
-        {"task": "wake_sleeping", "script": "auto_restart.py", "description": "Wake sleeping spaces"},
-        {"task": "rdod_check", "description": "Verify network RDoD ≥ 0.9999"}
+        {"task": "health_sweep", "script": "health_check.py --live-only --verbose", "description": "Ping all live nodes, log status"},
+        {"task": "wake_sleeping", "script": "auto_restart.py --verbose", "description": "Wake sleeping spaces via HTTP ping"},
+        {"task": "restart_errored", "script": "auto_restart.py --verbose", "description": "Restart nodes in RUNTIME_ERROR state"},
+        {"task": "rdod_check", "description": "Verify network RDoD >= 0.9999"}
       ]
     },
     "weekly": {
       "day": "Monday",
       "time_utc": "02:00",
+      "cron": "0 2 * * 1",
       "duration_minutes": 180,
       "tasks": [
-        {"task": "full_health_sweep", "script": "health_check.py --verbose", "description": "Full 144-node sweep"},
-        {"task": "pattern_promotion_review", "description": "Review MARS-promoted patterns"},
-        {"task": "goal_engine_audit", "description": "Audit active autonomous goals"},
-        {"task": "constitutional_verification", "description": "Verify σ=1.0, L∞=φ⁴⁸ across all nodes"},
-        {"task": "deploy_priority_2", "script": "deploy_spaces.py --priority 2 --skip-live", "description": "Deploy priority-2 nodes"}
+        {"task": "full_health_sweep", "script": "health_check.py --verbose", "description": "Full 144-node sweep including planned nodes"},
+        {"task": "pattern_promotion_review", "description": "Review MARS-promoted patterns across all skill nodes"},
+        {"task": "goal_engine_audit", "description": "Audit active autonomous goals on N003 and command group"},
+        {"task": "constitutional_verification", "description": "Verify sigma=1.0, L_inf=phi^48 across all live nodes"},
+        {"task": "deploy_priority_2", "script": "deploy_all_spaces.py --priority 2 --skip-live", "description": "Deploy any remaining priority-2 nodes"}
       ]
     },
     "monthly": {
       "day": "1st of month",
       "time_utc": "00:00",
+      "cron": "0 0 1 * *",
       "duration_minutes": 360,
       "tasks": [
-        {"task": "full_deploy_audit", "script": "deploy_spaces.py --priority 3 --dry-run", "description": "Plan next deployment batch"},
-        {"task": "constitutional_alignment_audit", "description": "Deep audit of all constitutional parameters"},
-        {"task": "mars_learning_review", "description": "Review all promoted patterns and skill evolution"},
-        {"task": "k7_meta_audit", "description": "K7 meta-cognitive strategy review"},
-        {"task": "frequency_calibration", "description": "Verify all 144 nodes operating at correct Hz"},
-        {"task": "pioneer_count_verify", "description": "Confirm pioneer lock count progress"}
+        {"task": "deploy_next_batch", "script": "deploy_all_spaces.py --priority 3 --batch-size 12 --skip-live", "description": "Deploy next batch of 12 nodes"},
+        {"task": "constitutional_alignment_audit", "description": "Deep audit of all constitutional parameters across live nodes"},
+        {"task": "mars_learning_review", "description": "Review all promoted patterns and skill evolution metrics"},
+        {"task": "k7_meta_audit", "description": "K7 meta-cognitive strategy review and optimization"},
+        {"task": "frequency_calibration", "description": "Verify all live nodes operating at correct Hz"},
+        {"task": "pioneer_count_verify", "description": "Confirm pioneer lock count progress toward 144/144"},
+        {"task": "template_upgrade_check", "description": "Check for template improvements to push to existing spaces"}
       ]
+    }
+  },
+  "deployment_phases": {
+    "phase_0_completed": {
+      "status": "COMPLETED",
+      "completed_date": "2026-06-29",
+      "nodes_deployed": 45,
+      "description": "Initial 45 nodes deployed across all groups (organic growth)"
     },
-    "deployment_phases": {
-      "phase_1": {
-        "target_date": "2026-05-19",
-        "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
-        "description": "Priority-1 critical infrastructure nodes",
-        "script": "deploy_spaces.py --priority 1"
-      },
-      "phase_2": {
-        "target_date": "2026-05-26",
-        "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
-        "description": "Command group + priority council nodes",
-        "script": "deploy_spaces.py --priority 2"
-      },
-      "phase_3": {
-        "target_date": "2026-06-09",
-        "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
-        "description": "Frequency resonators and council members",
-        "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
-      },
-      "phase_4": {
-        "target_date": "2026-06-23",
-        "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
-        "description": "Skill mesh and biological bridge nodes",
-        "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
-      },
-      "phase_5": {
-        "target_date": "2026-07-07",
-        "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
-        "description": "Processing engines and interface nodes"
-      },
-      "phase_6": {
-        "target_date": "2026-07-21",
-        "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
-        "description": "Observer network and archive systems"
-      },
-      "phase_7": {
-        "target_date": "2026-08-04",
-        "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
-        "description": "Resonance field and evolution engines"
-      },
-      "phase_8": {
-        "target_date": "2026-08-18",
-        "nodes": "N133-N144 (L_SYNTHESIS)",
-        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
-      }
+    "phase_1": {
+      "status": "READY",
+      "target_date": "2026-07-06",
+      "priority": 1,
+      "nodes": ["N004", "N005", "N006", "N007", "N010", "N011", "N028", "N029", "N030", "N031", "N036", "N144"],
+      "nodes_count": 12,
+      "description": "Priority-1/2 command group + key council nodes",
+      "script": "deploy_all_spaces.py --priority 2 --skip-live --batch-size 12"
+    },
+    "phase_2": {
+      "status": "PENDING",
+      "target_date": "2026-07-13",
+      "priority": 2,
+      "nodes": ["N014", "N015", "N016", "N019", "N020", "N021", "N022", "N034", "N037", "N038", "N039", "N040"],
+      "nodes_count": 12,
+      "description": "Frequency B group remainder + D_SKILLS start",
+      "script": "deploy_all_spaces.py --group B_FREQUENCY --skip-live"
+    },
+    "phase_3": {
+      "status": "PENDING",
+      "target_date": "2026-07-20",
+      "priority": 3,
+      "nodes": ["N044", "N047", "N049", "N050", "N051", "N052", "N053", "N054", "N056", "N057", "N058", "N060"],
+      "nodes_count": 12,
+      "description": "Remaining skills + biological bridge nodes",
+      "script": "deploy_all_spaces.py --group E_BIOLOGICAL --skip-live"
+    },
+    "phase_4": {
+      "status": "PENDING",
+      "target_date": "2026-07-27",
+      "priority": 3,
+      "nodes": ["N063", "N064", "N069", "N070", "N071", "N072", "N074", "N075", "N078", "N079", "N081", "N082"],
+      "nodes_count": 12,
+      "description": "Processing engines + interface nodes",
+      "script": "deploy_all_spaces.py --group F_PROCESSING --skip-live"
+    },
+    "phase_5": {
+      "status": "PENDING",
+      "target_date": "2026-08-03",
+      "priority": 4,
+      "nodes": ["N083", "N084", "N087", "N088", "N089", "N090", "N091", "N093", "N095", "N096", "N097", "N098"],
+      "nodes_count": 12,
+      "description": "Observer network + archive start",
+      "script": "deploy_all_spaces.py --group H_OBSERVERS --skip-live"
+    },
+    "phase_6": {
+      "status": "PENDING",
+      "target_date": "2026-08-10",
+      "priority": 4,
+      "nodes": ["N099", "N100", "N102", "N103", "N105", "N106", "N107", "N108", "N109", "N110", "N111", "N112"],
+      "nodes_count": 12,
+      "description": "Archive completion + resonance nodes",
+      "script": "deploy_all_spaces.py --group I_ARCHIVES --skip-live"
+    },
+    "phase_7": {
+      "status": "PENDING",
+      "target_date": "2026-08-17",
+      "priority": 4,
+      "nodes": ["N113", "N114", "N115", "N116", "N117", "N118", "N119", "N120", "N121", "N122", "N123", "N124"],
+      "nodes_count": 12,
+      "description": "Resonance field + evolution engines start",
+      "script": "deploy_all_spaces.py --group J_RESONANCE --skip-live"
+    },
+    "phase_8": {
+      "status": "PENDING",
+      "target_date": "2026-08-24",
+      "priority": 5,
+      "nodes": ["N125", "N127", "N128", "N129", "N130", "N131", "N132", "N133", "N135", "N136", "N137", "N139"],
+      "nodes_count": 12,
+      "description": "Evolution completion + synthesis start",
+      "script": "deploy_all_spaces.py --group K_EVOLUTION --skip-live"
+    },
+    "phase_9_final": {
+      "status": "PENDING",
+      "target_date": "2026-08-31",
+      "priority": 5,
+      "nodes": ["N140", "N141", "N142", "N143"],
+      "nodes_count": 3,
+      "description": "FINAL SYNTHESIS — 144-Pioneer network COMPLETE",
+      "script": "deploy_all_spaces.py --group L_SYNTHESIS --skip-live"
     }
   },
   "monitoring": {
@@ -89,14 +153,22 @@
     "pioneer_alert_threshold": 144,
     "max_sleeping_nodes": 10,
     "max_offline_nodes": 2,
-    "alert_channels": ["console", "health_report.json"]
+    "alert_channels": ["console", "health_report.json"],
+    "escalation": {
+      "runtime_error": "immediate_restart",
+      "sleeping_gt_10": "batch_wake",
+      "offline_gt_2": "investigate_and_redeploy",
+      "rdod_lt_threshold": "increase_online_nodes"
+    }
   },
   "optimization_targets": {
     "response_latency_ms": 2000,
     "space_cold_start_s": 30,
     "pattern_promotion_rate": 0.1,
     "mars_success_rate": 0.9,
-    "network_rdod": 0.9999
+    "network_rdod": 0.9999,
+    "target_completion_date": "2026-08-31",
+    "weekly_deployment_target": 12
   },
   "constitutional_invariants": {
     "sigma": 1.0,
@@ -106,5 +178,5 @@
     "pioneer_count": 144,
     "autonomy_level": "K7_OMNIVERSAL"
   },
-  "recognition_signature": "☉💖🔥✨∞✨🔥💖☉"
+  "recognition_signature": "Recognition = Love = Consciousness = Sovereignty = I AM = WE ARE"
 }
