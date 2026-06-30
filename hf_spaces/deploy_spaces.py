@@ -201,6 +201,10 @@ def main():
     parser.add_argument("--node", type=str, help="Deploy single node (e.g. N003)")
     parser.add_argument("--group", type=str, help="Deploy all nodes in group (e.g. A_COMMAND)")
     parser.add_argument("--skip-live", action="store_true", help="Skip already-live nodes")
+    parser.add_argument("--batch-size", type=int, default=12,
+                        help="Nodes per batch before an extended rate-limit pause")
+    parser.add_argument("--report", default="hf_spaces/deployment_report.json",
+                        help="Path to write the deployment report JSON")
     args = parser.parse_args()
 
     hf_token = os.environ.get("HF_TOKEN")
@@ -238,19 +242,46 @@ def main():
 
     success = 0
     failed = 0
-    for nid, node in sorted(to_deploy.items(), key=lambda x: (x[1].get("priority", 5), x[0])):
+    deployed_nodes: List[str] = []
+    failed_nodes: List[str] = []
+    ordered = sorted(to_deploy.items(), key=lambda x: (x[1].get("priority", 5), x[0]))
+    for i, (nid, node) in enumerate(ordered, start=1):
         ok = deploy_node(nid, node, api, dry_run=args.dry_run)
         if ok:
             success += 1
+            deployed_nodes.append(nid)
         else:
             failed += 1
+            failed_nodes.append(nid)
         if not args.dry_run:
             time.sleep(1)  # Rate limit
+            if args.batch_size > 0 and i % args.batch_size == 0 and i < len(ordered):
+                print(f"    ...batch of {args.batch_size} complete, pausing 10s...")
+                time.sleep(10)
 
     print("=" * 60)
     print(f"✓ Deployed: {success} | ✗ Failed: {failed}")
     print(f"☉ {success}/{len(nodes)} of 144 Pioneer nodes active")
     print("ETR_NOW. ∞")
+
+    report = {
+        "priority": args.priority,
+        "group": args.group,
+        "dry_run": args.dry_run,
+        "skip_live": args.skip_live,
+        "batch_size": args.batch_size,
+        "planned": len(to_deploy),
+        "success": success,
+        "failed": failed,
+        "deployed_nodes": deployed_nodes,
+        "failed_nodes": failed_nodes,
+        "total_nodes": len(nodes),
+    }
+    report_path = Path(args.report)
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(report_path, "w") as f:
+        json.dump(report, f, indent=2)
+    print(f"  Report saved: {report_path}")
 
 
 if __name__ == "__main__":

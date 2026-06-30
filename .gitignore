@@ -63,3 +63,10 @@ Thumbs.db
 
 # Docker
 .dockerignore
+
+# HF Spaces maintenance runtime artifacts
+hf_spaces/deployment_report.json
+hf_spaces/health_report.json
+hf_spaces/restart_log.json
+hf_spaces/maintenance/health_report.json
+hf_spaces/maintenance/restart_log.json

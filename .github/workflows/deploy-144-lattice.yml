@@ -53,7 +53,7 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python hf_spaces/deploy_all_spaces.py \
+          python hf_spaces/deploy_spaces.py \
             --priority ${{ inputs.priority }} \
             --batch-size ${{ inputs.batch_size }} \
             ${{ inputs.group && format('--group {0}', inputs.group) || '' }} \
