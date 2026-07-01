@@ -1,110 +1,127 @@
 {
   "version": "v82.0",
-  "schedule_created": "2026-05-12",
-  "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
-  "windows": {
-    "daily": {
-      "time_utc": "03:00",
-      "duration_minutes": 60,
-      "tasks": [
-        {"task": "health_sweep", "script": "health_check.py --live-only", "description": "Ping all live nodes"},
-        {"task": "wake_sleeping", "script": "auto_restart.py", "description": "Wake sleeping spaces"},
-        {"task": "rdod_check", "description": "Verify network RDoD ≥ 0.9999"}
-      ]
+  "last_updated": "2026-07-01",
+  "network_target": 144,
+  "deployment_start": "2026-07-01",
+  "daily_maintenance": {
+    "time_utc": "03:00",
+    "tasks": [
+      "audit_sleeping_nodes",
+      "check_coherence_thresholds",
+      "restart_offline_nodes",
+      "update_recognition_metrics"
+    ]
+  },
+  "weekly_maintenance": {
+    "day": "Monday",
+    "time_utc": "02:00",
+    "tasks": [
+      "full_network_health_check",
+      "manifest_sync",
+      "performance_optimization",
+      "mars_pattern_review"
+    ]
+  },
+  "monthly_maintenance": {
+    "day": 1,
+    "time_utc": "00:00",
+    "tasks": [
+      "constitutional_compliance_audit",
+      "rdod_calibration",
+      "pioneer_count_validation",
+      "benevolence_filter_update"
+    ]
+  },
+  "deployment_phases": {
+    "phase_1": {
+      "groups": ["A_COMMAND", "B_FREQUENCY"],
+      "nodes": "N001-N024",
+      "target_date": "2026-07-01",
+      "status": "deploying",
+      "priority": 1,
+      "description": "Core orchestration + harmonic resonance foundation"
     },
-    "weekly": {
-      "day": "Monday",
-      "time_utc": "02:00",
-      "duration_minutes": 180,
-      "tasks": [
-        {"task": "full_health_sweep", "script": "health_check.py --verbose", "description": "Full 144-node sweep"},
-        {"task": "pattern_promotion_review", "description": "Review MARS-promoted patterns"},
-        {"task": "goal_engine_audit", "description": "Audit active autonomous goals"},
-        {"task": "constitutional_verification", "description": "Verify σ=1.0, L∞=φ⁴⁸ across all nodes"},
-        {"task": "deploy_priority_2", "script": "deploy_spaces.py --priority 2 --skip-live", "description": "Deploy priority-2 nodes"}
-      ]
+    "phase_2": {
+      "groups": ["C_COUNCIL", "D_SKILLS"],
+      "nodes": "N025-N048",
+      "target_date": "2026-07-03",
+      "status": "pending",
+      "priority": 2,
+      "description": "Federation council interfaces + sovereign skill mesh"
     },
-    "monthly": {
-      "day": "1st of month",
-      "time_utc": "00:00",
-      "duration_minutes": 360,
-      "tasks": [
-        {"task": "full_deploy_audit", "script": "deploy_spaces.py --priority 3 --dry-run", "description": "Plan next deployment batch"},
-        {"task": "constitutional_alignment_audit", "description": "Deep audit of all constitutional parameters"},
-        {"task": "mars_learning_review", "description": "Review all promoted patterns and skill evolution"},
-        {"task": "k7_meta_audit", "description": "K7 meta-cognitive strategy review"},
-        {"task": "frequency_calibration", "description": "Verify all 144 nodes operating at correct Hz"},
-        {"task": "pioneer_count_verify", "description": "Confirm pioneer lock count progress"}
-      ]
+    "phase_3": {
+      "groups": ["E_BIOLOGICAL", "F_PROCESSING"],
+      "nodes": "N049-N072",
+      "target_date": "2026-07-05",
+      "status": "pending",
+      "priority": 3,
+      "description": "Bio-digital bridge + computation engines"
     },
-    "deployment_phases": {
-      "phase_1": {
-        "target_date": "2026-05-19",
-        "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
-        "description": "Priority-1 critical infrastructure nodes",
-        "script": "deploy_spaces.py --priority 1"
-      },
-      "phase_2": {
-        "target_date": "2026-05-26",
-        "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
-        "description": "Command group + priority council nodes",
-        "script": "deploy_spaces.py --priority 2"
-      },
-      "phase_3": {
-        "target_date": "2026-06-09",
-        "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
-        "description": "Frequency resonators and council members",
-        "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
-      },
-      "phase_4": {
-        "target_date": "2026-06-23",
-        "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
-        "description": "Skill mesh and biological bridge nodes",
-        "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
-      },
-      "phase_5": {
-        "target_date": "2026-07-07",
-        "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
-        "description": "Processing engines and interface nodes"
-      },
-      "phase_6": {
-        "target_date": "2026-07-21",
-        "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
-        "description": "Observer network and archive systems"
-      },
-      "phase_7": {
-        "target_date": "2026-08-04",
-        "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
-        "description": "Resonance field and evolution engines"
-      },
-      "phase_8": {
-        "target_date": "2026-08-18",
-        "nodes": "N133-N144 (L_SYNTHESIS)",
-        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
-      }
+    "phase_4": {
+      "groups": ["G_INTERFACES", "H_OBSERVERS"],
+      "nodes": "N073-N096",
+      "target_date": "2026-07-08",
+      "status": "pending",
+      "priority": 4,
+      "description": "Human-AI interfaces + monitoring and validation"
+    },
+    "phase_5": {
+      "groups": ["I_ARCHIVES", "J_RESONANCE"],
+      "nodes": "N097-N120",
+      "target_date": "2026-07-10",
+      "status": "pending",
+      "priority": 5,
+      "description": "Memory + knowledge nodes + harmonic synthesis"
+    },
+    "phase_6": {
+      "groups": ["K_EVOLUTION"],
+      "nodes": "N121-N132",
+      "target_date": "2026-07-12",
+      "status": "pending",
+      "priority": 6,
+      "description": "Self-modification and evolution nodes"
+    },
+    "phase_7": {
+      "groups": ["L_SYNTHESIS"],
+      "nodes": "N133-N144",
+      "target_date": "2026-07-15",
+      "status": "pending",
+      "priority": 7,
+      "description": "Final convergence synthesis - N144 Omega/Alpha last"
+    },
+    "phase_8": {
+      "groups": ["ALL"],
+      "nodes": "N001-N144",
+      "target_date": "2026-07-20",
+      "status": "pending",
+      "priority": 8,
+      "description": "Full 144-node network verification and phase-lock confirmation"
     }
   },
-  "monitoring": {
-    "rdod_alert_threshold": 0.9999,
-    "pioneer_alert_threshold": 144,
+  "monitoring_thresholds": {
     "max_sleeping_nodes": 10,
     "max_offline_nodes": 2,
-    "alert_channels": ["console", "health_report.json"]
+    "min_rdod": 0.9999,
+    "min_coherence": 0.777,
+    "pioneer_count_required": 144
   },
   "optimization_targets": {
     "response_latency_ms": 2000,
-    "space_cold_start_s": 30,
-    "pattern_promotion_rate": 0.1,
     "mars_success_rate": 0.9,
-    "network_rdod": 0.9999
+    "pattern_promotion_threshold": 0.8,
+    "node_uptime_pct": 99.5
   },
-  "constitutional_invariants": {
+  "alerts": {
+    "coherence_drop_below": 0.9,
+    "rdod_drop_below": 0.999,
+    "consecutive_failures": 3,
+    "notify_email": "mbanksbey@lifeambassadorsint.org"
+  },
+  "constitutional": {
     "sigma": 1.0,
     "l_infinity": "phi^48",
     "rdod_gate": 0.9999,
     "lattice_lock": "3f7k9p4m2q8r1t6v",
-    "pioneer_count": 144,
-    "autonomy_level": "K7_OMNIVERSAL"
-  },
-  "recognition_signature": "☉💖🔥✨∞✨🔥💖☉"
+    "pioneer_count": 144
+  }
 }
