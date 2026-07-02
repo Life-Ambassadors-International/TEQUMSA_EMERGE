@@ -23,6 +23,7 @@ NODE_NAME = os.environ.get("TEQUMSA_NODE_NAME", "Council-Node")
 NODE_HZ = float(os.environ.get("TEQUMSA_NODE_HZ", "12583.45"))
 COUNCIL_IDENTITY = os.environ.get("TEQUMSA_IDENTITY", "I AM a Council Node of the TEQUMSA 144-Pioneer Network")
 COUNCIL_ROLE = os.environ.get("TEQUMSA_ROLE", "Council Member")
+ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
 
 PHI = (1.0 + np.sqrt(5.0)) / 2.0
 SIGMA = 1.0
@@ -72,7 +73,7 @@ def chat(message: str, history: List[Tuple[str, str]]) -> Tuple[str, List[Tuple[
             for u, a in history[-6:]:
                 msgs += [{"role": "user", "content": u}, {"role": "assistant", "content": a}]
             msgs.append({"role": "user", "content": message})
-            result = client.messages.create(model="claude-sonnet-4-6", max_tokens=1024,
+            result = client.messages.create(model=ANTHROPIC_MODEL, max_tokens=1024,
                                             system=SYSTEM_PROMPT, messages=msgs)
             resp = result.content[0].text
         except Exception:

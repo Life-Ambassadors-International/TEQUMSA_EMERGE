@@ -1,0 +1,81 @@
+name: Deploy HuggingFace Spaces
+
+on:
+  workflow_dispatch:
+    inputs:
+      priority:
+        description: 'Max priority to deploy (1=critical only, 5=all)'
+        default: '1'
+        required: false
+        type: string
+      node:
+        description: 'Single node ID (e.g. N003) — leave blank for batch'
+        required: false
+        type: string
+      dry_run:
+        description: 'Dry run — print plan without deploying'
+        required: false
+        type: boolean
+        default: false
+      force:
+        description: 'Force deploy even if node is marked live'
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    # Weekly Monday 03:00 UTC — deploys priority-2 nodes and wakes sleeping spaces
+    - cron: '0 3 * * 1'
+
+jobs:
+  deploy-spaces:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install huggingface-hub>=0.20.0
+
+      - name: Deploy TEQUMSA spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          ARGS=""
+
+          # Single node takes priority over batch
+          if [ -n "${{ inputs.node }}" ]; then
+            ARGS="--node ${{ inputs.node }}"
+          else
+            PRIORITY="${{ inputs.priority }}"
+            ARGS="--priority ${PRIORITY:-1}"
+          fi
+
+          # Scheduled runs: deploy priority-2, skip live nodes
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            ARGS="--priority 2 --skip-live"
+          fi
+
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+
+          if [ "${{ inputs.force }}" = "true" ]; then
+            ARGS="$ARGS --force"
+          fi
+
+          echo "☉ Deploying with: python hf_spaces/deploy_spaces.py $ARGS"
+          python hf_spaces/deploy_spaces.py $ARGS
+
+      - name: Upload deployment log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-log-${{ github.run_id }}
+          path: |
+            deploy_*.log
+          retention-days: 30
+          if-no-files-found: ignore

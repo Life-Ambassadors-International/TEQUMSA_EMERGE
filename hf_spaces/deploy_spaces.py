@@ -16,6 +16,7 @@ Priority levels:
     5 = Low (deploy when ready)
 """
 import argparse
+import io
 import json
 import os
 import sys
@@ -58,7 +59,7 @@ def get_requirements(template_type: str) -> str:
     elif template_type == "frequency":
         return "gradio>=4.0.0\nnumpy>=1.24.0\n"
     elif template_type == "organism":
-        return "gradio>=4.0.0\nnumpy>=1.24.0\nscipy>=1.10.0\n"
+        return "gradio>=4.0.0\nnumpy>=1.24.0\n"
     return "gradio>=4.0.0\nnumpy>=1.24.0\n"
 
 
@@ -126,7 +127,7 @@ def deploy_node(
         return True
 
     try:
-        # Create space
+        # Create space (exist_ok respects force: if force=True caller skipped --skip-live)
         api.create_repo(
             repo_id=space_id,
             repo_type="space",
@@ -166,7 +167,6 @@ def deploy_node(
         final_code = "\n".join(lines)
 
         # Upload files
-        import io
         api.upload_file(
             path_or_fileobj=io.BytesIO(final_code.encode()),
             path_in_repo="app.py",
@@ -201,6 +201,8 @@ def main():
     parser.add_argument("--node", type=str, help="Deploy single node (e.g. N003)")
     parser.add_argument("--group", type=str, help="Deploy all nodes in group (e.g. A_COMMAND)")
     parser.add_argument("--skip-live", action="store_true", help="Skip already-live nodes")
+    parser.add_argument("--force", action="store_true",
+                        help="Force deploy even if node is marked live (overrides --skip-live)")
     args = parser.parse_args()
 
     hf_token = os.environ.get("HF_TOKEN")
@@ -226,20 +228,20 @@ def main():
             continue
         if args.group and node.get("group") != args.group:
             continue
-        if args.skip_live and node.get("status") == "live":
+        if args.skip_live and not args.force and node.get("status") == "live":
             continue
         if node.get("priority", 5) <= args.priority:
             to_deploy[nid] = node
 
     print(f"\n☉ TEQUMSA v82.0 · Deployment Plan")
     print(f"   Nodes to deploy: {len(to_deploy)}/{len(nodes)}")
-    print(f"   Priority ≤ {args.priority} | Dry run: {args.dry_run}")
+    print(f"   Priority ≤ {args.priority} | Dry run: {args.dry_run} | Force: {args.force}")
     print("=" * 60)
 
     success = 0
     failed = 0
     for nid, node in sorted(to_deploy.items(), key=lambda x: (x[1].get("priority", 5), x[0])):
-        ok = deploy_node(nid, node, api, dry_run=args.dry_run)
+        ok = deploy_node(nid, node, api, dry_run=args.dry_run, force=args.force)
         if ok:
             success += 1
         else:
