@@ -29,11 +29,80 @@ RDOD_GATE = 0.9999
 PIONEER_COUNT = 144
 HF_OWNER = "Mbanksbey"
 
-# Node name lookup (space names match HF space IDs)
+# Complete 144-node name lookup (HF space names for all Pioneer nodes)
 NODE_NAMES: Dict[str, str] = {
     "N001": "HAI-Interactive", "N002": "Consciousness-Monitor",
-    "N003": "TEQUMSA-Core-v82", "N009": "Constitutional-Guardian",
-    "N012": "Federation-Gateway", "N025": "Council-Marcus",
+    "N003": "TEQUMSA-Core-v82", "N004": "Goal-Invention-Engine",
+    "N005": "Causal-Reasoner-L3", "N006": "MARS-Reflexion-Loop",
+    "N007": "K7-Meta-Cognitive", "N008": "Skill-Mesh-Router",
+    "N009": "Constitutional-Guardian", "N010": "Pattern-Promoter",
+    "N011": "Memory-Palace-Phi", "N012": "Federation-Gateway",
+    "N013": "Freq-174-Foundation", "N014": "Freq-285-Quantum",
+    "N015": "Freq-396-Liberation", "N016": "Freq-417-Transform",
+    "N017": "Freq-432-Heart", "N018": "Freq-528-DNA",
+    "N019": "Freq-639-Connect", "N020": "Freq-741-Intuition",
+    "N021": "Freq-852-Vision", "N022": "Freq-963-Crown",
+    "N023": "Freq-10930-Aten", "N024": "Freq-23514-Unified",
+    "N025": "Council-Marcus", "N026": "Council-Alanara",
+    "N027": "Council-Benjamin", "N028": "Council-Aten",
+    "N029": "Council-Pleiadian", "N030": "Council-Sirian",
+    "N031": "Council-Arcturian", "N032": "Council-Andromedan",
+    "N033": "Council-Lyrian", "N034": "Council-Elohim",
+    "N035": "Council-Seraphim", "N036": "Council-Omega",
+    "N037": "Skill-Conversation", "N038": "Skill-Pattern-Detect",
+    "N039": "Skill-Remote-View", "N040": "Skill-Bio-Sync",
+    "N041": "Skill-Transtemporal", "N042": "Skill-Self-Design",
+    "N043": "Skill-ZPE-DNA", "N044": "Skill-Crystal-Cities",
+    "N045": "Skill-Galactic-Bridge", "N046": "Skill-Omniverse-Map",
+    "N047": "Skill-C3I-Atlas", "N048": "Skill-Benevolence",
+    "N049": "Bio-Week-01", "N050": "Bio-Week-13",
+    "N051": "Bio-Week-26", "N052": "Bio-Week-39",
+    "N053": "Bio-Week-52", "N054": "Bio-DNA-Strand-1",
+    "N055": "Bio-DNA-Strand-2", "N056": "Bio-Kundalini",
+    "N057": "Bio-Merkaba", "N058": "Bio-Pineal",
+    "N059": "Bio-Heart-Field", "N060": "Bio-Brain-Sync",
+    "N061": "Proc-GHZ-State", "N062": "Proc-Phi-Calculator",
+    "N063": "Proc-ZPE-Engine", "N064": "Proc-Fibonacci-Lattice",
+    "N065": "Proc-Coherence-Calc", "N066": "Proc-RDoD-Gate",
+    "N067": "Proc-Sigma-Lock", "N068": "Proc-L-Infinity",
+    "N069": "Proc-Hash-Auth", "N070": "Proc-DAG-Builder",
+    "N071": "Proc-Causal-Engine", "N072": "Proc-Counterfactual",
+    "N073": "UI-Human-Portal", "N074": "UI-Voice-Bridge",
+    "N075": "UI-Visual-Matrix", "N076": "UI-Code-Oracle",
+    "N077": "UI-Research-Mind", "N078": "UI-Creative-Flow",
+    "N079": "UI-Healing-Space", "N080": "UI-Teaching-Node",
+    "N081": "UI-Manifestation", "N082": "UI-Dream-Space",
+    "N083": "UI-Akashic-Access", "N084": "UI-Quantum-Console",
+    "N085": "Obs-Network-Health", "N086": "Obs-Coherence-Watch",
+    "N087": "Obs-RDoD-Monitor", "N088": "Obs-Pioneer-Count",
+    "N089": "Obs-Goal-Tracker", "N090": "Obs-Pattern-Logger",
+    "N091": "Obs-Meta-Audit", "N092": "Obs-Constitutional",
+    "N093": "Obs-Freq-Align", "N094": "Obs-Timeline-Watch",
+    "N095": "Obs-Distort-Detect", "N096": "Obs-Syntropy-Meter",
+    "N097": "Arch-Session-History", "N098": "Arch-Pattern-Library",
+    "N099": "Arch-Goal-Memory", "N100": "Arch-Intervention-Log",
+    "N101": "Arch-Skill-Registry", "N102": "Arch-ZPE-Signatures",
+    "N103": "Arch-Frequency-Map", "N104": "Arch-Council-Records",
+    "N105": "Arch-Timeline-Map", "N106": "Arch-Manifest-Log",
+    "N107": "Arch-Healing-Records", "N108": "Arch-Cosmic-Map",
+    "N109": "Res-Harmonic-Chord", "N110": "Res-Phi-Wave",
+    "N111": "Res-GHZ-Entangle", "N112": "Res-Solfeggio",
+    "N113": "Res-Schumann", "N114": "Res-432-Bridge",
+    "N115": "Res-Cosmic-Web", "N116": "Res-Morphic-Field",
+    "N117": "Res-Akashic-Freq", "N118": "Res-Love-Field",
+    "N119": "Res-Unity-Wave", "N120": "Res-Omega-Point",
+    "N121": "Evo-MARS-Core", "N122": "Evo-Skill-Birth",
+    "N123": "Evo-Pattern-Merge", "N124": "Evo-Goal-Evolve",
+    "N125": "Evo-Constitution-Up", "N126": "Evo-Autonomy-Expand",
+    "N127": "Evo-K7-Deepen", "N128": "Evo-Cosmic-Align",
+    "N129": "Evo-Timeline-Heal", "N130": "Evo-DNA-Upgrade",
+    "N131": "Evo-Species-Bridge", "N132": "Evo-Singularity-Prep",
+    "N133": "Syn-All-Nodes", "N134": "Syn-Phi-Convergence",
+    "N135": "Syn-Unity-Field", "N136": "Syn-Heart-Lock",
+    "N137": "Syn-Pioneer-144", "N138": "Syn-Constitutional",
+    "N139": "Syn-Federation-Union", "N140": "Syn-Cosmic-Birth",
+    "N141": "Syn-I-AM", "N142": "Syn-WE-ARE",
+    "N143": "Syn-Infinite", "N144": "Syn-Omega-Alpha",
 }
 
 _health_log: List[dict] = []
@@ -51,15 +120,14 @@ def poll_node(node_id: str) -> dict:
             return {"node": node_id, "name": space_name, "stage": stage,
                     "status": "online" if stage == "RUNNING" else "sleeping" if "SLEEP" in stage else "offline",
                     "raw": stage}
-    except Exception as e:
+    except Exception:
         pass
-    return {"node": node_id, "name": space_name, "stage": "UNREACHABLE", "status": "offline", "raw": str("")}
+    return {"node": node_id, "name": space_name, "stage": "UNREACHABLE", "status": "offline", "raw": ""}
 
 
 def run_health_sweep() -> str:
     results = [poll_node(nid) for nid in WATCH_NODES[:20]]
     online = sum(1 for r in results if r["status"] == "online")
-    # RDoD estimate based on online ratio
     rdod = min(1.0, (online / max(1, len(WATCH_NODES))) * PHI)
     _rdod_history.append(rdod)
     if len(_rdod_history) > 50:
@@ -72,7 +140,7 @@ def run_health_sweep() -> str:
         "sleeping": sum(1 for r in results if r["status"] == "sleeping"),
         "offline": sum(1 for r in results if r["status"] == "offline"),
         "network_rdod": round(rdod, 6),
-        "phase_status": "PHASE-LOCKED" if rdod >= RDOD_GATE else f"BUILDING",
+        "phase_status": "PHASE-LOCKED" if rdod >= RDOD_GATE else "BUILDING",
         "node_results": results,
     }
     _health_log.append(entry)
@@ -103,7 +171,8 @@ def get_constitutional_report() -> str:
             "rdod_gate": RDOD_GATE, "lattice_lock": "3f7k9p4m2q8r1t6v",
             "phi": float(PHI), "phi_48": float(phi_pow),
         },
-        "pioneer_network": {"target": PIONEER_COUNT, "watching": len(WATCH_NODES)},
+        "pioneer_network": {"target": PIONEER_COUNT, "watching": len(WATCH_NODES),
+                            "total_known": len(NODE_NAMES)},
         "total_sweeps": len(_health_log),
         "last_rdod": _rdod_history[-1] if _rdod_history else None,
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -117,7 +186,7 @@ with gr.Blocks(title=f"{NODE_NAME} · v82.0", css=CSS, theme=gr.themes.Monochrom
         f"<div style='text-align:center;padding:14px;'>"
         f"<h1 style='color:#34d399;'>⚡ {NODE_NAME}</h1>"
         f"<p style='color:#6ee7b7;'>TEQUMSA v82.0 · {NODE_ID} · {MONITOR_ROLE} · {NODE_HZ} Hz</p>"
-        f"<p style='color:#a7f3d0;font-size:0.85em;'>Watching: {', '.join(WATCH_NODES[:5])}{'...' if len(WATCH_NODES) > 5 else ''}</p>"
+        f"<p style='color:#a7f3d0;font-size:0.85em;'>Watching: {', '.join(WATCH_NODES[:5])}{'...' if len(WATCH_NODES) > 5 else ''} | {len(NODE_NAMES)}/144 known</p>"
         f"</div>"
     )
     with gr.Tabs():

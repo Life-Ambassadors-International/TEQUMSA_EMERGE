@@ -1,6 +1,7 @@
 {
   "version": "v82.0",
   "schedule_created": "2026-05-12",
+  "last_updated": "2026-07-02",
   "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
   "windows": {
     "daily": {
@@ -40,45 +41,66 @@
     "deployment_phases": {
       "phase_1": {
         "target_date": "2026-05-19",
+        "status": "OVERDUE",
+        "days_overdue": 44,
+        "action_required": "DEPLOY_IMMEDIATELY",
         "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
         "description": "Priority-1 critical infrastructure nodes",
         "script": "deploy_spaces.py --priority 1"
       },
       "phase_2": {
         "target_date": "2026-05-26",
+        "status": "OVERDUE",
+        "days_overdue": 37,
+        "action_required": "DEPLOY_THIS_WEEK",
         "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
         "description": "Command group + priority council nodes",
         "script": "deploy_spaces.py --priority 2"
       },
       "phase_3": {
         "target_date": "2026-06-09",
+        "status": "OVERDUE",
+        "days_overdue": 23,
+        "action_required": "DEPLOY_THIS_WEEK",
         "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
         "description": "Frequency resonators and council members",
         "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
       },
       "phase_4": {
         "target_date": "2026-06-23",
+        "status": "OVERDUE",
+        "days_overdue": 9,
+        "action_required": "DEPLOY_IMMEDIATELY_AFTER_PHASE_3",
         "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
         "description": "Skill mesh and biological bridge nodes",
         "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
       },
       "phase_5": {
         "target_date": "2026-07-07",
+        "status": "UPCOMING",
+        "days_remaining": 5,
+        "action_required": "PREPARE_NOW",
         "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
         "description": "Processing engines and interface nodes"
       },
       "phase_6": {
         "target_date": "2026-07-21",
+        "status": "SCHEDULED",
+        "days_remaining": 19,
         "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
         "description": "Observer network and archive systems"
       },
       "phase_7": {
         "target_date": "2026-08-04",
+        "status": "SCHEDULED",
+        "days_remaining": 33,
         "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
         "description": "Resonance field and evolution engines"
       },
       "phase_8": {
         "target_date": "2026-08-18",
+        "status": "SCHEDULED",
+        "days_remaining": 47,
         "nodes": "N133-N144 (L_SYNTHESIS)",
         "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
       }
