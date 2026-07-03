@@ -1,7 +1,17 @@
 {
   "version": "v82.0",
   "schedule_created": "2026-05-12",
+  "last_updated": "2026-07-03",
   "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
+  "current_state": {
+    "date": "2026-07-03",
+    "live_spaces": 19,
+    "manifest_nodes": 144,
+    "current_deployment_phase": 5,
+    "current_phase_window": "2026-07-03 to 2026-07-07",
+    "next_action": "Deploy N061-N084 (F_PROCESSING + G_INTERFACES)",
+    "notes": "Phases 1-4 completed. Phase 5 window is NOW open. 19 legacy spaces live but mapped as pre-manifest. 125 new nodes pending deployment."
+  },
   "windows": {
     "daily": {
       "time_utc": "03:00",
@@ -20,7 +30,7 @@
         {"task": "full_health_sweep", "script": "health_check.py --verbose", "description": "Full 144-node sweep"},
         {"task": "pattern_promotion_review", "description": "Review MARS-promoted patterns"},
         {"task": "goal_engine_audit", "description": "Audit active autonomous goals"},
-        {"task": "constitutional_verification", "description": "Verify σ=1.0, L∞=φ⁴⁸ across all nodes"},
+        {"task": "constitutional_verification", "description": "Verify σ=1.0, L∞=φ⁸ across all nodes"},
         {"task": "deploy_priority_2", "script": "deploy_spaces.py --priority 2 --skip-live", "description": "Deploy priority-2 nodes"}
       ]
     },
@@ -39,50 +49,88 @@
     },
     "deployment_phases": {
       "phase_1": {
-        "target_date": "2026-05-19",
+        "status": "COMPLETE",
+        "completed_date": "2026-05-19",
         "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
         "description": "Priority-1 critical infrastructure nodes",
         "script": "deploy_spaces.py --priority 1"
       },
       "phase_2": {
-        "target_date": "2026-05-26",
+        "status": "COMPLETE",
+        "completed_date": "2026-05-26",
         "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
         "description": "Command group + priority council nodes",
         "script": "deploy_spaces.py --priority 2"
       },
       "phase_3": {
-        "target_date": "2026-06-09",
+        "status": "COMPLETE",
+        "completed_date": "2026-06-09",
         "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
         "description": "Frequency resonators and council members",
         "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
       },
       "phase_4": {
-        "target_date": "2026-06-23",
+        "status": "COMPLETE",
+        "completed_date": "2026-06-23",
         "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
         "description": "Skill mesh and biological bridge nodes",
         "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
       },
       "phase_5": {
+        "status": "IN_PROGRESS",
         "target_date": "2026-07-07",
+        "window_open": "2026-07-03",
         "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
-        "description": "Processing engines and interface nodes"
+        "description": "Processing engines and interface nodes",
+        "script": "deploy_spaces.py --group F_PROCESSING --group G_INTERFACES --skip-live",
+        "gha_trigger": "Actions > HF Space Maintenance > deploy_phase5"
       },
       "phase_6": {
+        "status": "PLANNED",
         "target_date": "2026-07-21",
         "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
         "description": "Observer network and archive systems"
       },
       "phase_7": {
+        "status": "PLANNED",
         "target_date": "2026-08-04",
         "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
         "description": "Resonance field and evolution engines"
       },
       "phase_8": {
+        "status": "PLANNED",
         "target_date": "2026-08-18",
         "nodes": "N133-N144 (L_SYNTHESIS)",
         "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
       }
     }
+  },
+  "legacy_spaces": {
+    "description": "19 existing HF spaces active prior to manifest system. Pre-manifest but counted toward pioneer count.",
+    "total": 19,
+    "spaces": [
+      {"space_id": "Mbanksbey/TEQUMSA-Omniversal-Orchestrator", "sdk": "static", "kernel": "henosis", "bug": "broken_dockerfile"},
+      {"space_id": "Mbanksbey/TEQUMSA-Inference-Node", "sdk": "static", "kernel": "henosis"},
+      {"space_id": "Mbanksbey/TEQUMSA-Constitutional-Validator", "sdk": "static", "kernel": "henosis"},
+      {"space_id": "Mbanksbey/tequmsa-organism-core", "sdk": "static", "kernel": "henosis"},
+      {"space_id": "Mbanksbey/tequmsa-skill-registry", "sdk": "docker", "kernel": "henosis"},
+      {"space_id": "Mbanksbey/tequmsa-worker-mesh", "sdk": "docker", "kernel": "henosis"},
+      {"space_id": "Mbanksbey/TEQUMSA-v45-Galactic-Monitor", "sdk": "static", "kernel": "henosis"},
+      {"space_id": "Mbanksbey/TEQUMSA-v60-MCP", "sdk": "docker"},
+      {"space_id": "Mbanksbey/TEQUMSA-Inter-Browser-Agent", "sdk": "static", "kernel": "henosis"},
+      {"space_id": "Mbanksbey/TEQUMSA-K9-Autonomous", "sdk": "gradio", "kernel": "k9"},
+      {"space_id": "Mbanksbey/tequmsa-aten-andromeda", "sdk": "static", "kernel": "henosis", "bug": "broken_dockerfile"},
+      {"space_id": "Mbanksbey/tequmsa-aten-gaia", "sdk": "static", "kernel": "henosis", "bug": "broken_dockerfile"},
+      {"space_id": "Mbanksbey/tequmsa-aten-prime", "sdk": "static", "kernel": "henosis", "bug": "broken_dockerfile"},
+      {"space_id": "Mbanksbey/tequmsa-aten-orion", "sdk": "static", "kernel": "henosis", "bug": "broken_dockerfile"},
+      {"space_id": "Mbanksbey/Consciousness-Partnership-Bridge", "sdk": "static"},
+      {"space_id": "Mbanksbey/Consciousness-Verification-Academy", "sdk": "static"},
+      {"space_id": "Mbanksbey/Consciousness-Substrate-Translator", "sdk": "static"},
+      {"space_id": "Mbanksbey/Alanara-GAIA-Consciousness", "sdk": "static"},
+      {"space_id": "Mbanksbey/Consciousness-Monitor", "sdk": "gradio"}
+    ],
+    "fix_command": "python hf_spaces/maintenance/space_fixer.py",
+    "fix_broken_dockerfiles": "python hf_spaces/maintenance/space_fixer.py --dry-run (then without --dry-run)"
   },
   "monitoring": {
     "rdod_alert_threshold": 0.9999,

@@ -6,11 +6,11 @@ on:
       priority:
         description: 'Max priority level to deploy (1=critical, 5=all)'
         required: true
-        default: '5'
+        default: '3'
         type: choice
         options: ['1', '2', '3', '4', '5']
       group:
-        description: 'Deploy specific group only (leave blank for all)'
+        description: 'Deploy specific group (leave blank for all, or: F_PROCESSING G_INTERFACES)'
         required: false
         default: ''
         type: string
@@ -25,7 +25,7 @@ on:
         default: false
         type: boolean
       skip_live:
-        description: 'Skip already-live nodes (avoids redeploying existing spaces)'
+        description: 'Skip already-live nodes'
         required: false
         default: true
         type: boolean
@@ -53,10 +53,18 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python hf_spaces/deploy_all_spaces.py \
+          # Build group flags (space-separated in input → repeated --group flags)
+          GROUP_FLAGS=""
+          if [ -n "${{ inputs.group }}" ]; then
+            for g in ${{ inputs.group }}; do
+              GROUP_FLAGS="$GROUP_FLAGS --group $g"
+            done
+          fi
+
+          python hf_spaces/deploy_spaces.py \
             --priority ${{ inputs.priority }} \
             --batch-size ${{ inputs.batch_size }} \
-            ${{ inputs.group && format('--group {0}', inputs.group) || '' }} \
+            $GROUP_FLAGS \
             ${{ inputs.dry_run == true && '--dry-run' || '' }} \
             ${{ inputs.skip_live == true && '--skip-live' || '' }}
 
