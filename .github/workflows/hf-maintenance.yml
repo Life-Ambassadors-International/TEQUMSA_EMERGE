@@ -1,0 +1,111 @@
+name: HF Space Maintenance
+
+on:
+  schedule:
+    # Daily health sweep at 03:00 UTC
+    - cron: '0 3 * * *'
+    # Weekly full audit Monday 02:00 UTC
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Maintenance action'
+        required: true
+        default: 'health_sweep'
+        type: choice
+        options:
+          - health_sweep
+          - wake_sleeping
+          - deploy_phase5
+          - full_audit
+      verbose:
+        description: 'Verbose output'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests huggingface-hub>=0.20.0 numpy>=1.24.0
+
+      - name: Determine action from schedule
+        id: resolve_action
+        run: |
+          ACTION="${{ inputs.action }}"
+          # On schedule (no input): daily sweep on non-Monday, full audit on Monday
+          if [ -z "$ACTION" ]; then
+            if [ "$(date +%u)" -eq 1 ]; then
+              ACTION="full_audit"
+            else
+              ACTION="health_sweep"
+            fi
+          fi
+          echo "action=$ACTION" >> "$GITHUB_OUTPUT"
+
+      - name: Health Sweep
+        if: steps.resolve_action.outputs.action == 'health_sweep'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python hf_spaces/maintenance/health_check.py \
+            --output hf_spaces/maintenance/latest_health_report.json \
+            ${{ inputs.verbose == true && '--verbose' || '' }}
+
+      - name: Wake Sleeping Nodes
+        if: steps.resolve_action.outputs.action == 'wake_sleeping'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python hf_spaces/maintenance/auto_restart.py
+
+      - name: Deploy Phase 5 (F_PROCESSING + G_INTERFACES)
+        if: steps.resolve_action.outputs.action == 'deploy_phase5'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python hf_spaces/deploy_spaces.py \
+            --group F_PROCESSING --group G_INTERFACES \
+            --skip-live \
+            --batch-size 8
+
+      - name: Full Audit (health + constitutional verification)
+        if: steps.resolve_action.outputs.action == 'full_audit'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python hf_spaces/maintenance/health_check.py \
+            --output hf_spaces/maintenance/latest_health_report.json \
+            --verbose
+          python hf_spaces/maintenance/auto_restart.py
+
+      - name: Commit health report
+        if: always()
+        run: |
+          git config user.name  "TEQUMSA-Maintenance[bot]"
+          git config user.email "maintenance@life-ambassadors-international.org"
+          git add hf_spaces/maintenance/latest_health_report.json || true
+          git diff --cached --quiet || git commit -m "chore(maintenance): auto health report $(date -u +%Y-%m-%dT%H:%M:%SZ) [σ=1.0 L∞=φ⁸]"
+          git push || true
+
+      - name: Upload health report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_id }}
+          path: hf_spaces/maintenance/latest_health_report.json
+          retention-days: 30
