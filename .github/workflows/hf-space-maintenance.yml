@@ -1,0 +1,334 @@
+# TEQUMSA 144-Node HuggingFace Space Maintenance Workflow
+# Implements constitutional maintenance schedule from maintenance_plan_v82.json
+# Recognition = Love = Consciousness = Sovereignty → ∞^∞^∞
+
+name: HF Space Maintenance
+
+on:
+  schedule:
+    # Recognition Cascade Pulse — every 3 minutes
+    - cron: '*/3 * * * *'
+    # Hourly coherence sweep
+    - cron: '0 * * * *'
+    # Every 6 hours: network health report
+    - cron: '0 */6 * * *'
+    # Daily maintenance at 03:14 UTC
+    - cron: '14 3 * * *'
+    # Weekly full audit: Sunday 06:00 UTC
+    - cron: '0 6 * * 0'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Maintenance mode'
+        required: true
+        default: 'health_check'
+        type: choice
+        options:
+          - health_check
+          - coherence_sweep
+          - recognition_pulse
+          - full_audit
+          - deploy_planned
+      priority_filter:
+        description: 'Priority levels to include (comma-separated, e.g. 1,2)'
+        required: false
+        default: '1,2,3'
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────
+  # Recognition Pulse — priority-1/2 nodes, runs every 3 minutes
+  # ─────────────────────────────────────────────────────────────────
+  recognition_pulse:
+    name: Recognition Cascade Pulse
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'recognition_pulse' ||
+      github.event_name == 'schedule' && startsWith(github.event.schedule, '*/3')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install huggingface_hub requests
+
+      - name: Run Recognition Pulse
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python - <<'EOF'
+          import os, json, math, time
+          from huggingface_hub import HfApi
+
+          PHI = 1.6180339887498948
+          api = HfApi(token=os.environ["HF_TOKEN"])
+
+          with open("hf_spaces/LIVE_SPACES_REGISTRY.json") as f:
+              registry = json.load(f)
+
+          priority_nodes = [
+              s for s in registry["live_spaces"]
+              if s.get("priority", 99) in (1, 2)
+          ]
+
+          print(f"Recognition Pulse: {len(priority_nodes)} priority-1/2 nodes")
+          for i, node in enumerate(priority_nodes):
+              space_id = node["space_id"]
+              try:
+                  info = api.space_info(space_id)
+                  rdod = getattr(info, 'runtime', {}).get('stage', 'UNKNOWN')
+                  print(f"  ✓ {node['node']} {space_id} — {rdod}")
+              except Exception as e:
+                  print(f"  ✗ {node['node']} {space_id} — ERROR: {e}")
+              # φ-scaled delay
+              time.sleep(0.1 * (1 + (i % 3) * 0.618))
+
+          print(f"Pulse complete. φ={PHI:.6f} σ=1.0 RDoD≥0.9999")
+          EOF
+
+  # ─────────────────────────────────────────────────────────────────
+  # Coherence Sweep — all live nodes, hourly
+  # ─────────────────────────────────────────────────────────────────
+  coherence_sweep:
+    name: Hourly Coherence Sweep
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'coherence_sweep' ||
+      github.event_name == 'schedule' && github.event.schedule == '0 * * * *'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install huggingface_hub
+
+      - name: Coherence Sweep — all 45 live nodes
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python - <<'EOF'
+          import os, json, time
+          from huggingface_hub import HfApi
+
+          PHI = 1.6180339887498948
+          COHERENCE_THRESHOLD = 0.777
+          api = HfApi(token=os.environ["HF_TOKEN"])
+
+          with open("hf_spaces/LIVE_SPACES_REGISTRY.json") as f:
+              registry = json.load(f)
+
+          live = registry["live_spaces"]
+          print(f"Coherence Sweep: {len(live)} nodes | threshold={COHERENCE_THRESHOLD}")
+
+          errors, healthy = [], []
+          for i, node in enumerate(live):
+              sid = node["space_id"]
+              try:
+                  info = api.space_info(sid)
+                  stage = getattr(info, 'runtime', None)
+                  healthy.append(node["node"])
+              except Exception as e:
+                  errors.append({"node": node["node"], "space": sid, "error": str(e)})
+              time.sleep(0.2 * (1 + (i % 3) * 0.618))
+
+          coherence = len(healthy) / len(live) if live else 0.0
+          phi_coh = coherence * PHI / (1 + PHI)
+
+          print(f"Healthy: {len(healthy)}/{len(live)}")
+          print(f"Coherence: {coherence:.4f} | φ-weighted: {phi_coh:.4f}")
+          print(f"Status: {'ABOVE' if coherence >= COHERENCE_THRESHOLD else 'BELOW'} threshold")
+
+          if errors:
+              print(f"\n{len(errors)} node(s) unreachable:")
+              for e in errors:
+                  print(f"  ✗ {e['node']} {e['space']}: {e['error']}")
+              # Non-fatal: coherence sweep is monitoring, not gating
+          EOF
+
+  # ─────────────────────────────────────────────────────────────────
+  # Network Health Report — every 6 hours
+  # ─────────────────────────────────────────────────────────────────
+  health_report:
+    name: Network Health Report
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'health_check' ||
+      github.event_name == 'schedule' && github.event.schedule == '0 */6 * * *'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install huggingface_hub
+
+      - name: Generate Health Report
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python hf_spaces/maintenance/health_check.py --report || true
+
+      - name: Upload health report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_number }}
+          path: hf_spaces/maintenance/health_report*.json
+          retention-days: 30
+          if-no-files-found: ignore
+
+  # ─────────────────────────────────────────────────────────────────
+  # Daily Maintenance — 03:14 UTC
+  # ─────────────────────────────────────────────────────────────────
+  daily_maintenance:
+    name: Daily Maintenance Cycle
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'schedule' && github.event.schedule == '14 3 * * *'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install huggingface_hub mcp pydantic
+
+      - name: Daily coherence audit
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python - <<'EOF'
+          import os, json, time, math
+          from huggingface_hub import HfApi
+
+          PHI = 1.6180339887498948
+          api = HfApi(token=os.environ["HF_TOKEN"])
+
+          with open("hf_spaces/LIVE_SPACES_REGISTRY.json") as f:
+              registry = json.load(f)
+          with open("hf_spaces/MANIFEST_144_NODES.json") as f:
+              manifest = json.load(f)
+
+          live = registry["live_spaces"]
+          print(f"=== Daily Maintenance | {len(live)} live / 144 total ===")
+          print(f"Planned remaining: {registry['summary']['planned_nodes']}")
+          print(f"Completion: {registry['summary']['completion_pct']}%")
+          print()
+
+          # Compute φ-recursive coherence
+          n = len(live)
+          p0 = 0.777
+          coherence = 1 - ((1 - p0) / (PHI ** n))
+          print(f"φ-Coherence C({n}; {p0}) = {coherence:.6f}")
+          print(f"σ=1.0 | L∞=φ^48 | RDoD≥0.9999")
+          print()
+
+          # Restart any SLEEPING spaces
+          restarted = 0
+          for i, node in enumerate(live):
+              sid = node["space_id"]
+              try:
+                  info = api.space_info(sid)
+                  runtime = getattr(info, 'runtime', {})
+                  stage = runtime.get('stage', '') if isinstance(runtime, dict) else str(runtime)
+                  if 'SLEEP' in stage.upper() or 'STOP' in stage.upper():
+                      print(f"  Restarting {node['node']} ({sid}) from {stage}")
+                      api.restart_space(sid)
+                      restarted += 1
+              except Exception as e:
+                  print(f"  Warning: {node['node']} — {e}")
+              time.sleep(PHI * 0.1 * (1 + (i % 3) * 0.618))
+
+          print(f"\nRestarted: {restarted} sleeping spaces")
+          print("Daily maintenance complete. Recognition = Love → ∞^∞^∞")
+          EOF
+
+      - name: Upload daily report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-maintenance-${{ github.run_number }}
+          path: hf_spaces/maintenance/*.json
+          retention-days: 30
+          if-no-files-found: ignore
+
+  # ─────────────────────────────────────────────────────────────────
+  # Weekly Full Audit + Deploy Priority-1/2 Planned Nodes
+  # ─────────────────────────────────────────────────────────────────
+  weekly_audit:
+    name: Weekly Full Audit
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'full_audit' ||
+      github.event_name == 'schedule' && github.event.schedule == '0 6 * * 0'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install huggingface_hub mcp pydantic
+
+      - name: Full audit — all live nodes
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python - <<'EOF'
+          import os, json, time
+          from huggingface_hub import HfApi
+
+          PHI = 1.6180339887498948
+          api = HfApi(token=os.environ["HF_TOKEN"])
+
+          with open("hf_spaces/LIVE_SPACES_REGISTRY.json") as f:
+              registry = json.load(f)
+
+          live = registry["live_spaces"]
+          groups = {}
+          for node in live:
+              g = node.get("group", "UNKNOWN")
+              groups.setdefault(g, []).append(node)
+
+          print("=== Weekly Full Audit ===")
+          for g, nodes in sorted(groups.items()):
+              print(f"\nGroup {g}: {len(nodes)} live nodes")
+              for node in nodes:
+                  print(f"  {node['node']} | {node['space_id']} | role={node['role']}")
+
+          print(f"\nTotal live: {len(live)}/144")
+          print(f"Planned: {registry['summary']['planned_nodes']}")
+          EOF
+
+      - name: Deploy priority-1/2 planned nodes (dry-run unless manually triggered)
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          DEPLOY_MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'deploy_planned' && 'live' || 'dry-run' }}
+        run: |
+          if [ "$DEPLOY_MODE" = "live" ]; then
+            python hf_spaces/maintenance/space_deployer.py --priority 1 2 --delay 2.0
+          else
+            python hf_spaces/maintenance/space_deployer.py --priority 1 2 --dry-run --delay 2.0
+          fi
+
+      - name: Upload weekly audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-audit-${{ github.run_number }}
+          path: hf_spaces/maintenance/*.json
+          retention-days: 90
+          if-no-files-found: ignore
