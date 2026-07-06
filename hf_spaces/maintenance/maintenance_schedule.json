@@ -1,6 +1,6 @@
 {
   "version": "v82.0",
-  "schedule_created": "2026-05-12",
+  "schedule_created": "2026-06-25",
   "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
   "windows": {
     "daily": {
@@ -39,48 +39,60 @@
     },
     "deployment_phases": {
       "phase_1": {
-        "target_date": "2026-05-19",
-        "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
-        "description": "Priority-1 critical infrastructure nodes",
-        "script": "deploy_spaces.py --priority 1"
+        "target_date": "2026-07-01",
+        "window": "2026-06-25 to 2026-07-01",
+        "nodes": "N001-N012 (A_COMMAND)",
+        "node_count": 12,
+        "description": "Priority 1-2 critical infrastructure nodes (A_COMMAND group)",
+        "script": "deploy_spaces.py --priority 1 --priority 2"
       },
       "phase_2": {
-        "target_date": "2026-05-26",
-        "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
-        "description": "Command group + priority council nodes",
-        "script": "deploy_spaces.py --priority 2"
-      },
-      "phase_3": {
-        "target_date": "2026-06-09",
-        "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
-        "description": "Frequency resonators and council members",
+        "target_date": "2026-07-08",
+        "window": "2026-07-02 to 2026-07-08",
+        "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL)",
+        "node_count": 24,
+        "description": "Frequency resonators and council coordination nodes",
         "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
       },
-      "phase_4": {
-        "target_date": "2026-06-23",
+      "phase_3": {
+        "target_date": "2026-07-15",
+        "window": "2026-07-09 to 2026-07-15",
         "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
+        "node_count": 24,
         "description": "Skill mesh and biological bridge nodes",
         "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
       },
-      "phase_5": {
-        "target_date": "2026-07-07",
+      "phase_4": {
+        "target_date": "2026-07-22",
+        "window": "2026-07-16 to 2026-07-22",
         "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
-        "description": "Processing engines and interface nodes"
+        "node_count": 24,
+        "description": "Processing engines and interface nodes",
+        "script": "deploy_spaces.py --group F_PROCESSING --group G_INTERFACES"
+      },
+      "phase_5": {
+        "target_date": "2026-07-29",
+        "window": "2026-07-23 to 2026-07-29",
+        "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
+        "node_count": 24,
+        "description": "Observer network and archive systems",
+        "script": "deploy_spaces.py --group H_OBSERVERS --group I_ARCHIVES"
       },
       "phase_6": {
-        "target_date": "2026-07-21",
-        "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
-        "description": "Observer network and archive systems"
+        "target_date": "2026-08-05",
+        "window": "2026-07-30 to 2026-08-05",
+        "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
+        "node_count": 24,
+        "description": "Resonance field and evolution engines",
+        "script": "deploy_spaces.py --group J_RESONANCE --group K_EVOLUTION"
       },
       "phase_7": {
-        "target_date": "2026-08-04",
-        "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
-        "description": "Resonance field and evolution engines"
-      },
-      "phase_8": {
-        "target_date": "2026-08-18",
+        "target_date": "2026-08-12",
+        "window": "2026-08-06 to 2026-08-12",
         "nodes": "N133-N144 (L_SYNTHESIS)",
-        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
+        "node_count": 12,
+        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE",
+        "script": "deploy_spaces.py --group L_SYNTHESIS"
       }
     }
   },

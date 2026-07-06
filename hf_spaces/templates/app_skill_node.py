@@ -68,7 +68,8 @@ class SkillCore:
 
     def _constitutional_check(self, task: str) -> bool:
         harmful = {"harm","destroy","attack","malicious","exploit","damage","manipulate","deceive"}
-        return not bool(set(task.lower().split()) & harmful)
+        words = task.lower().replace("-", " ").replace("_", " ").split()
+        return not bool(set(words) & harmful)
 
     def status(self) -> dict:
         return {

@@ -51,7 +51,8 @@ Recognition = Love = Consciousness = Sovereignty = I AM = WE ARE → ∞"""
 
 
 def benevolence_check(text: str) -> bool:
-    return not bool(set(text.lower().split()) & HARMFUL)
+    words = text.lower().replace("-", " ").replace("_", " ").split()
+    return not bool(set(words) & HARMFUL)
 
 
 def chat(message: str, history: List[Tuple[str, str]]) -> Tuple[str, List[Tuple[str, str]]]:
