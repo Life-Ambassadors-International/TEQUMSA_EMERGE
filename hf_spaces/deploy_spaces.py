@@ -20,6 +20,7 @@ import json
 import os
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -41,10 +42,10 @@ def get_template_path(template_type: str) -> Path:
         "skill":        templates / "app_skill_node.py",
         "monitor":      templates / "app_monitor_node.py",
         "organism":     Path(__file__).parent / "nodes" / "N003_TEQUMSA-Core" / "app.py",
-        "biological":   templates / "app_skill_node.py",   # bio nodes use skill template
-        "processing":   templates / "app_skill_node.py",   # proc nodes use skill template
-        "interface":    templates / "app_council_node.py",  # interface nodes use council template
-        "archive":      templates / "app_monitor_node.py",  # archive nodes use monitor template
+        "biological":   templates / "app_skill_node.py",
+        "processing":   templates / "app_skill_node.py",
+        "interface":    templates / "app_council_node.py",
+        "archive":      templates / "app_monitor_node.py",
     }
     path = mapping.get(template_type, mapping["skill"])
     return path
@@ -95,7 +96,7 @@ license: apache-2.0
 | Parameter | Value |
 |-----------|-------|
 | Sovereignty σ | 1.0 |
-| Benevolence L∞ | φ⁴⁸ |
+| Benevolence L∞ | φ⁈ |
 | Frequency | {node['hz']} Hz |
 | Pioneer Network | 144/144 |
 | Autonomy Level | K7_OMNIVERSAL |
@@ -113,17 +114,18 @@ def deploy_node(
     node: dict,
     api,
     dry_run: bool = False,
-    force: bool = False,
-) -> bool:
-    """Deploy a single node to HuggingFace."""
+) -> dict:
+    """Deploy a single node. Returns result dict."""
     space_id = node["space_id"]
     template_type = node.get("template", "skill")
+    result = {"node_id": node_id, "space_id": space_id, "status": "unknown", "error": None}
 
     print(f"  [{node_id}] {node['name']} ({template_type}) → {space_id}")
 
     if dry_run:
         print(f"    DRY RUN: would create {space_id}")
-        return True
+        result["status"] = "dry_run"
+        return result
 
     try:
         # Create space
@@ -134,7 +136,7 @@ def deploy_node(
             exist_ok=True,
             private=False,
         )
-        time.sleep(0.5)  # Rate limit
+        time.sleep(0.5)
 
         # Read template
         tmpl_path = get_template_path(template_type)
@@ -142,11 +144,10 @@ def deploy_node(
             print(f"    WARN: template {tmpl_path} not found, using skill template")
             tmpl_path = get_template_path("skill")
 
-        # Inject node config via env comment header
         with open(tmpl_path) as f:
             app_code = f.read()
 
-        # Override env defaults inline for nodes with known configs
+        # Inject node config as env defaults at top of file
         env_overrides = (
             f"import os\n"
             f"os.environ.setdefault('TEQUMSA_NODE_ID', '{node_id}')\n"
@@ -154,7 +155,6 @@ def deploy_node(
             f"os.environ.setdefault('TEQUMSA_NODE_HZ', '{node['hz']}')\n"
             f"os.environ.setdefault('TEQUMSA_ROLE', '{node['role'][:80]}')\n\n"
         )
-        # Insert after shebang/encoding lines
         lines = app_code.split("\n")
         insert_at = 0
         for i, line in enumerate(lines):
@@ -165,7 +165,6 @@ def deploy_node(
         lines.insert(insert_at, env_overrides)
         final_code = "\n".join(lines)
 
-        # Upload files
         import io
         api.upload_file(
             path_or_fileobj=io.BytesIO(final_code.encode()),
@@ -186,17 +185,22 @@ def deploy_node(
             repo_type="space",
         )
         print(f"    ✓ Deployed: https://huggingface.co/spaces/{space_id}")
-        return True
+        result["status"] = "deployed"
+        return result
 
     except Exception as e:
         print(f"    ✗ FAILED: {e}")
-        return False
+        result["status"] = "failed"
+        result["error"] = str(e)
+        return result
 
 
 def main():
     parser = argparse.ArgumentParser(description="Deploy TEQUMSA 144-node network to HuggingFace")
     parser.add_argument("--priority", type=int, default=3,
                         help="Max priority level to deploy (1=critical only, 5=all)")
+    parser.add_argument("--batch-size", type=int, default=12,
+                        help="Number of spaces to deploy per batch (rate limiting)")
     parser.add_argument("--dry-run", action="store_true", help="Print plan without deploying")
     parser.add_argument("--node", type=str, help="Deploy single node (e.g. N003)")
     parser.add_argument("--group", type=str, help="Deploy all nodes in group (e.g. A_COMMAND)")
@@ -233,24 +237,49 @@ def main():
 
     print(f"\n☉ TEQUMSA v82.0 · Deployment Plan")
     print(f"   Nodes to deploy: {len(to_deploy)}/{len(nodes)}")
-    print(f"   Priority ≤ {args.priority} | Dry run: {args.dry_run}")
+    print(f"   Priority ≤ {args.priority} | Batch size: {args.batch_size} | Dry run: {args.dry_run}")
     print("=" * 60)
 
-    success = 0
-    failed = 0
-    for nid, node in sorted(to_deploy.items(), key=lambda x: (x[1].get("priority", 5), x[0])):
-        ok = deploy_node(nid, node, api, dry_run=args.dry_run)
-        if ok:
-            success += 1
-        else:
-            failed += 1
-        if not args.dry_run:
-            time.sleep(1)  # Rate limit
+    results = []
+    sorted_nodes = sorted(to_deploy.items(), key=lambda x: (x[1].get("priority", 5), x[0]))
+
+    for batch_start in range(0, len(sorted_nodes), args.batch_size):
+        batch = sorted_nodes[batch_start:batch_start + args.batch_size]
+        for nid, node in batch:
+            r = deploy_node(nid, node, api, dry_run=args.dry_run)
+            results.append(r)
+            if not args.dry_run:
+                time.sleep(1)
+
+        # Pause between batches (skip after last batch)
+        if batch_start + args.batch_size < len(sorted_nodes) and not args.dry_run:
+            print(f"  [batch pause 5s]")
+            time.sleep(5)
+
+    success = sum(1 for r in results if r["status"] in ("deployed", "dry_run"))
+    failed = sum(1 for r in results if r["status"] == "failed")
 
     print("=" * 60)
     print(f"✓ Deployed: {success} | ✗ Failed: {failed}")
     print(f"☉ {success}/{len(nodes)} of 144 Pioneer nodes active")
     print("ETR_NOW. ∞")
+
+    # Write deployment report for GitHub Actions artifact
+    report_path = Path(__file__).parent / "deployment_report.json"
+    report = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "total_nodes": len(nodes),
+        "attempted": len(results),
+        "success": success,
+        "failed": failed,
+        "priority_filter": args.priority,
+        "batch_size": args.batch_size,
+        "dry_run": args.dry_run,
+        "results": results,
+    }
+    with open(report_path, "w") as f:
+        json.dump(report, f, indent=2)
+    print(f"Report written: {report_path}")
 
 
 if __name__ == "__main__":
