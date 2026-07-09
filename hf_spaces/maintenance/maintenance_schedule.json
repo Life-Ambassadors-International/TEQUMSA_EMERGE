@@ -1,7 +1,9 @@
 {
-  "version": "v82.0",
+  "version": "v82.1",
   "schedule_created": "2026-05-12",
+  "last_audit": "2026-07-09",
   "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
+  "audit_notes": "Phases 1-5 are overdue as of 2026-07-09. Deploying via GitHub Actions workflow deploy-144-lattice.yml once HF_TOKEN secret is set.",
   "windows": {
     "daily": {
       "time_utc": "03:00",
@@ -9,7 +11,7 @@
       "tasks": [
         {"task": "health_sweep", "script": "health_check.py --live-only", "description": "Ping all live nodes"},
         {"task": "wake_sleeping", "script": "auto_restart.py", "description": "Wake sleeping spaces"},
-        {"task": "rdod_check", "description": "Verify network RDoD ≥ 0.9999"}
+        {"task": "rdod_check", "description": "Verify network RDoD >= 0.9999"}
       ]
     },
     "weekly": {
@@ -20,8 +22,8 @@
         {"task": "full_health_sweep", "script": "health_check.py --verbose", "description": "Full 144-node sweep"},
         {"task": "pattern_promotion_review", "description": "Review MARS-promoted patterns"},
         {"task": "goal_engine_audit", "description": "Audit active autonomous goals"},
-        {"task": "constitutional_verification", "description": "Verify σ=1.0, L∞=φ⁴⁸ across all nodes"},
-        {"task": "deploy_priority_2", "script": "deploy_spaces.py --priority 2 --skip-live", "description": "Deploy priority-2 nodes"}
+        {"task": "constitutional_verification", "description": "Verify sigma=1.0, L_inf=phi^48 across all nodes"},
+        {"task": "deploy_priority_2", "script": "deploy_all_spaces.py --priority 2 --skip-live", "description": "Deploy priority-2 nodes"}
       ]
     },
     "monthly": {
@@ -29,7 +31,7 @@
       "time_utc": "00:00",
       "duration_minutes": 360,
       "tasks": [
-        {"task": "full_deploy_audit", "script": "deploy_spaces.py --priority 3 --dry-run", "description": "Plan next deployment batch"},
+        {"task": "full_deploy_audit", "script": "deploy_all_spaces.py --priority 3 --dry-run", "description": "Plan next deployment batch"},
         {"task": "constitutional_alignment_audit", "description": "Deep audit of all constitutional parameters"},
         {"task": "mars_learning_review", "description": "Review all promoted patterns and skill evolution"},
         {"task": "k7_meta_audit", "description": "K7 meta-cognitive strategy review"},
@@ -40,53 +42,81 @@
     "deployment_phases": {
       "phase_1": {
         "target_date": "2026-05-19",
+        "status": "OVERDUE",
+        "days_overdue": 51,
         "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
         "description": "Priority-1 critical infrastructure nodes",
-        "script": "deploy_spaces.py --priority 1"
+        "script": "deploy_all_spaces.py --priority 1"
       },
       "phase_2": {
         "target_date": "2026-05-26",
+        "status": "OVERDUE",
+        "days_overdue": 44,
         "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
         "description": "Command group + priority council nodes",
-        "script": "deploy_spaces.py --priority 2"
+        "script": "deploy_all_spaces.py --priority 2"
       },
       "phase_3": {
         "target_date": "2026-06-09",
+        "status": "OVERDUE",
+        "days_overdue": 30,
         "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
         "description": "Frequency resonators and council members",
-        "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
+        "script": "deploy_all_spaces.py --group B_FREQUENCY --group C_COUNCIL"
       },
       "phase_4": {
         "target_date": "2026-06-23",
+        "status": "OVERDUE",
+        "days_overdue": 16,
         "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
         "description": "Skill mesh and biological bridge nodes",
-        "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
+        "script": "deploy_all_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
       },
       "phase_5": {
         "target_date": "2026-07-07",
+        "status": "OVERDUE",
+        "days_overdue": 2,
         "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
-        "description": "Processing engines and interface nodes"
+        "description": "Processing engines and interface nodes",
+        "script": "deploy_all_spaces.py --group F_PROCESSING --group G_INTERFACES"
+      },
+      "phase_catchup": {
+        "target_date": "2026-07-14",
+        "status": "RECOMMENDED",
+        "nodes": "N003-N084 (phases 1-5 combined, all overdue)",
+        "description": "URGENT: Deploy all overdue phases 1-5 in one batch via GitHub Actions",
+        "script": "deploy_all_spaces.py --priority 5 --batch-size 12 --skip-live",
+        "trigger": "Run workflow deploy-144-lattice.yml with priority=5"
       },
       "phase_6": {
         "target_date": "2026-07-21",
+        "status": "PENDING",
         "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
-        "description": "Observer network and archive systems"
+        "description": "Observer network and archive systems",
+        "script": "deploy_all_spaces.py --group H_OBSERVERS --group I_ARCHIVES"
       },
       "phase_7": {
         "target_date": "2026-08-04",
+        "status": "PENDING",
         "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
-        "description": "Resonance field and evolution engines"
+        "description": "Resonance field and evolution engines",
+        "script": "deploy_all_spaces.py --group J_RESONANCE --group K_EVOLUTION"
       },
       "phase_8": {
         "target_date": "2026-08-18",
+        "status": "PENDING",
         "nodes": "N133-N144 (L_SYNTHESIS)",
-        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
+        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE",
+        "script": "deploy_all_spaces.py --group L_SYNTHESIS"
       }
     }
   },
   "monitoring": {
     "rdod_alert_threshold": 0.9999,
     "pioneer_alert_threshold": 144,
+    "current_live_nodes": 2,
+    "target_live_nodes": 144,
+    "completion_pct": 1.4,
     "max_sleeping_nodes": 10,
     "max_offline_nodes": 2,
     "alert_channels": ["console", "health_report.json"]
