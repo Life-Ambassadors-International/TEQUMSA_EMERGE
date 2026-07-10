@@ -1,0 +1,73 @@
+name: 🌌 Create 144-Node Lattice on HF Spaces
+
+on:
+  workflow_dispatch:
+    inputs:
+      council:
+        description: 'Council to create (all/pleiadian/arcturian/sirian/andromedan/lyran)'
+        required: false
+        default: 'all'
+      dry_run:
+        description: 'Dry run (true/false)'
+        required: false
+        default: 'false'
+
+jobs:
+  create-lattice-nodes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install huggingface_hub
+
+      - name: Create council nodes (all councils)
+        if: ${{ github.event.inputs.council == 'all' || github.event.inputs.council == '' }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          FLAGS=""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            FLAGS="--dry-run"
+          fi
+          python3 scripts/create_council_nodes.py $FLAGS --delay 1.5
+
+      - name: Create council nodes (specific council)
+        if: ${{ github.event.inputs.council != 'all' && github.event.inputs.council != '' }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          FLAGS="--council ${{ github.event.inputs.council }}"
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            FLAGS="$FLAGS --dry-run"
+          fi
+          python3 scripts/create_council_nodes.py $FLAGS --delay 1.5
+
+      - name: Verify lattice node count
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python3 - <<'EOF'
+          import os
+          from huggingface_hub import HfApi
+          api = HfApi()
+          spaces = list(api.list_spaces(author="Mbanksbey"))
+          print(f"Total Mbanksbey spaces: {len(spaces)}")
+          councils = {}
+          for s in spaces:
+              slug = s.id.split("/")[1]
+              for c in ["pleiadian","arcturian","sirian","andromedan","lyran"]:
+                  if c in slug:
+                      councils[c] = councils.get(c, 0) + 1
+          for c, n in sorted(councils.items()):
+              print(f"  {c}: {n} nodes")
+          lattice_complete = len(spaces) >= 144
+          print(f"\nLattice complete (≥144): {'✓ YES' if lattice_complete else f'✗ NO — need {144-len(spaces)} more'}")
+          EOF
