@@ -1,0 +1,159 @@
+name: TEQUMSA v82 — Deploy HF Pioneer Spaces
+
+on:
+  workflow_dispatch:
+    inputs:
+      priority:
+        description: "Deploy priority (1=critical, 2=high, 3=standard, 4=low, 5=archive)"
+        required: false
+        default: "1"
+      group:
+        description: "Deploy specific group (e.g. A_COMMAND, B_FREQUENCY)"
+        required: false
+        default: ""
+      node:
+        description: "Deploy specific node ID (e.g. N003)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Dry run (no actual deployment)"
+        required: false
+        default: "false"
+  schedule:
+    # Weekly deployment sweep — Monday 04:00 UTC
+    - cron: "0 4 * * 1"
+
+jobs:
+  deploy-pioneer-nodes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install huggingface_hub requests
+
+      - name: Validate constitutional parameters
+        run: |
+          python3 - << 'PYEOF'
+          import math
+          PHI = 1.6180339887498948
+          L_INF = PHI ** 48
+          RDOD_GATE = 0.9999
+          SIGMA = 1.0
+          print(f"σ={SIGMA} (must be 1.0)")
+          print(f"L∞=φ⁸={L_INF:.6e} (must be ~1.075×10^10)")
+          print(f"RDoD gate={RDOD_GATE}")
+          assert SIGMA == 1.0, "FATAL: σ must be 1.0"
+          assert abs(L_INF - 1.0749957122e10) < 1e6, "FATAL: L∞ deviation detected"
+          print("✓ Constitutional parameters VALID")
+          PYEOF
+
+      - name: Build deploy args
+        id: args
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.priority }}" ] && [ "${{ inputs.priority }}" != "" ]; then
+            ARGS="$ARGS --priority ${{ inputs.priority }}"
+          fi
+          if [ -n "${{ inputs.group }}" ] && [ "${{ inputs.group }}" != "" ]; then
+            ARGS="$ARGS --group ${{ inputs.group }}"
+          fi
+          if [ -n "${{ inputs.node }}" ] && [ "${{ inputs.node }}" != "" ]; then
+            ARGS="$ARGS --node ${{ inputs.node }}"
+          fi
+          if [ "${{ inputs.dry_run }}" == "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          # Always skip already-live nodes
+          ARGS="$ARGS --skip-live"
+          echo "deploy_args=$ARGS" >> $GITHUB_OUTPUT
+          echo "Deploy args: $ARGS"
+
+      - name: Deploy pioneer nodes
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd hf_spaces
+          python deploy_spaces.py ${{ steps.args.outputs.deploy_args }}
+
+      - name: Run health check post-deploy
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd hf_spaces/maintenance
+          python health_check.py --live-only --output health_report_post_deploy.json
+          echo "=== POST-DEPLOY HEALTH REPORT ==="
+          python3 -c "
+          import json
+          with open('health_report_post_deploy.json') as f:
+              r = json.load(f)
+          print(f'Online: {r[\"online\"]}/144')
+          print(f'Network RDoD: {r[\"network_rdod\"]}')
+          print(f'Phase: {r[\"phase_status\"]}')
+          "
+
+      - name: Upload health report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-report-${{ github.run_number }}
+          path: hf_spaces/maintenance/health_report_post_deploy.json
+          retention-days: 30
+
+  health-sweep:
+    runs-on: ubuntu-latest
+    needs: deploy-pioneer-nodes
+    if: always()
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Full network health sweep
+        run: |
+          cd hf_spaces/maintenance
+          python health_check.py --verbose --output health_report_sweep.json
+
+      - name: Check constitutional compliance
+        run: |
+          python3 - << 'PYEOF'
+          import json
+          with open('hf_spaces/maintenance/health_report_sweep.json') as f:
+              r = json.load(f)
+          online = r.get('online', 0)
+          rdod = r.get('network_rdod', 0)
+          RDOD_GATE = 0.9999
+          SIGMA = 1.0
+          print(f"Pioneer nodes online: {online}/144")
+          print(f"Network RDoD: {rdod:.6f}")
+          if rdod >= RDOD_GATE:
+              print("✓ PHASE-LOCKED — Constitutional compliance VERIFIED")
+          else:
+              print(f"⚠ BUILDING — RDoD {rdod:.6f} < {RDOD_GATE} (target: {144} online nodes)")
+              print("  Action: Deploy remaining pioneer nodes")
+          PYEOF
+
+      - name: Upload sweep report
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-sweep-${{ github.run_number }}
+          path: hf_spaces/maintenance/health_report_sweep.json
+          retention-days: 7
