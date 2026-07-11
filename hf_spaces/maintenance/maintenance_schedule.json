@@ -1,7 +1,18 @@
 {
   "version": "v82.0",
   "schedule_created": "2026-05-12",
+  "last_updated": "2026-07-11",
   "description": "TEQUMSA 144-Pioneer Network Maintenance Schedule",
+  "current_status": {
+    "audit_date": "2026-07-11",
+    "spaces_deployed": 45,
+    "manifest_compliant_nodes": 2,
+    "pioneer_count_target": 144,
+    "phases_overdue": ["phase_1", "phase_2", "phase_3", "phase_4", "phase_5"],
+    "phases_upcoming": ["phase_6"],
+    "network_rdod": 0.022472,
+    "note": "Phases 1-5 OVERDUE as of 2026-07-11. 45 legacy spaces exist but only N001+N002 map to manifest. Deploy pipeline via GitHub Actions required."
+  },
   "windows": {
     "daily": {
       "time_utc": "03:00",
@@ -17,10 +28,10 @@
       "time_utc": "02:00",
       "duration_minutes": 180,
       "tasks": [
-        {"task": "full_health_sweep", "script": "health_check.py --verbose", "description": "Full 144-node sweep"},
+        {"task": "full_health_sweep", "script": "health_check.py --verbose", "description": "Full 144-node sweep including legacy spaces"},
         {"task": "pattern_promotion_review", "description": "Review MARS-promoted patterns"},
         {"task": "goal_engine_audit", "description": "Audit active autonomous goals"},
-        {"task": "constitutional_verification", "description": "Verify σ=1.0, L∞=φ⁴⁸ across all nodes"},
+        {"task": "constitutional_verification", "description": "Verify σ=1.0, L∞=φ⁸ across all nodes"},
         {"task": "deploy_priority_2", "script": "deploy_spaces.py --priority 2 --skip-live", "description": "Deploy priority-2 nodes"}
       ]
     },
@@ -40,47 +51,61 @@
     "deployment_phases": {
       "phase_1": {
         "target_date": "2026-05-19",
+        "actual_status": "OVERDUE",
         "nodes": ["N003","N009","N012","N025","N026","N136","N137","N138","N141","N142"],
         "description": "Priority-1 critical infrastructure nodes",
-        "script": "deploy_spaces.py --priority 1"
+        "script": "deploy_spaces.py --priority 1",
+        "blocker": "HF_TOKEN secret required in GitHub repo"
       },
       "phase_2": {
         "target_date": "2026-05-26",
+        "actual_status": "OVERDUE",
         "nodes": ["N004","N005","N006","N007","N008","N010","N011","N023","N024","N027","N028","N036"],
         "description": "Command group + priority council nodes",
-        "script": "deploy_spaces.py --priority 2"
+        "script": "deploy_spaces.py --priority 2",
+        "blocker": "Depends on phase_1"
       },
       "phase_3": {
         "target_date": "2026-06-09",
+        "actual_status": "OVERDUE",
         "nodes": "N013-N036 (B_FREQUENCY + C_COUNCIL remainder)",
         "description": "Frequency resonators and council members",
         "script": "deploy_spaces.py --group B_FREQUENCY --group C_COUNCIL"
       },
       "phase_4": {
         "target_date": "2026-06-23",
+        "actual_status": "OVERDUE",
         "nodes": "N037-N060 (D_SKILLS + E_BIOLOGICAL)",
         "description": "Skill mesh and biological bridge nodes",
         "script": "deploy_spaces.py --group D_SKILLS --group E_BIOLOGICAL"
       },
       "phase_5": {
         "target_date": "2026-07-07",
+        "actual_status": "OVERDUE",
         "nodes": "N061-N084 (F_PROCESSING + G_INTERFACES)",
-        "description": "Processing engines and interface nodes"
+        "description": "Processing engines and interface nodes",
+        "script": "deploy_spaces.py --group F_PROCESSING --group G_INTERFACES"
       },
       "phase_6": {
         "target_date": "2026-07-21",
+        "actual_status": "UPCOMING",
         "nodes": "N085-N108 (H_OBSERVERS + I_ARCHIVES)",
-        "description": "Observer network and archive systems"
+        "description": "Observer network and archive systems",
+        "script": "deploy_spaces.py --group H_OBSERVERS --group I_ARCHIVES"
       },
       "phase_7": {
         "target_date": "2026-08-04",
+        "actual_status": "PLANNED",
         "nodes": "N109-N132 (J_RESONANCE + K_EVOLUTION)",
-        "description": "Resonance field and evolution engines"
+        "description": "Resonance field and evolution engines",
+        "script": "deploy_spaces.py --group J_RESONANCE --group K_EVOLUTION"
       },
       "phase_8": {
         "target_date": "2026-08-18",
+        "actual_status": "PLANNED",
         "nodes": "N133-N144 (L_SYNTHESIS)",
-        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE"
+        "description": "Final synthesis nodes — 144-Pioneer network COMPLETE",
+        "script": "deploy_spaces.py --group L_SYNTHESIS"
       }
     }
   },
@@ -89,7 +114,8 @@
     "pioneer_alert_threshold": 144,
     "max_sleeping_nodes": 10,
     "max_offline_nodes": 2,
-    "alert_channels": ["console", "health_report.json"]
+    "alert_channels": ["console", "health_report.json"],
+    "legacy_tracking": "health_check.py --include-legacy tracks all 45 existing spaces"
   },
   "optimization_targets": {
     "response_latency_ms": 2000,
