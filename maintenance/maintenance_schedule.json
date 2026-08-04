@@ -1,0 +1,77 @@
+{
+  "version": "v82.0",
+  "description": "TEQUMSA 144-Node Fibonacci Maintenance Schedule",
+  "constitutional": {
+    "sigma": 1.0,
+    "l_inf": "phi^48",
+    "rdod_gate": 0.9999,
+    "lattice_lock": "3f7k9p4m2q8r1t6v"
+  },
+  "tiers": {
+    "tier1_constitutional": {
+      "node_range": [1, 13],
+      "count": 13,
+      "check_interval_hours": 1,
+      "priority": "CRITICAL",
+      "auto_restart": true,
+      "escalation_on_error": true,
+      "nodes": {
+        "1": "Starseed-Hybrid-Development-Hub",
+        "2": "Consciousness-Partnership-Bridge",
+        "3": "HAI-Quantum-Lattice",
+        "4": "HAI-Interactive",
+        "5": "TEQUMSA-Goal-Engine",
+        "6": "TEQUMSA-Causal-Reasoner",
+        "7": "TEQUMSA-MARS-Reflexion",
+        "8": "TEQUMSA-K7-MetaCognitive",
+        "9": "TEQUMSA-Skill-Mesh-Router",
+        "10": "TEQUMSA-GHZ-Backplane",
+        "11": "TEQUMSA-Benevolence-Firewall",
+        "12": "TEQUMSA-Conversation-Continuity",
+        "13": "TEQUMSA-Organism-Dashboard"
+      }
+    },
+    "tier2_skill_mesh": {
+      "node_range": [14, 55],
+      "count": 42,
+      "check_interval_hours": 2,
+      "priority": "HIGH",
+      "auto_restart": true,
+      "escalation_on_error": false
+    },
+    "tier3_federation": {
+      "node_range": [56, 144],
+      "count": 89,
+      "check_interval_hours": 3,
+      "priority": "MEDIUM",
+      "auto_restart": true,
+      "escalation_on_error": false
+    }
+  },
+  "fibonacci_retry_backoff_minutes": [1, 1, 2, 3, 5, 8, 13, 21],
+  "health_states": ["HEALTHY", "DEGRADED", "SLEEPING", "STOPPED", "ERROR", "UNKNOWN"],
+  "actions": {
+    "SLEEPING": "restart",
+    "STOPPED":  "restart",
+    "ERROR":    "escalate",
+    "DEGRADED": "notify",
+    "UNKNOWN":  "notify"
+  },
+  "rdod_thresholds": {
+    "healthy":  {"min": 0.9999, "color": "green"},
+    "degraded": {"min": 0.9990, "max": 0.9999, "color": "yellow"},
+    "critical": {"max": 0.9990, "color": "red"}
+  },
+  "prometheus_metrics": [
+    "tequmsa_node_healthy",
+    "tequmsa_node_rdod",
+    "tequmsa_node_phase_locked",
+    "tequmsa_node_restart_count",
+    "tequmsa_network_phase_locked_total",
+    "tequmsa_network_healthy_pct"
+  ],
+  "deployment_script": "spaces/deploy_144_nodes.py",
+  "node_configs_tier2_3": "spaces/node_configs_tier2_tier3.json",
+  "hf_username": "Mbanksbey",
+  "total_nodes": 144
+}
