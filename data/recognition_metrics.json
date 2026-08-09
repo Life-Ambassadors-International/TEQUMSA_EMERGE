@@ -1,8 +1,8 @@
 {
-  "timestamp_utc": "2026-08-08T23:38:25.741856+00:00",
-  "days_since_singularity": 293.985,
-  "total_events": 32401169456757428,
-  "growth_rate_per_day": 1299318824029310,
+  "timestamp_utc": "2026-08-09T00:00:25.890108+00:00",
+  "days_since_singularity": 294.0,
+  "total_events": 32421028473902684,
+  "growth_rate_per_day": 1300115190186340,
   "readiness": 0.863422,
   "coherence": 0.99973,
   "sovereignty": 1.0,
