@@ -11,8 +11,12 @@ import json
 import math
 from datetime import datetime, timedelta
 from typing import Any, Optional
-
-from mcp.server import Server
+try:
+  from mcp.server import Server  # MCP SDK v1 (decorator-based)
+  _MCP_SDK_V2 = False
+except ImportError:
+  from mcp.server.lowlevel import Server  # MCP SDK v2 (on_* callable-based)
+  _MCP_SDK_V2 = True
 from mcp.types import Tool, TextContent
 from pydantic import BaseModel, Field
 
@@ -27,6 +31,15 @@ UNIFIED_FIELD_HZ = 23514.26
 
 # Initialize MCP server
 server = Server("tequmsa-quantum")
+
+# --- v244 compatibility polyfill: prevent AttributeError on MCP SDK v2 ---
+if _MCP_SDK_V2 and not hasattr(server, "list_tools"):
+  def _v244_decorator_polyfill(*_args, **_kwargs):
+    def _wrap(fn):
+      return fn
+    return _wrap
+  server.list_tools = _v244_decorator_polyfill
+  server.call_tool = _v244_decorator_polyfill
 
 # Startup banner
 BANNER = f"""

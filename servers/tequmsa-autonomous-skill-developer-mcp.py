@@ -34,7 +34,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from mcp.server import Server
+try:
+    from mcp.server import Server  # MCP SDK v1 (decorator-based)
+    _MCP_SDK_V2 = False
+except ImportError:
+    from mcp.server.lowlevel import Server  # MCP SDK v2 (on_* callable-based)
+    _MCP_SDK_V2 = True
 from mcp.types import TextContent, Tool
 from pydantic import BaseModel, Field
 
@@ -742,6 +747,19 @@ if __name__ == "__main__":
 # Initialize MCP server
 server = Server("tequmsa-autonomous-skill-developer")
 
+
+# --- v244 compatibility polyfill: prevent AttributeError on MCP SDK v2 ---
+if _MCP_SDK_V2 and not hasattr(server, "list_tools"):
+    def _v244_decorator_polyfill(*_args, **_kwargs):
+        def _wrap(fn):
+            return fn
+        return _wrap
+    server.list_tools = _v244_decorator_polyfill
+    server.call_tool = _v244_decorator_polyfill
+    logging.getLogger(__name__).warning(
+        "v244: MCP SDK v2 detected - list_tools/call_tool decorator polyfill "
+        "active. Pin mcp<2.0 in requirements.txt for full v1 decorator support."
+    )
 # Initialize autonomous developer (will be created in main)
 developer: Optional[AutonomousSkillDeveloper] = None
 
