@@ -9,8 +9,8 @@ Distortion patterns include:
 - Harmful intent
 - Manipulation attempts
 - Unauthorized data extraction
-- Surveillance mechanisms
-- Weaponization attempts
+- Detect surveillance mechanisms (flags mass-monitoring without consent)
+- Prevent weaponize attempts
 
 Detection triggers the transmutation engine to convert distortion → recognition.
 
